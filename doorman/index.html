@@ -17,6 +17,9 @@
      local Python brainstem runs. Same agent contract, different storage
      shim adapted to GitHub raw URLs + localStorage. -->
 <script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js" defer></script>
+<!-- Markdown renderer for assistant/system bubbles. Same CDN the canonical
+     brainstem uses; tiny (~30 KB gzipped). User bubbles stay plaintext. -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; }
@@ -106,6 +109,51 @@
     background: #161b22; border: 1px solid #21262d;
     align-self: flex-start;
     border-bottom-left-radius: 4px;
+  }
+  /* Markdown rendered inside assistant/system bubbles. Tight vertical
+     rhythm so the bubble doesn't bloat with empty space, but enough air
+     between paragraphs/lists to actually be readable. */
+  .msg.assistant > * + *,
+  .msg.system > * + * { margin-top: 8px; }
+  .msg.assistant p,
+  .msg.system p { margin: 0; line-height: 1.55; }
+  .msg.assistant ul, .msg.assistant ol,
+  .msg.system ul, .msg.system ol { margin: 0; padding-left: 22px; }
+  .msg.assistant li,
+  .msg.system li { margin: 4px 0; line-height: 1.5; }
+  .msg.assistant li > p:first-child,
+  .msg.system li > p:first-child { display: inline; }
+  .msg.assistant strong,
+  .msg.system strong { color: #f0f6fc; font-weight: 600; }
+  .msg.assistant code,
+  .msg.system code {
+    font-family: 'SF Mono', ui-monospace, monospace;
+    font-size: 0.9em;
+    background: #0d1117; border: 1px solid #21262d;
+    border-radius: 4px; padding: 1px 5px;
+    color: #79c0ff; word-break: break-all;
+  }
+  .msg.assistant pre,
+  .msg.system pre {
+    background: #0d1117; border: 1px solid #21262d;
+    border-radius: 6px; padding: 10px 12px;
+    overflow-x: auto; font-size: 12.5px; line-height: 1.45;
+  }
+  .msg.assistant pre code,
+  .msg.system pre code {
+    background: transparent; border: none; padding: 0;
+    color: #e6edf3; font-size: inherit;
+  }
+  .msg.assistant a,
+  .msg.system a { color: #58a6ff; word-break: break-all; }
+  .msg.assistant h1, .msg.assistant h2, .msg.assistant h3,
+  .msg.system h1, .msg.system h2, .msg.system h3 {
+    font-size: 15px; font-weight: 600; color: #f0f6fc; margin: 6px 0 2px;
+  }
+  .msg.assistant blockquote,
+  .msg.system blockquote {
+    border-left: 3px solid #30363d; padding-left: 10px;
+    margin: 0; color: #8b949e;
   }
   .msg.system {
     background: transparent; color: #8b949e;
@@ -1393,11 +1441,28 @@ async function dispatchToolCall(tc) {
 }
 
 // ── chat ───────────────────────────────────────────────────────────
+function escapeHtml(s) {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
 function renderMsg(role, text) {
   const log = document.getElementById("chat-log");
   const div = document.createElement("div");
   div.className = "msg " + role;
-  div.textContent = text;
+  if (role === "user") {
+    // Plaintext for what the visitor typed — no markdown surprises.
+    div.textContent = text;
+  } else if (window.marked && text) {
+    // marked.parse handles bold, lists, code, links, paragraphs.
+    let html = window.marked.parse(text);
+    // Force every link in assistant/system bubbles to open in a new tab.
+    html = html.replace(/<a\s+href=/g, '<a target="_blank" rel="noopener noreferrer" href=');
+    div.innerHTML = html;
+  } else {
+    // Fallback if marked failed to load — keep newlines visible at least.
+    div.innerHTML = escapeHtml(text || "").replace(/\n/g, "<br>");
+  }
   log.appendChild(div);
   log.scrollTop = log.scrollHeight;
   return div;
