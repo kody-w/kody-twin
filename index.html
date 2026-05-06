@@ -289,6 +289,40 @@
     font-size: 13px; padding: 12px 14px;
   }
   .row-actions button.action:hover { background: #2d333b; border-color: #484f58; }
+  /* Propose-a-skill pane — agent submission form */
+  .propose-row { margin-bottom: 12px; }
+  .propose-label {
+    display: block;
+    font-size: 11px; color: #8b949e;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-bottom: 5px;
+  }
+  .propose-hint {
+    text-transform: none; letter-spacing: 0;
+    color: #6e7681; font-size: 11px; font-weight: 400;
+  }
+  #propose-code {
+    width: 100%; min-width: 0;
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 12px; line-height: 1.5;
+    background: #0d1117; color: #e6edf3;
+    border: 1px solid #30363d; border-radius: 8px;
+    padding: 12px;
+    resize: vertical;
+  }
+  #propose-code:focus { outline: none; border-color: #1f6feb; }
+  .propose-actions {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    margin-top: 14px;
+  }
+  .propose-meta {
+    font-size: 11px; color: #8b949e; flex: 1; min-width: 240px;
+  }
+  .propose-meta code {
+    background: #0d1117; padding: 1px 5px; border-radius: 3px;
+    border: 1px solid #21262d; font-size: 10px;
+  }
+
   /* Verify panel — drop-target + per-file pass/fail readout */
   .verify-drop {
     border: 2px dashed #30363d; border-radius: 10px;
@@ -322,6 +356,35 @@
   .verify-files li.modified .v-icon { color: #f85149; }
   .verify-files li.missing .v-icon  { color: #d29922; }
   .verify-files li.unexpected .v-icon { color: #d29922; }
+  .verify-files li.unreachable .v-icon { color: #6e7681; }
+  .verify-origin {
+    background: rgba(31,111,235,0.05);
+    border: 1px solid rgba(31,111,235,0.20);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 10px 0;
+    font-size: 12px;
+  }
+  .verify-origin .origin-line {
+    display: flex; gap: 8px; align-items: center;
+    margin-bottom: 10px; flex-wrap: wrap;
+  }
+  .verify-origin .origin-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+    color: #6e7681;
+  }
+  .verify-origin .origin-link {
+    color: #58a6ff; text-decoration: none;
+  }
+  .verify-origin .origin-link:hover { text-decoration: underline; }
+  .verify-origin .origin-link code {
+    font-family: "SF Mono", Menlo, monospace; font-size: 11px;
+    background: #0d1117; padding: 1px 5px; border-radius: 3px;
+    border: 1px solid #21262d;
+  }
+  .verify-origin .origin-hint {
+    font-size: 11px; color: #8b949e; margin-top: 8px; line-height: 1.5;
+  }
 
   /* Track Record — the organism's resume. Sits between hero and actions. */
   .track-record {
@@ -763,6 +826,7 @@
   <div class="row-actions">
     <button class="action secondary" id="btn-card">🃏 Show my card</button>
     <button class="action secondary" id="btn-tether">📱 Pair with another device</button>
+    <button class="action secondary" id="btn-propose-skill" title="Submit a new agent.py to this organism via PR — the lineage evolution path.">🌱 Propose a skill</button>
     <button class="action secondary" id="btn-export-egg" title="Backup the public organism — rappid, soul, agents, public memory.">🥚 Export .egg</button>
     <button class="action secondary" id="btn-verify-egg" title="Drop in any .egg and verify nothing was modified offline.">🔬 Verify an .egg</button>
     <button class="action secondary" id="btn-publish-egg" title="Open a pre-filled submission to the public Egg Hub.">🌐 Back up to Egg Hub</button>
@@ -778,7 +842,7 @@
       </div>
       <div class="identity-row">
         <span class="identity-key">Rappid</span>
-        <span class="identity-val">30f32e1e-2455-4ef5-98af-72726bb63ebd</span>
+        <span class="identity-val">3e458660-bd06-460f-b7d7-0a1951ba5b43</span>
       </div>
       <div class="identity-row">
         <span class="identity-key">Kernel</span>
@@ -822,6 +886,37 @@
         </div>
       </div>
     </details>
+  </section>
+
+  <!-- Propose a skill — the PR-driven evolution path. The frozen kernel
+       never moves; capabilities grow via agent .py files merged into
+       the seed's /agents/. Visitor fills out the form, we open the
+       GitHub create-file URL in a new tab pre-filled with their code;
+       GitHub auto-handles fork + branch + PR for non-collaborators. -->
+  <section class="pane" id="pane-propose" hidden>
+    <h2>🌱 Propose a new skill</h2>
+    <p>The frozen kernel never changes. Capabilities grow via <code>agent.py</code> files merged into <code>/agents/</code>. If you found a pattern useful working with this organism, package it as an agent and submit it back — the operator reviews + merges; once accepted, it becomes part of the lineage.</p>
+
+    <div class="propose-row">
+      <label class="propose-label">Skill name <span class="propose-hint">(snake_case)</span></label>
+      <input type="text" id="propose-name" placeholder="e.g. fetch_weather, summarize_chat" />
+    </div>
+
+    <div class="propose-row">
+      <label class="propose-label">One-line description</label>
+      <input type="text" id="propose-desc" placeholder="What the LLM should know about when to call this." />
+    </div>
+
+    <div class="propose-row">
+      <label class="propose-label">Agent source <span class="propose-hint">(extends BasicAgent · one class · one perform())</span></label>
+      <textarea id="propose-code" rows="14" spellcheck="false"></textarea>
+    </div>
+
+    <div class="propose-actions">
+      <button class="small primary" id="btn-propose-submit">Open PR on GitHub →</button>
+      <button class="small" id="btn-propose-template">Reset to template</button>
+      <span class="propose-meta">Submits to <code id="propose-target">…</code> · GitHub forks the repo for you if you don't have push access</span>
+    </div>
   </section>
 
   <!-- Verify .egg — drop in any cartridge to check it hasn't been
@@ -895,7 +990,7 @@
 "use strict";
 
 const FD = {
-  rappid: "30f32e1e-2455-4ef5-98af-72726bb63ebd",
+  rappid: "3e458660-bd06-460f-b7d7-0a1951ba5b43",
   displayName: "Kody Wildfeuer",
   slug: "kody-twin",
   ghUser: "kody-w",
@@ -1444,6 +1539,26 @@ async function buildDoormanEgg() {
   // and the receiver knows to treat it cautiously.
   const manifestHash = await sha256Hex(_canonicalHashTable(hashes));
   const seedUrl = location.origin + location.pathname.replace(/\/?$/, "/");
+
+  // Capture the live origin commit SHA so the egg points at a real
+  // point in the public repo's history. At verify time the receiver
+  // can re-fetch each file at THAT exact SHA and recompute the hashes
+  // — if matching, the egg is provably canonical with public state.
+  // The seed is on GitHub, so raw.githubusercontent.com IS the source.
+  let originCommit = null;
+  const oc = _ghOwnerRepo();
+  if (oc.owner && oc.repo) {
+    try {
+      const r = await fetch(`https://api.github.com/repos/${oc.owner}/${oc.repo}/commits?per_page=1`, {
+        headers: { Accept: "application/vnd.github+json" },
+      });
+      if (r.ok) {
+        const arr = await r.json();
+        if (Array.isArray(arr) && arr[0] && arr[0].sha) originCommit = arr[0].sha;
+      }
+    } catch (_) {}
+  }
+
   const provenance = {
     schema: "rapp-egg-provenance/1.0",
     scheme: "sha256",
@@ -1451,6 +1566,9 @@ async function buildDoormanEgg() {
     manifest_hash: manifestHash,
     origin_url: seedUrl,
     origin_repo: rappidObj.github || null,
+    origin_commit_sha: originCommit,
+    origin_owner: oc.owner || null,
+    origin_repo_name: oc.repo || null,
     sealed_at: new Date().toISOString(),
     sealed_by_rappid: rappidObj.rappid || null,
   };
@@ -1514,6 +1632,116 @@ async function exportDoormanEgg() {
 // + the URL where the live egg can be downloaded already filled in.
 // The hub maintainer (or anyone with push) closes the loop by
 // committing the egg + sidecar from that URL.
+
+// ── Propose a skill (the lineage-evolution path) ───────────────────
+//
+// Capabilities grow via PRs of new agent .py files into /agents/. The
+// frozen kernel never changes. This pane drafts a skeleton, lets the
+// visitor fill it in, then opens GitHub's create-file URL in a new
+// tab — GitHub auto-handles fork + branch + PR for visitors who
+// don't have push access. Operator reviews on GitHub, merges if good,
+// the skill becomes part of the lineage on the next page render.
+
+function _agentTemplate(name, description, organismName) {
+  const cls = (name || "new")
+    .replace(/[^a-zA-Z0-9_]/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_|_$/g, "")
+    .replace(/(^|_)(\w)/g, (_, __, c) => c.toUpperCase()) || "New";
+  const tool = cls + "Agent";
+  return `"""
+${cls}: ${description || "<one-line description of what this skill does>"}
+
+Proposed back to ${organismName || "this organism"} on ${new Date().toISOString().slice(0, 10)}
+via the front-door 'Propose a skill' flow.
+"""
+from agents.basic_agent import BasicAgent
+
+
+class ${cls}Agent(BasicAgent):
+    metadata = {
+        "name": "${cls}",
+        "description": "${(description || "Tell the LLM when to call this tool.").replace(/"/g, '\\"')}",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                # "input_text": {"type": "string", "description": "..."},
+            },
+            "required": [],
+        },
+    }
+
+    def perform(self, **kwargs) -> str:
+        # Implementation goes here. Return a string the LLM sees.
+        return "Hello from ${cls}!"
+`;
+}
+
+function _resetProposeTemplate() {
+  const nameInput = document.getElementById("propose-name");
+  const descInput = document.getElementById("propose-desc");
+  const codeArea  = document.getElementById("propose-code");
+  if (!codeArea) return;
+  codeArea.value = _agentTemplate(
+    nameInput && nameInput.value || "",
+    descInput && descInput.value || "",
+    window.__seedDisplayName || ""
+  );
+}
+
+function showProposePane() {
+  showPane("pane-propose");
+  const target = document.getElementById("propose-target");
+  if (target) {
+    target.textContent =
+      (window.__seedRepoName ? `${window.__seedDisplayName ? "" : ""}` : "") +
+      "agents/<name>_agent.py on @" +
+      (location.host.split(".")[0]) + "/" +
+      (location.pathname.split("/").filter(Boolean)[0] || "this seed");
+  }
+  // Only seed the template if the textarea is currently empty
+  const codeArea = document.getElementById("propose-code");
+  if (codeArea && !codeArea.value.trim()) _resetProposeTemplate();
+}
+
+function submitProposedSkill() {
+  const name = (document.getElementById("propose-name").value || "").trim();
+  const desc = (document.getElementById("propose-desc").value || "").trim();
+  const code = (document.getElementById("propose-code").value || "").trim();
+  if (!name) { alert("Give the skill a name first (snake_case, no spaces)."); return; }
+  if (!code) { alert("Paste the agent source first."); return; }
+
+  // Normalize the filename — must match RAPP's auto-discovery glob:
+  // agents/*_agent.py at the seed root (flat, never nested).
+  const slug = name.toLowerCase()
+    .replace(/[^a-z0-9_]+/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_|_$/g, "");
+  const filename = slug.endsWith("_agent") ? slug + ".py" : slug + "_agent.py";
+  const path = "agents/" + filename;
+
+  // GitHub's web UI deep-link for creating a new file. If the visitor
+  // doesn't have push access, GitHub silently forks, creates a branch
+  // on the fork, and walks them through the PR flow. If they do have
+  // push, they can commit directly. Either way, the operator reviews
+  // before it lands on main.
+  const owner = location.host.split(".")[0];
+  const repo  = location.pathname.split("/").filter(Boolean)[0] || "";
+  if (!owner || !repo) { alert("Couldn't figure out the GitHub destination."); return; }
+
+  const u = new URL(`https://github.com/${owner}/${repo}/new/main`);
+  u.searchParams.set("filename", path);
+  u.searchParams.set("value", code);
+  // GitHub web UI also accepts ?message= but it caps title length;
+  // visitors can edit the commit message in the form before submitting.
+  u.searchParams.set("message", `propose new skill: ${slug}`);
+  u.searchParams.set("description", desc || `New agent proposed back to this organism via the front-door 'Propose a skill' flow.`);
+
+  // GitHub URL length limit varies but is generous. If we ever blow
+  // past it, fallback would be to surface the agent code in the pane
+  // and link to the bare /new/ page; for now the deep link is fine.
+  window.open(u.toString(), "_blank", "noopener,noreferrer");
+}
 
 // ── Egg verifier (non-GMO check) ───────────────────────────────────
 //
@@ -1626,7 +1854,118 @@ function renderVerifyResults(out) {
        <span class="v-status">${r.status}</span>
      </li>`
   ).join("");
-  wrap.innerHTML = head + (rows ? `<ul class="verify-files">${rows}</ul>` : "");
+
+  // Origin block — surfaces the public-repo anchor + a deep-verify button
+  // when the egg points at a public GitHub seed.
+  const prov = out.manifest && out.manifest.provenance;
+  let originBlock = "";
+  if (prov && prov.origin_owner && prov.origin_repo_name) {
+    const sha = prov.origin_commit_sha || "";
+    const shaShort = sha ? sha.slice(0, 8) : null;
+    const repoLabel = prov.origin_owner + "/" + prov.origin_repo_name;
+    const repoUrl = `https://github.com/${prov.origin_owner}/${prov.origin_repo_name}`;
+    const shaUrl = sha ? `${repoUrl}/commit/${sha}` : null;
+    originBlock = `
+      <div class="verify-origin">
+        <div class="origin-line">
+          <span class="origin-label">origin</span>
+          <a class="origin-link" href="${escapeHtml(repoUrl)}" target="_blank" rel="noopener">${escapeHtml(repoLabel)}</a>
+          ${shaShort ? `at <a class="origin-link" href="${escapeHtml(shaUrl)}" target="_blank" rel="noopener"><code>${escapeHtml(shaShort)}</code></a>` : "<span style='color:#8b949e'>(no commit pinned)</span>"}
+        </div>
+        ${shaShort ? `<button class="small primary" id="btn-deep-verify">🌐 Deep-verify against live repo →</button>
+        <div class="origin-hint">Refetches each file from raw.githubusercontent.com at the sealed commit and recomputes hashes. Authoritative integrity check using the public-repo source-of-truth.</div>` : ""}
+        <div id="deep-verify-results"></div>
+      </div>
+    `;
+  }
+
+  wrap.innerHTML = head + originBlock + (rows ? `<ul class="verify-files">${rows}</ul>` : "");
+  // Stash the egg's hash table so deep-verify can read it without re-unzipping
+  wrap._lastVerify = out;
+  const btn = document.getElementById("btn-deep-verify");
+  if (btn) btn.onclick = () => deepVerifyAgainstOrigin(out);
+}
+
+// Deep verify — fetch each file from the seed's public repo at the
+// EXACT sealed commit, recompute its sha256, and compare to the egg's
+// hash table. If they match, the egg is provably authentic to that
+// commit on the public repo. The public seed IS the source-of-truth;
+// only the operator can push to it. So matching hashes against
+// raw.githubusercontent.com proves authorship without ed25519.
+async function deepVerifyAgainstOrigin(out) {
+  const wrap = document.getElementById("deep-verify-results");
+  if (!wrap) return;
+  const prov = out.manifest && out.manifest.provenance;
+  if (!prov) return;
+  const owner = prov.origin_owner;
+  const repo  = prov.origin_repo_name;
+  const sha   = prov.origin_commit_sha;
+  if (!owner || !repo || !sha) {
+    wrap.innerHTML = `<div class="verify-summary partial">no origin commit pinned — can't deep-verify against public state.</div>`;
+    return;
+  }
+  wrap.innerHTML = `<div class="verify-summary partial">🌐 fetching ${escapeHtml(Object.keys(prov.file_hashes).length)} files from raw.githubusercontent.com at <code>${escapeHtml(sha.slice(0,8))}</code>…</div>`;
+
+  // Map egg paths to the seed's repo paths. The egg packs files at
+  // top-level (rappid.json, soul.md, agents/*.py, data/memory.json),
+  // but in the seed repo the public memory lives under .brainstem_data/
+  // and the doorman SEED_AGENT_BASE points elsewhere. The doorman tier
+  // egg packs match the seed root layout — straight 1:1 mapping.
+  function _eggPathToRepoPath(p) {
+    // data/memory.json (in egg) → .brainstem_data/memory.json (in seed)
+    if (p === "data/memory.json") return ".brainstem_data/memory.json";
+    // private/* paths come from the private companion repo, not this seed —
+    // skip them here. user_memories.json is a doorman-side synthesis, not
+    // a file in the public repo, so skip that too.
+    if (p.startsWith("private/")) return null;
+    if (p === "data/user_memories.json") return null;
+    return p;  // 1:1
+  }
+
+  const matches = [];
+  let ok = 0, mismatch = 0, unreachable = 0;
+  for (const [eggPath, expectedHash] of Object.entries(prov.file_hashes)) {
+    const repoPath = _eggPathToRepoPath(eggPath);
+    if (!repoPath) continue;
+    const url = `https://raw.githubusercontent.com/${owner}/${repo}/${sha}/${repoPath}`;
+    try {
+      const r = await fetch(url, { cache: "no-cache" });
+      if (!r.ok) {
+        matches.push({ path: eggPath, status: "unreachable", note: `HTTP ${r.status}` });
+        unreachable++;
+        continue;
+      }
+      const text = await r.text();
+      const actual = await sha256Hex(text);
+      if (actual === expectedHash) { matches.push({ path: eggPath, status: "ok" }); ok++; }
+      else                          { matches.push({ path: eggPath, status: "modified", actual, expected: expectedHash }); mismatch++; }
+    } catch (e) {
+      matches.push({ path: eggPath, status: "unreachable", note: e.message });
+      unreachable++;
+    }
+  }
+
+  let summary, status;
+  if (mismatch === 0 && unreachable === 0 && ok > 0) {
+    status = "ok";
+    summary = `✓ ${ok} files at <code>${owner}/${repo}@${sha.slice(0,8)}</code> match the egg's sealed hashes byte-for-byte. This egg is authentic to that commit on the public repo — only the seed's owner could have produced it.`;
+  } else if (mismatch > 0) {
+    status = "tampered";
+    summary = `✗ ${mismatch} file${mismatch === 1 ? "" : "s"} don't match the public repo at <code>${sha.slice(0,8)}</code>. Either the egg was tampered, or the seal pointed at the wrong commit.`;
+  } else {
+    status = "partial";
+    summary = `⚠ ${unreachable} file${unreachable === 1 ? "" : "s"} unreachable on raw.githubusercontent.com (commit may have been GC'd or repo gone private). ${ok} file${ok === 1 ? "" : "s"} matched.`;
+  }
+
+  const ICONS = { ok: "✓", modified: "✗", missing: "⚠", unexpected: "+", unreachable: "—" };
+  const rowsHtml = matches.map(r =>
+    `<li class="${r.status}">
+       <span class="v-icon">${ICONS[r.status] || "?"}</span>
+       <span class="v-path">${escapeHtml(r.path)}</span>
+       <span class="v-status">${r.status}${r.note ? " · " + escapeHtml(r.note) : ""}</span>
+     </li>`
+  ).join("");
+  wrap.innerHTML = `<div class="verify-summary ${status}">${summary}</div>${rowsHtml ? `<ul class="verify-files">${rowsHtml}</ul>` : ""}`;
 }
 
 async function _handleVerifyFile(file) {
@@ -1702,7 +2041,7 @@ async function copy(text) {
 // Seed metadata — read by the card derivation logic. Set from the
 // substituted placeholders below so the card can render before any
 // async fetches land.
-window.__seedRappid      = "30f32e1e-2455-4ef5-98af-72726bb63ebd";
+window.__seedRappid      = "3e458660-bd06-460f-b7d7-0a1951ba5b43";
 window.__seedDisplayName = "Kody Wildfeuer";
 window.__seedKind        = "personal";
 window.__seedRepoName    = "kody-twin";
@@ -1714,6 +2053,13 @@ document.getElementById("btn-export-egg").onclick = exportDoormanEgg;
 document.getElementById("btn-verify-egg").onclick = showVerifyPane;
 document.getElementById("btn-publish-egg").onclick = openEggHubSubmission;
 document.getElementById("btn-install").onclick = showInstall;
+document.getElementById("btn-propose-skill").onclick = showProposePane;
+document.getElementById("btn-propose-submit").onclick = submitProposedSkill;
+document.getElementById("btn-propose-template").onclick = (e) => {
+  e.preventDefault();
+  document.getElementById("propose-code").value = "";
+  _resetProposeTemplate();
+};
 
 // Verify pane: drag-drop + file picker. Both routes call the same
 // _handleVerifyFile so the verifier UI doesn't care how the file got
@@ -1846,7 +2192,7 @@ function rappidSigil(rappid, size) {
 (function renderSigil() {
   const el = document.getElementById("hero-sigil");
   if (!el) return;
-  el.innerHTML = rappidSigil("30f32e1e-2455-4ef5-98af-72726bb63ebd", 96);
+  el.innerHTML = rappidSigil("3e458660-bd06-460f-b7d7-0a1951ba5b43", 96);
 })();
 
 // ── Profile stats: memory count + age ──────────────────────────────

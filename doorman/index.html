@@ -1168,6 +1168,26 @@ async function buildAscendedEgg() {
 
   // Provenance — non-GMO integrity. Same scheme as the doorman egg.
   const manifestHash = await _doormanSha256Hex(_doormanCanonicalHashTable(hashes));
+
+  // Origin commit SHA — pin the egg to a real point in the seed's
+  // public history. The seed is at <user>.github.io/<repo>/doorman/
+  // so the public seed repo is <user>/<repo>.
+  let originCommit = null;
+  const seedHost = location.host;
+  const seedOwner = seedHost.split(".")[0];
+  const seedRepoName = location.pathname.split("/").filter(Boolean)[0] || "";
+  if (seedOwner && seedRepoName) {
+    try {
+      const r = await fetch(`https://api.github.com/repos/${seedOwner}/${seedRepoName}/commits?per_page=1`, {
+        headers: { Accept: "application/vnd.github+json" },
+      });
+      if (r.ok) {
+        const arr = await r.json();
+        if (Array.isArray(arr) && arr[0] && arr[0].sha) originCommit = arr[0].sha;
+      }
+    } catch (_) {}
+  }
+
   const provenance = {
     schema: "rapp-egg-provenance/1.0",
     scheme: "sha256",
@@ -1175,6 +1195,9 @@ async function buildAscendedEgg() {
     manifest_hash: manifestHash,
     origin_url: seedBase,
     origin_repo: rappidObj.github || null,
+    origin_commit_sha: originCommit,
+    origin_owner: seedOwner || null,
+    origin_repo_name: seedRepoName || null,
     sealed_at: new Date().toISOString(),
     sealed_by_rappid: rappidObj.rappid || null,
     sealed_by_login: viewerLogin ? "@" + viewerLogin : null,
