@@ -652,8 +652,15 @@
     transform-style: preserve-3d;
     transition: transform 0.7s cubic-bezier(.6,.1,.4,1);
     cursor: pointer;
+    /* Mouse-tracking tilt vars (RAR store.html pattern). The global
+       handler updates these on mousemove; the perspective wrap below
+       composes them with the flip so tilt + flip don't fight. */
+    --tilt-x: 0deg; --tilt-y: 0deg;
+    transform: perspective(1000px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
   }
-  .card-flipper.flipped { transform: rotateY(180deg); }
+  .card-flipper.flipped {
+    transform: perspective(1000px) rotateX(var(--tilt-x)) rotateY(calc(180deg + var(--tilt-y)));
+  }
   .card-face {
     position: absolute; inset: 0;
     backface-visibility: hidden; -webkit-backface-visibility: hidden;
@@ -706,6 +713,76 @@
   @keyframes holoShine {
     0%, 100% { background-position: 0% 50%; }
     50%      { background-position: 100% 50%; }
+  }
+  /* Mouse-tracked holo layers (RAR store.html port).
+     Each updates via --mx / --my / --angle CSS vars set on the
+     parent card by the global initHoloTilt handler. */
+  .holo-card .holo-shimmer-track {
+    position: absolute; inset: 0; z-index: 4; pointer-events: none;
+    background: radial-gradient(ellipse 60% 80% at var(--mx, 50%) var(--my, 50%),
+      rgba(255,255,255,.22) 0%, rgba(255,220,150,.10) 20%,
+      rgba(0,200,255,.06) 40%, transparent 70%);
+    opacity: 0; transition: opacity .3s ease;
+    mix-blend-mode: screen;
+  }
+  .card-flipper:hover .holo-shimmer-track { opacity: 1; }
+  .holo-card .holo-prism {
+    position: absolute; inset: 0; z-index: 2; pointer-events: none;
+    background: linear-gradient(calc(var(--angle, 0deg) + 90deg),
+      rgba(255,0,80,.0) 0%, rgba(255,0,120,.10) 12%, rgba(255,165,0,.08) 22%,
+      rgba(255,255,0,.06) 32%, rgba(0,255,100,.08) 42%, rgba(0,180,255,.10) 52%,
+      rgba(100,0,255,.08) 62%, rgba(255,0,200,.06) 72%, rgba(255,0,80,.0) 82%);
+    opacity: 0; transition: opacity .3s ease;
+    mix-blend-mode: screen;
+  }
+  .card-flipper:hover .holo-prism { opacity: 1; }
+  .holo-card .holo-fresnel {
+    position: absolute; inset: 0; z-index: 2; pointer-events: none;
+    border-radius: inherit; opacity: 0; transition: opacity .3s;
+    background: radial-gradient(ellipse at var(--mx, 50%) var(--my, 50%),
+      transparent 30%, rgba(0,255,255,.10) 60%, rgba(255,0,255,.15) 100%);
+    mix-blend-mode: screen;
+  }
+  .card-flipper:hover .holo-fresnel { opacity: 1; }
+  .holo-card .holo-scanlines {
+    position: absolute; inset: 0; z-index: 3; pointer-events: none;
+    border-radius: inherit; opacity: 0; transition: opacity .3s;
+    background: repeating-linear-gradient(0deg,
+      transparent 0px, transparent 2px,
+      rgba(0,255,255,.025) 2px, rgba(0,255,255,.025) 4px);
+    animation: holoScanScroll 4s linear infinite;
+    mix-blend-mode: screen;
+  }
+  @keyframes holoScanScroll { to { background-position-y: 200px; } }
+  .card-flipper:hover .holo-scanlines { opacity: 1; }
+  .holo-card .holo-orbit-cyan, .holo-card .holo-orbit-magenta {
+    position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    border-radius: inherit; opacity: 0; transition: opacity .3s;
+    mix-blend-mode: screen; background-size: 200% 200%;
+  }
+  .card-flipper:hover .holo-orbit-cyan,
+  .card-flipper:hover .holo-orbit-magenta { opacity: 1; }
+  .holo-card .holo-orbit-cyan {
+    background: radial-gradient(circle at 30% 30%, rgba(0,255,255,.10), transparent 50%);
+    animation: holoOrbitA 6s linear infinite;
+  }
+  .holo-card .holo-orbit-magenta {
+    background: radial-gradient(circle at 70% 70%, rgba(255,0,255,.10), transparent 50%);
+    animation: holoOrbitB 6s linear infinite;
+  }
+  @keyframes holoOrbitA {
+    0%   { background-position: 0% 0%; }
+    25%  { background-position: 100% 0%; }
+    50%  { background-position: 100% 100%; }
+    75%  { background-position: 0% 100%; }
+    100% { background-position: 0% 0%; }
+  }
+  @keyframes holoOrbitB {
+    0%   { background-position: 100% 100%; }
+    25%  { background-position: 0% 100%; }
+    50%  { background-position: 0% 0%; }
+    75%  { background-position: 100% 0%; }
+    100% { background-position: 100% 100%; }
   }
   .holo-header {
     display: flex; justify-content: space-between; align-items: flex-start;
@@ -790,39 +867,75 @@
     font-family: "SF Mono", Menlo, monospace;
   }
 
-  /* Card back (QR + invitation) */
+  /* Card back — matches RAR holo card pattern: gold-on-dark, RAPP
+     brand wordmark in serif, QR centered, content-hash caption,
+     display name, two action buttons (Open / 💬 Summon). */
   .card-back-frame {
     position: absolute; inset: 0;
     border-radius: 18px;
     border: 3px solid #c9a84c;
-    background: linear-gradient(160deg, #1c2230 0%, #11161e 50%, #1a1f29 100%);
+    background: linear-gradient(160deg, #2a2418 0%, #1a1510 40%, #1f1a12 100%);
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    text-align: center; padding: 24px;
-    color: #c9d1d9;
+    text-align: center; padding: 22px;
+    color: #d8c8a8; gap: 10px;
   }
-  .card-back-title {
-    font-size: 22px; font-weight: 700;
+  .card-back-brand {
     font-family: "Cinzel", Georgia, serif;
-    color: #f0e6d0; margin-bottom: 6px;
-    letter-spacing: -0.01em;
-  }
-  .card-back-sub {
-    font-size: 12px; color: #8b949e; margin-bottom: 18px;
+    font-size: 22px; font-weight: 700;
+    letter-spacing: 0.5em; padding-left: 0.5em;  /* compensate tracking */
+    color: #c9a84c;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
   }
   .card-back-qr {
-    width: 220px; height: 220px;
-    background: white; padding: 10px; border-radius: 10px;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.4);
+    width: 200px; height: 200px;
+    background: white; padding: 9px; border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.45);
+    border: 2px solid #6a5a30;
   }
-  .card-back-url {
+  .card-back-caption {
+    font-size: 11px; color: #8b7332;
     font-family: "SF Mono", Menlo, monospace;
-    font-size: 10px; color: #58a6ff;
-    word-break: break-all; margin-top: 14px;
-    max-width: 100%; padding: 0 10px;
+    letter-spacing: 0.3px;
+  }
+  .card-back-caption span {
+    color: #c8a870;
+  }
+  .card-back-name {
+    font-family: "Cinzel", Georgia, serif;
+    font-size: 17px; font-weight: 700;
+    color: #f0e6d0;
+    margin-top: 2px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  }
+  .card-back-actions {
+    display: flex; gap: 8px; margin-top: 4px;
+  }
+  .card-back-btn {
+    background: rgba(40,35,20,0.7); color: #d8c8a8;
+    border: 1px solid #6a5a30;
+    padding: 6px 14px; border-radius: 6px;
+    font-size: 12px; font-weight: 600;
+    text-decoration: none;
+    font-family: "Cinzel", Georgia, serif;
+    letter-spacing: 0.3px;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .card-back-btn:hover {
+    background: rgba(60,50,28,0.9);
+    border-color: #c9a84c;
+    color: #f0e6d0;
+  }
+  .card-back-btn.primary {
+    background: rgba(201,168,76,0.18);
+    border-color: #c9a84c;
+    color: #f0e6d0;
+  }
+  .card-back-btn.primary:hover {
+    background: rgba(201,168,76,0.32);
   }
   .card-back-hint {
     font-size: 10px; color: #6e7681; font-style: italic;
-    margin-top: 14px; letter-spacing: 0.3px;
+    margin-top: 6px; letter-spacing: 0.3px;
   }
 </style>
 </head>
@@ -906,7 +1019,7 @@
       </div>
       <div class="identity-row">
         <span class="identity-key">Rappid</span>
-        <span class="identity-val">1bf22394-2629-471b-8f8d-b83ea4a3908d</span>
+        <span class="identity-val">74c4f727-d780-4316-a8dc-0eb001f962cd</span>
       </div>
       <div class="identity-row">
         <span class="identity-key">Kernel</span>
@@ -1120,6 +1233,15 @@ is unclear.</pre>
       <div class="card-face card-front">
         <div class="holo-card" id="holo-card">
           <div class="holo-shine"></div>
+          <!-- Mouse-tracking holo layers (ported from kody-w/RAR/store.html).
+               Each layer is purely visual; no JS needed beyond the global
+               tilt handler that updates --mx/--my/--angle on the parent. -->
+          <div class="holo-shimmer-track"></div>
+          <div class="holo-prism"></div>
+          <div class="holo-fresnel"></div>
+          <div class="holo-scanlines"></div>
+          <div class="holo-orbit-cyan"></div>
+          <div class="holo-orbit-magenta"></div>
           <div class="holo-header">
             <div>
               <div class="holo-name" id="card-name">Kody Wildfeuer</div>
@@ -1141,10 +1263,14 @@ is unclear.</pre>
       </div>
       <div class="card-face card-back">
         <div class="card-back-frame">
-          <h2 class="card-back-title">Scan to summon</h2>
-          <p class="card-back-sub" id="card-back-sub">Kody Wildfeuer's front door</p>
-          <img class="card-back-qr" id="card-back-qr" alt="Front-door QR">
-          <div class="card-back-url" id="card-back-url"></div>
+          <div class="card-back-brand">RAPP</div>
+          <img class="card-back-qr" id="card-back-qr" alt="Scan to summon">
+          <div class="card-back-caption">Scan to summon · <span id="card-back-hash">…</span></div>
+          <div class="card-back-name" id="card-back-name">Kody Wildfeuer</div>
+          <div class="card-back-actions">
+            <a class="card-back-btn" id="card-back-open" href="./" target="_blank" rel="noopener">Open</a>
+            <a class="card-back-btn primary" id="card-back-summon" href="./doorman/" target="_blank" rel="noopener">💬 Summon</a>
+          </div>
           <div class="card-back-hint">tap card to flip back</div>
         </div>
       </div>
@@ -1162,7 +1288,7 @@ is unclear.</pre>
 "use strict";
 
 const FD = {
-  rappid: "1bf22394-2629-471b-8f8d-b83ea4a3908d",
+  rappid: "74c4f727-d780-4316-a8dc-0eb001f962cd",
   displayName: "Kody Wildfeuer",
   slug: "kody-twin",
   ghUser: "kody-w",
@@ -1584,6 +1710,18 @@ async function _viewerIsOperator() {
   } catch (_) { return false; }
 }
 
+// Normalize an abilities array — accept both schemas:
+//   { kw, text }                              ← our internal shape
+//   { keyword, cost, text }                   ← RAR holo-card schema
+// Output: always { kw, text } so render is uniform.
+function _normalizeAbilities(arr) {
+  if (!Array.isArray(arr)) return [];
+  return arr.map(a => ({
+    kw:   String(a.kw || a.keyword || ""),
+    text: String(a.text || "") + (a.cost ? "" : ""),  // cost dropped in render for now
+  })).filter(a => a.text);
+}
+
 async function deriveCardData() {
   if (_cardData) return _cardData;
   const kind = (window.__seedKind || "mirror").toLowerCase();
@@ -1643,20 +1781,38 @@ async function deriveCardData() {
     mem_count:  memCount,
     stage,
   };
-  // Operator override — optional card.json at seed root
+  // Operator override — optional card.json at seed root.
+  // ACCEPTS the full RAR holo-card schema (rapp-egg-hub/cards/holo_cards.json)
+  // so an operator can drop a card forged by @borg/cardsmith_agent
+  // directly into their seed and it renders byte-identically. Fields:
+  //   { name, title, mana_cost, colors[], type_line, rarity, power,
+  //     toughness, abilities[{keyword,cost,text}], flavor_text,
+  //     avatar_svg, set_code, artist, agent_name, agent_types,
+  //     type_colors }
+  // Plus our existing simpler shape ({ title, type_line, rarity,
+  //   abilities[{kw,text}], flavor_text }) — both work, RAR fields
+  //   override matching kind defaults.
   try {
     const r = await fetch("card.json", { cache: "no-cache" });
     if (r.ok) {
       const o = await r.json();
-      if (o.title)      data.title      = String(o.title);
-      if (o.type_line)  data.type_line  = String(o.type_line);
-      if (o.rarity)     data.rarity     = String(o.rarity);
-      if (o.flavor_text)data.flavor     = String(o.flavor_text);
-      if (Array.isArray(o.abilities) && o.abilities.length) {
-        data.abilities = o.abilities.map(a => ({
-          kw: String(a.kw || a.keyword || ""), text: String(a.text || ""),
-        })).filter(a => a.text);
-      }
+      if (o.name)          data.name        = String(o.name);
+      if (o.title)         data.title       = String(o.title);
+      if (o.type_line)     data.type_line   = String(o.type_line);
+      if (o.rarity)        data.rarity      = String(o.rarity);
+      if (o.flavor_text)   data.flavor      = String(o.flavor_text);
+      if (typeof o.power === "number")     data.power     = Math.max(0, Math.min(99, o.power));
+      if (typeof o.toughness === "number") data.toughness = Math.max(0, Math.min(99, o.toughness));
+      // RAR mana_cost takes precedence over rappid-derived pip when present
+      if (o.mana_cost)     data.mana_cost   = String(o.mana_cost);
+      if (Array.isArray(o.colors) && o.colors.length) data.colors = o.colors.map(String);
+      // RAR's avatar_svg overrides the rappid sigil for the card art
+      if (o.avatar_svg)    data.avatar_svg  = String(o.avatar_svg);
+      if (o.set_code)      data.set_code    = String(o.set_code);
+      if (o.artist)        data.artist      = String(o.artist);
+      if (o.agent_name)    data.agent_name  = String(o.agent_name);
+      const norm = _normalizeAbilities(o.abilities);
+      if (norm.length)     data.abilities   = norm;
     }
   } catch (_) { /* no card.json — ride on the kind defaults */ }
   _cardData = data;
@@ -1691,8 +1847,11 @@ async function openCard() {
       holo.classList.add("stage-" + data.stage.name.toLowerCase());
     }
   }
-  // Sigil → art well
-  document.getElementById("card-art").innerHTML = rappidSigil(window.__seedRappid || "", 200);
+  // Sigil → art well. RAR card.json's avatar_svg (e.g. forged by
+  // @borg/cardsmith_agent) takes precedence; otherwise the rappid-
+  // derived sigil renders.
+  document.getElementById("card-art").innerHTML =
+    data.avatar_svg ? data.avatar_svg : rappidSigil(window.__seedRappid || "", 200);
   // Abilities
   const abilHtml = data.abilities.map(a =>
     `<div class="holo-ability"><span class="kw">${escapeHtml(a.kw)}</span> — ${escapeHtml(a.text)}</div>`
@@ -1700,12 +1859,22 @@ async function openCard() {
   document.getElementById("card-abilities").innerHTML = abilHtml;
   // Flavor
   document.getElementById("card-flavor").textContent = data.flavor ? `"${data.flavor}"` : "";
-  // Back: QR pointing at the front door (no ?peer, no ?card — just the URL)
+  // Back: QR pointing at the front door + 8-char rappid hash for
+  // visual-fingerprint match with RAR cards (which display first 6
+  // chars of the agent's content hash). Same idea: a stable visual
+  // identifier so two cards of the same organism are recognizable.
   const url = location.origin + location.pathname.replace(/\/?$/, "/");
   document.getElementById("card-back-qr").src =
     "https://api.qrserver.com/v1/create-qr-code/?size=440x440&margin=0&data=" + encodeURIComponent(url);
-  document.getElementById("card-back-url").textContent = url;
-  document.getElementById("card-back-sub").textContent = data.name + "'s front door";
+  const backHash = document.getElementById("card-back-hash");
+  if (backHash) backHash.textContent = (window.__seedRappid || "").slice(0, 8);
+  const backName = document.getElementById("card-back-name");
+  if (backName) backName.textContent = data.name;
+  // Back-of-card action links — match the seed's actual URLs
+  const openLink = document.getElementById("card-back-open");
+  if (openLink) openLink.href = url;
+  const summonLink = document.getElementById("card-back-summon");
+  if (summonLink) summonLink.href = url + "doorman/";
   // Show
   document.getElementById("card-flipper").classList.remove("flipped");
   document.getElementById("card-overlay").hidden = false;
@@ -2622,7 +2791,7 @@ async function copy(text) {
 // Seed metadata — read by the card derivation logic. Set from the
 // substituted placeholders below so the card can render before any
 // async fetches land.
-window.__seedRappid      = "1bf22394-2629-471b-8f8d-b83ea4a3908d";
+window.__seedRappid      = "74c4f727-d780-4316-a8dc-0eb001f962cd";
 window.__seedDisplayName = "Kody Wildfeuer";
 window.__seedKind        = "personal";
 window.__seedRepoName    = "kody-twin";
@@ -2701,6 +2870,61 @@ document.getElementById("card-flipper").addEventListener("click", (e) => {
   if (e.target.closest("a, button")) return;
   e.currentTarget.classList.toggle("flipped");
 });
+
+// ── Holo tilt + shimmer (RAR store.html port) ──────────────────────
+//
+// On mousemove anywhere over the card flipper, compute (x, y) in [0,1]
+// relative to the card and update CSS vars: --tilt-x / --tilt-y for
+// 3D rotation, --mx / --my for shimmer-track + fresnel position,
+// --angle for the prism gradient. Also touch support so the card
+// tilts when dragged on mobile. Reset on mouseleave / touchend.
+//
+// Kept off the BACK so the QR stays scan-friendly (no parallax
+// distortion when the visitor is trying to align their phone camera).
+(function initHoloTilt() {
+  const wrap = document.getElementById("card-flipper");
+  if (!wrap) return;
+  const holo = document.getElementById("holo-card");
+
+  function apply(x, y) {
+    if (wrap.classList.contains("flipped")) return reset();
+    const tiltX = ((0.5 - y) * 16).toFixed(1);   // ±8 deg vertical
+    const tiltY = ((x - 0.5) * 16).toFixed(1);   // ±8 deg horizontal
+    const angle = (Math.atan2(y - 0.5, x - 0.5) * 180 / Math.PI).toFixed(0);
+    wrap.style.setProperty("--tilt-x", tiltX + "deg");
+    wrap.style.setProperty("--tilt-y", tiltY + "deg");
+    wrap.style.transition = "transform .08s ease-out";
+    if (holo) {
+      const mxPct = (x * 100).toFixed(0) + "%";
+      const myPct = (y * 100).toFixed(0) + "%";
+      holo.style.setProperty("--mx", mxPct);
+      holo.style.setProperty("--my", myPct);
+      holo.style.setProperty("--angle", angle + "deg");
+    }
+  }
+  function reset() {
+    wrap.style.setProperty("--tilt-x", "0deg");
+    wrap.style.setProperty("--tilt-y", "0deg");
+    wrap.style.transition = "transform .4s ease-out";
+    if (holo) {
+      holo.style.removeProperty("--mx");
+      holo.style.removeProperty("--my");
+      holo.style.removeProperty("--angle");
+    }
+  }
+
+  wrap.addEventListener("mousemove", (e) => {
+    const r = wrap.getBoundingClientRect();
+    apply((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
+  });
+  wrap.addEventListener("mouseleave", reset);
+  wrap.addEventListener("touchmove", (e) => {
+    const t = e.touches[0]; if (!t) return;
+    const r = wrap.getBoundingClientRect();
+    apply((t.clientX - r.left) / r.width, (t.clientY - r.top) / r.height);
+  }, { passive: true });
+  wrap.addEventListener("touchend", reset, { passive: true });
+})();
 // Tap outside the card → close (but don't close on click of card itself)
 document.getElementById("card-overlay").addEventListener("click", (e) => {
   if (e.target.id === "card-overlay") closeCard();
@@ -2811,7 +3035,7 @@ function rappidSigil(rappid, size) {
 (function renderSigil() {
   const el = document.getElementById("hero-sigil");
   if (!el) return;
-  el.innerHTML = rappidSigil("1bf22394-2629-471b-8f8d-b83ea4a3908d", 96);
+  el.innerHTML = rappidSigil("74c4f727-d780-4316-a8dc-0eb001f962cd", 96);
 })();
 
 // ── Profile stats: memory count + age ──────────────────────────────
