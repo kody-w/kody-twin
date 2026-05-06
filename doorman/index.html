@@ -121,6 +121,44 @@
     align-self: flex-start;
     border-bottom-left-radius: 4px;
   }
+  /* Agent-call output (ported from rapp_brainstem/utils/web/index.html).
+     Shows under each assistant reply when the LLM called one or more
+     agent.py side-tools — the raw {args, output} the agent returned to
+     the LLM. Same pattern every vbrainstem in this ecosystem uses, so
+     visitors who've seen one understand the others at a glance. */
+  .agent-log { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+  .agent-log details {
+    border: 1px solid #21262d; border-radius: 6px;
+    background: rgba(13,17,23,0.6); overflow: hidden;
+  }
+  .agent-log details summary {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 10px;
+    color: #8b949e; font-size: 11px;
+    cursor: pointer; user-select: none; list-style: none;
+  }
+  .agent-log details summary::-webkit-details-marker { display: none; }
+  .agent-log details summary::before {
+    content: '›'; color: #58a6ff; font-size: 13px; line-height: 1;
+    transition: transform 0.15s; display: inline-block; width: 8px;
+  }
+  .agent-log details[open] summary::before { transform: rotate(90deg); }
+  .agent-log details:hover { border-color: #30363d; background: rgba(13,17,23,0.85); }
+  .agent-log .al-name { color: #c9d1d9; font-weight: 600; }
+  .agent-log .al-section {
+    padding: 4px 10px 2px; background: #0d1117;
+    font-size: 9px; color: #6e7681;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    border-top: 1px solid #21262d;
+  }
+  .agent-log .al-pre {
+    padding: 4px 10px 8px; background: #0d1117;
+    font-size: 10px; color: #7ee787;
+    font-family: "SF Mono", ui-monospace, monospace;
+    white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere;
+    max-height: 220px; overflow-y: auto; margin: 0;
+  }
+  .agent-log .al-pre.args { color: #79c0ff; }
   /* Markdown rendered inside assistant/system bubbles. Tight vertical
      rhythm so the bubble doesn't bloat with empty space, but enough air
      between paragraphs/lists to actually be readable. */
@@ -1942,23 +1980,49 @@ function escapeHtml(s) {
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
-function renderMsg(role, text) {
+function renderMsg(role, text, agent_logs) {
   const log = document.getElementById("chat-log");
   const div = document.createElement("div");
   div.className = "msg " + role;
+  let html;
   if (role === "user") {
     // Plaintext for what the visitor typed — no markdown surprises.
     div.textContent = text;
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+    return div;
   } else if (window.marked && text) {
-    // marked.parse handles bold, lists, code, links, paragraphs.
-    let html = window.marked.parse(text);
-    // Force every link in assistant/system bubbles to open in a new tab.
+    html = window.marked.parse(text);
     html = html.replace(/<a\s+href=/g, '<a target="_blank" rel="noopener noreferrer" href=');
-    div.innerHTML = html;
   } else {
-    // Fallback if marked failed to load — keep newlines visible at least.
-    div.innerHTML = escapeHtml(text || "").replace(/\n/g, "<br>");
+    html = escapeHtml(text || "").replace(/\n/g, "<br>");
   }
+  // Agent-call output — expandable details under the bubble showing
+  // the raw {args, output} each side-agent returned. Same pattern as
+  // the canonical brainstem so visitors recognize it.
+  let logHtml = "";
+  if (Array.isArray(agent_logs) && agent_logs.length) {
+    logHtml = `<div class="agent-log">${agent_logs.map(l => {
+      const pretty = String(l.name || "Agent").replace(/([a-z])([A-Z])/g, "$1 $2");
+      const hasArgs = l.args && Object.keys(l.args).length > 0;
+      const argsBlock = hasArgs
+        ? `<div class="al-section">args</div><pre class="al-pre args">${escapeHtml(JSON.stringify(l.args, null, 2))}</pre>`
+        : "";
+      const outStr = typeof l.output === "string" ? l.output : JSON.stringify(l.output, null, 2);
+      return `<details>
+        <summary>✨ <span class="al-name">${escapeHtml(pretty)}</span> agent called</summary>
+        ${argsBlock}
+        <div class="al-section">result</div>
+        <pre class="al-pre">${escapeHtml(outStr)}</pre>
+      </details>`;
+    }).join("")}</div>`;
+  }
+  div.innerHTML = html + logHtml;
+  // When a visitor expands a details panel the bubble grows — keep the
+  // bottom in view so they don't have to chase it.
+  div.querySelectorAll(".agent-log details").forEach(d => {
+    d.addEventListener("toggle", () => { if (d.open) { log.scrollTop = log.scrollHeight; } });
+  });
   log.appendChild(div);
   log.scrollTop = log.scrollHeight;
   return div;
@@ -2008,6 +2072,11 @@ async function sendMessage() {
   const pending = renderPending();
   const sendBtn = document.getElementById("btn-send");
   sendBtn.disabled = true;
+
+  // Capture every agent.py side-call this turn — name, args, output —
+  // so the final assistant message can render them as expandable
+  // log entries underneath. Same shape the canonical brainstem emits.
+  const agentLogs = [];
 
   try {
     // Tool-call loop: identical pattern to the local brainstem's tool
@@ -2084,7 +2153,16 @@ async function sendMessage() {
           const pretty = String(tc.function.name || "tool")
             .replace(/([a-z])([A-Z])/g, "$1 $2");
           setPendingLabel(pending, "calling " + pretty + "…");
+          // Capture args before dispatch (the call mutates state)
+          let parsedArgs = {};
+          try { parsedArgs = JSON.parse(tc.function.arguments || "{}"); } catch (_) {}
           const result = await dispatchToolCall(tc);
+          // Record for the agent-log block under the final reply
+          agentLogs.push({
+            name:   tc.function.name,
+            args:   parsedArgs,
+            output: result,
+          });
           history.push({
             role: "tool",
             tool_call_id: tc.id,
@@ -2109,10 +2187,11 @@ async function sendMessage() {
         continue; // call again — let LLM produce its final reply
       }
 
-      // No tool calls — render the final assistant reply
+      // No tool calls — render the final assistant reply with any
+      // captured agent calls expandable beneath it.
       const reply = msg.content || "(empty response)";
       pending.remove();
-      renderMsg("assistant", reply);
+      renderMsg("assistant", reply, agentLogs);
       history.push({ role: "assistant", content: reply });
       return;
     }
