@@ -842,7 +842,7 @@
       </div>
       <div class="identity-row">
         <span class="identity-key">Rappid</span>
-        <span class="identity-val">3e458660-bd06-460f-b7d7-0a1951ba5b43</span>
+        <span class="identity-val">da4ea931-52dd-46d5-8e14-3b35ba497b12</span>
       </div>
       <div class="identity-row">
         <span class="identity-key">Kernel</span>
@@ -895,7 +895,11 @@
        GitHub auto-handles fork + branch + PR for non-collaborators. -->
   <section class="pane" id="pane-propose" hidden>
     <h2>🌱 Propose a new skill</h2>
-    <p>The frozen kernel never changes. Capabilities grow via <code>agent.py</code> files merged into <code>/agents/</code>. If you found a pattern useful working with this organism, package it as an agent and submit it back — the operator reviews + merges; once accepted, it becomes part of the lineage.</p>
+    <p>The frozen kernel never changes. Capabilities grow via <code>agent.py</code> files merged into <code>/agents/</code>. If you found a pattern useful working with this organism, package it as an agent and submit it back. Two paths, your choice:</p>
+    <ul style="font-size:13px;color:#8b949e;line-height:1.6;margin:0 0 14px 18px;">
+      <li><strong>Rejoin the lineage</strong> — open a PR; if the operator merges it, your skill becomes part of this organism on every visitor's next visit.</li>
+      <li><strong>Keep it personal</strong> — leave the PR sitting on your fork, never merge it. You get the mutation as your private branch of this organism; nobody else sees it. GitHub auto-forks the repo to your account when you submit.</li>
+    </ul>
 
     <div class="propose-row">
       <label class="propose-label">Skill name <span class="propose-hint">(snake_case)</span></label>
@@ -990,7 +994,7 @@
 "use strict";
 
 const FD = {
-  rappid: "3e458660-bd06-460f-b7d7-0a1951ba5b43",
+  rappid: "da4ea931-52dd-46d5-8e14-3b35ba497b12",
   displayName: "Kody Wildfeuer",
   slug: "kody-twin",
   ghUser: "kody-w",
@@ -1546,17 +1550,59 @@ async function buildDoormanEgg() {
   // — if matching, the egg is provably canonical with public state.
   // The seed is on GitHub, so raw.githubusercontent.com IS the source.
   let originCommit = null;
+  let stateAtSeal = null;
   const oc = _ghOwnerRepo();
   if (oc.owner && oc.repo) {
+    // Snapshot the GitHub-derived signals at seal time. Once the egg
+    // is hatched on a thousand devices in parallel, each one renders
+    // its own offline resume from THIS snapshot — no need to call
+    // back to github.com. Each hatched dimension can then accumulate
+    // its own local mutations on top of the inherited starting state.
+    const [commitsRes, repoRes] = await Promise.all([
+      cachedGhJson(`https://api.github.com/repos/${oc.owner}/${oc.repo}/commits?per_page=10`),
+      cachedGhJson(`https://api.github.com/repos/${oc.owner}/${oc.repo}`),
+    ]);
+    if (Array.isArray(commitsRes.value) && commitsRes.value[0]) {
+      originCommit = commitsRes.value[0].sha || null;
+    }
+    // Compose the hatchable state — what this organism KNOWS about
+    // itself at the moment of sealing. Hatched instances start here.
+    let memSnapshot = 0;
     try {
-      const r = await fetch(`https://api.github.com/repos/${oc.owner}/${oc.repo}/commits?per_page=1`, {
-        headers: { Accept: "application/vnd.github+json" },
-      });
-      if (r.ok) {
-        const arr = await r.json();
-        if (Array.isArray(arr) && arr[0] && arr[0].sha) originCommit = arr[0].sha;
-      }
+      if (mem) { const j = JSON.parse(mem); memSnapshot = Array.isArray(j.facts) ? j.facts.length : 0; }
     } catch (_) {}
+    const ageDaysAtSeal = rappidObj.planted_at
+      ? (Date.now() - new Date(rappidObj.planted_at).getTime()) / 86400000
+      : 0;
+    const lastCommit = (Array.isArray(commitsRes.value) && commitsRes.value[0]
+      && commitsRes.value[0].commit && commitsRes.value[0].commit.author)
+      ? commitsRes.value[0].commit.author.date : null;
+    const recentCommits = (Array.isArray(commitsRes.value) ? commitsRes.value : []).slice(0, 6).map(c => ({
+      sha: c.sha,
+      message: (c.commit && c.commit.message || "").split("\n")[0].slice(0, 200),
+      date: c.commit && c.commit.author && c.commit.author.date,
+    }));
+    const forkCountSnap = (repoRes.value && repoRes.value.forks_count) || 0;
+    const mutCountSnap = recentCommits.length;
+    const act = activityStatus(lastCommit);
+    const customSkillsSnap = counts.agents > 2 ? counts.agents - 2 : 0;  // ManageMemory + ContextMemory are baseline
+    const mmrAtSeal = computeMMR({
+      memCount: memSnapshot, mutCount: mutCountSnap,
+      customSkills: customSkillsSnap, ageDays: ageDaysAtSeal,
+      forkCount: forkCountSnap, activityFactor: act.factor,
+    });
+    stateAtSeal = {
+      schema: "rapp-organism-state/1.0",
+      mem_count: memSnapshot,
+      mutation_count: mutCountSnap,
+      fork_count: forkCountSnap,
+      custom_skill_count: customSkillsSnap,
+      age_days: Math.round(ageDaysAtSeal * 10) / 10,
+      last_commit_at: lastCommit,
+      activity_kind: act.kind,
+      mmr: mmrAtSeal,
+      recent_mutations: recentCommits,
+    };
   }
 
   const provenance = {
@@ -1571,6 +1617,7 @@ async function buildDoormanEgg() {
     origin_repo_name: oc.repo || null,
     sealed_at: new Date().toISOString(),
     sealed_by_rappid: rappidObj.rappid || null,
+    state_at_seal: stateAtSeal,
   };
 
   const manifest = {
@@ -2041,7 +2088,7 @@ async function copy(text) {
 // Seed metadata — read by the card derivation logic. Set from the
 // substituted placeholders below so the card can render before any
 // async fetches land.
-window.__seedRappid      = "3e458660-bd06-460f-b7d7-0a1951ba5b43";
+window.__seedRappid      = "da4ea931-52dd-46d5-8e14-3b35ba497b12";
 window.__seedDisplayName = "Kody Wildfeuer";
 window.__seedKind        = "personal";
 window.__seedRepoName    = "kody-twin";
@@ -2192,7 +2239,7 @@ function rappidSigil(rappid, size) {
 (function renderSigil() {
   const el = document.getElementById("hero-sigil");
   if (!el) return;
-  el.innerHTML = rappidSigil("3e458660-bd06-460f-b7d7-0a1951ba5b43", 96);
+  el.innerHTML = rappidSigil("da4ea931-52dd-46d5-8e14-3b35ba497b12", 96);
 })();
 
 // ── Profile stats: memory count + age ──────────────────────────────
@@ -2244,6 +2291,69 @@ function _ghOwnerRepo() {
   return { owner, repo };
 }
 
+// ── Local-first network cache ──────────────────────────────────────
+//
+// Every GitHub fetch the resume makes goes through this wrapper. On
+// success: the response is cached in localStorage keyed by URL plus a
+// timestamp. On network failure or no-network: return the cached
+// value if we have one, marked stale. Result: an organism on a
+// laptop in airplane mode keeps rendering its own resume from the
+// last-known state instead of going blank. The seed's own files
+// (rappid.json, memory.json, agents/*) load from the local server
+// without ever hitting the network — the cache is only for
+// public-repo enrichment that needs github.com.
+//
+// Cache TTL is generous (24h default) — better to show slightly stale
+// data than blank fields. When online the live response always wins.
+
+const _CACHE_PREFIX = "rapp_cache_v1:";
+const _CACHE_TTL_MS = 24 * 60 * 60 * 1000;  // 24h
+
+function _cacheGet(url) {
+  try {
+    const raw = localStorage.getItem(_CACHE_PREFIX + url);
+    if (!raw) return null;
+    const j = JSON.parse(raw);
+    if (!j || typeof j.t !== "number") return null;
+    return { value: j.v, fetchedAt: new Date(j.t), stale: Date.now() - j.t > _CACHE_TTL_MS };
+  } catch (_) { return null; }
+}
+function _cachePut(url, value) {
+  try {
+    localStorage.setItem(_CACHE_PREFIX + url, JSON.stringify({ t: Date.now(), v: value }));
+  } catch (_) { /* quota — fine, we just won't cache */ }
+}
+
+// Cached JSON fetch. Tries network first; falls back to cached value
+// on network or HTTP error. Returns { value, source: 'live'|'cache'|'none', stale }.
+async function cachedGhJson(url, headers) {
+  try {
+    const r = await fetch(url, { headers: headers || { Accept: "application/vnd.github+json" }, cache: "no-cache" });
+    if (r.ok) {
+      const j = await r.json();
+      _cachePut(url, j);
+      return { value: j, source: "live", stale: false };
+    }
+    // Non-2xx — fall through to cache
+  } catch (_) { /* network down — fall through */ }
+  const c = _cacheGet(url);
+  if (c) return { value: c.value, source: "cache", stale: c.stale, fetchedAt: c.fetchedAt };
+  return { value: null, source: "none", stale: true };
+}
+async function cachedGhText(url, headers) {
+  try {
+    const r = await fetch(url, { headers: headers || {}, cache: "no-cache" });
+    if (r.ok) {
+      const t = await r.text();
+      _cachePut(url, t);
+      return { value: t, source: "live", stale: false };
+    }
+  } catch (_) {}
+  const c = _cacheGet(url);
+  if (c) return { value: c.value, source: "cache", stale: c.stale, fetchedAt: c.fetchedAt };
+  return { value: null, source: "none", stale: true };
+}
+
 const SKILL_FRIENDLY = {
   manage_memory_agent:   { name: "Manage Memory",   icon: "🧠" },
   context_memory_agent:  { name: "Context Memory",  icon: "📌" },
@@ -2257,34 +2367,37 @@ async function fillSkills() {
   if (!el) return;
   const { owner, repo } = _ghOwnerRepo();
   if (!owner || !repo) { el.innerHTML = ""; return; }
-  try {
-    const r = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/agents`, {
-      headers: { Accept: "application/vnd.github+json" },
-    });
-    if (!r.ok) { el.innerHTML = ""; return; }
-    const list = await r.json();
-    if (!Array.isArray(list)) { el.innerHTML = ""; return; }
-    const skills = [];
-    for (const f of list) {
-      if (f.type !== "file" || !f.name.endsWith(".py")) continue;
-      const stem = f.name.replace(/\.py$/, "");
-      const fr = SKILL_FRIENDLY[stem];
-      if (fr === null) continue;       // base class — skip
-      if (fr) {
-        skills.push({ icon: fr.icon, label: fr.name, custom: false });
-      } else {
-        // Custom agent — operator added it post-plant. Mark it as new.
-        const friendly = stem.replace(/_agent$/, "").replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
-        skills.push({ icon: "✨", label: friendly, custom: true });
-      }
-    }
-    if (!skills.length) { el.innerHTML = '<span class="skill-chip skel">no skills loaded yet</span>'; return; }
-    el.innerHTML = skills.map(s =>
-      `<span class="skill-chip ${s.custom ? "skill-new" : ""}">${s.icon} ${escapeHtml(s.label)}</span>`
-    ).join("");
-  } catch (_) {
-    el.innerHTML = "";
+  // Local-first: cachedGhJson tries network, then localStorage cache.
+  // An organism running offline still renders its skills from the last
+  // successful sync — never goes blank.
+  const res = await cachedGhJson(`https://api.github.com/repos/${owner}/${repo}/contents/agents`);
+  const list = res.value;
+  if (!Array.isArray(list)) {
+    el.innerHTML = res.source === "none"
+      ? '<span class="skill-chip skel">offline — skills will load when network returns</span>'
+      : "";
+    return;
   }
+  const skills = [];
+  for (const f of list) {
+    if (f.type !== "file" || !f.name.endsWith(".py")) continue;
+    const stem = f.name.replace(/\.py$/, "");
+    const fr = SKILL_FRIENDLY[stem];
+    if (fr === null) continue;
+    if (fr) {
+      skills.push({ icon: fr.icon, label: fr.name, custom: false });
+    } else {
+      const friendly = stem.replace(/_agent$/, "").replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      skills.push({ icon: "✨", label: friendly, custom: true });
+    }
+  }
+  if (!skills.length) { el.innerHTML = '<span class="skill-chip skel">no skills loaded yet</span>'; return; }
+  const stalePill = (res.source === "cache" && res.stale)
+    ? `<span class="skill-chip skel" title="last synced ${res.fetchedAt ? res.fetchedAt.toLocaleString() : 'a while ago'} — offline reading from cache">📡 stale</span>`
+    : "";
+  el.innerHTML = skills.map(s =>
+    `<span class="skill-chip ${s.custom ? "skill-new" : ""}">${s.icon} ${escapeHtml(s.label)}</span>`
+  ).join("") + stalePill;
 }
 
 function fillAchievements(memCount, plantedAt, mutationCount) {
@@ -2330,30 +2443,24 @@ async function fillMutations() {
   const { owner, repo } = _ghOwnerRepo();
   const linkEl = document.getElementById("tr-history-link");
   if (linkEl && owner && repo) linkEl.href = `https://github.com/${owner}/${repo}/commits`;
-  try {
-    const r = await fetch(`https://api.github.com/repos/${owner}/${repo}/commits?per_page=6`, {
-      headers: { Accept: "application/vnd.github+json" },
-    });
-    if (!r.ok) { list.innerHTML = '<li class="skel">no mutation history yet</li>'; return { count: 0, lastDate: null }; }
-    const commits = await r.json();
-    if (!Array.isArray(commits) || !commits.length) {
-      list.innerHTML = '<li class="skel">no mutation history yet</li>';
-      return { count: 0, lastDate: null };
-    }
-    list.innerHTML = commits.slice(0, 5).map(c => {
-      const msg = (c.commit && c.commit.message || "").split("\n")[0].slice(0, 90);
-      const when = _relativeDate(c.commit && c.commit.author && c.commit.author.date);
-      return `<li><span class="mut-time">${escapeHtml(when)}</span><span class="mut-msg">${escapeHtml(msg) || '<span class="empty">(no message)</span>'}</span></li>`;
-    }).join("");
-    const lastDate = commits[0] && commits[0].commit && commits[0].commit.author && commits[0].commit.author.date;
-    // Page returns up to 6 commits per request; >= 6 means "at least 6
-    // mutations" (we'd need pagination for an exact count). Good enough
-    // for achievement gating, MMR uses sqrt-dampened so the cap is fine.
-    return { count: commits.length, lastDate: lastDate || null };
-  } catch (_) {
-    list.innerHTML = '<li class="skel">couldn\'t load history</li>';
+  // Local-first: cached GH fetch keeps the mutation log visible offline.
+  const res = await cachedGhJson(`https://api.github.com/repos/${owner}/${repo}/commits?per_page=6`);
+  const commits = res.value;
+  if (!Array.isArray(commits) || !commits.length) {
+    list.innerHTML = res.source === "none"
+      ? '<li class="skel">offline — mutation log will load when network returns</li>'
+      : '<li class="skel">no mutation history yet</li>';
     return { count: 0, lastDate: null };
   }
+  const stalePrefix = (res.source === "cache" && res.stale)
+    ? `<li class="skel" style="font-size:10px">📡 cached snapshot — last synced ${res.fetchedAt ? res.fetchedAt.toLocaleString() : 'unknown'}</li>` : "";
+  list.innerHTML = stalePrefix + commits.slice(0, 5).map(c => {
+    const msg = (c.commit && c.commit.message || "").split("\n")[0].slice(0, 90);
+    const when = _relativeDate(c.commit && c.commit.author && c.commit.author.date);
+    return `<li><span class="mut-time">${escapeHtml(when)}</span><span class="mut-msg">${escapeHtml(msg) || '<span class="empty">(no message)</span>'}</span></li>`;
+  }).join("");
+  const lastDate = commits[0] && commits[0].commit && commits[0].commit.author && commits[0].commit.author.date;
+  return { count: commits.length, lastDate: lastDate || null };
 }
 
 // Fork count = offspring. Each fork is a child organism — they boost the
@@ -2362,14 +2469,8 @@ async function fillMutations() {
 async function _forkCount() {
   const { owner, repo } = _ghOwnerRepo();
   if (!owner || !repo) return 0;
-  try {
-    const r = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
-      headers: { Accept: "application/vnd.github+json" },
-    });
-    if (!r.ok) return 0;
-    const data = await r.json();
-    return Math.max(0, data.forks_count || 0);
-  } catch (_) { return 0; }
+  const res = await cachedGhJson(`https://api.github.com/repos/${owner}/${repo}`);
+  return Math.max(0, (res.value && res.value.forks_count) || 0);
 }
 
 async function fillLineage() {
@@ -2472,54 +2573,45 @@ async function _parentLineageGift(rappidObj) {
   const m = rappidObj.parent_repo.match(/github\.com\/([^/]+)\/([^/]+?)(?:\.git)?\/?$/);
   if (!m) return null;
   const [, owner, repo] = m;
-  try {
-    const [repoR, commitsR, memR, agentsR] = await Promise.all([
-      fetch(`https://api.github.com/repos/${owner}/${repo}`),
-      fetch(`https://api.github.com/repos/${owner}/${repo}/commits?per_page=6`),
-      fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/.brainstem_data/memory.json`),
-      fetch(`https://api.github.com/repos/${owner}/${repo}/contents/agents`),
-    ]);
-    if (!repoR.ok) return null;
-    const repoJ = await repoR.json();
-    const ageDays   = repoJ.created_at ? (Date.now() - new Date(repoJ.created_at).getTime()) / 86400000 : 0;
-    const forkCount = repoJ.forks_count || 0;
-    let mutCount = 0, lastCommit = null;
-    if (commitsR.ok) {
-      const arr = await commitsR.json();
-      if (Array.isArray(arr)) {
-        mutCount = arr.length;
-        if (arr[0] && arr[0].commit && arr[0].commit.author) lastCommit = arr[0].commit.author.date;
-      }
+  // Local-first: each lookup is cache-wrapped. If we go airplane mode,
+  // the lineage gift renders from the last successful sync — the
+  // organism never forgets its parent.
+  const [repoRes, commitsRes, memRes, agentsRes] = await Promise.all([
+    cachedGhJson(`https://api.github.com/repos/${owner}/${repo}`),
+    cachedGhJson(`https://api.github.com/repos/${owner}/${repo}/commits?per_page=6`),
+    cachedGhText(`https://raw.githubusercontent.com/${owner}/${repo}/main/.brainstem_data/memory.json`),
+    cachedGhJson(`https://api.github.com/repos/${owner}/${repo}/contents/agents`),
+  ]);
+  const repoJ = repoRes.value;
+  if (!repoJ) return null;
+  const ageDays   = repoJ.created_at ? (Date.now() - new Date(repoJ.created_at).getTime()) / 86400000 : 0;
+  const forkCount = repoJ.forks_count || 0;
+  let mutCount = 0, lastCommit = null;
+  if (Array.isArray(commitsRes.value)) {
+    mutCount = commitsRes.value.length;
+    if (commitsRes.value[0] && commitsRes.value[0].commit && commitsRes.value[0].commit.author) {
+      lastCommit = commitsRes.value[0].commit.author.date;
     }
-    let memCount = 0;
-    if (memR.ok) {
-      try { const j = await memR.json(); memCount = Array.isArray(j.facts) ? j.facts.length : 0; }
-      catch (_) {}
-    }
-    let customSkills = 0;
-    if (agentsR.ok) {
-      try {
-        const arr = await agentsR.json();
-        if (Array.isArray(arr)) {
-          customSkills = arr.filter(f =>
-            f.type === "file" && f.name.endsWith(".py") &&
-            !(f.name.replace(/\.py$/, "") in SKILL_FRIENDLY)
-          ).length;
-        }
-      } catch (_) {}
-    }
-    const act = activityStatus(lastCommit);
-    const parentMMR = computeMMR({
-      memCount, mutCount, customSkills, ageDays, forkCount,
-      activityFactor: act.factor,
-    });
-    // Child inherits 30% of parent's above-baseline as the lineage gift.
-    // Tunable: too high and lineage dynasties dominate; too low and it
-    // doesn't matter who your parent is. 30% felt right in playtest
-    // — parent at 4000 → child starts at +900 (Crusader-tier from day one).
-    const gift = Math.round(Math.max(0, (parentMMR - 1000) * 0.30));
-    return { parentMMR, gift, parentRepoLabel: owner + "/" + repo };
-  } catch (_) { return null; }
+  }
+  let memCount = 0;
+  if (memRes.value) {
+    try { const j = JSON.parse(memRes.value); memCount = Array.isArray(j.facts) ? j.facts.length : 0; } catch (_) {}
+  }
+  let customSkills = 0;
+  if (Array.isArray(agentsRes.value)) {
+    customSkills = agentsRes.value.filter(f =>
+      f.type === "file" && f.name.endsWith(".py") &&
+      !(f.name.replace(/\.py$/, "") in SKILL_FRIENDLY)
+    ).length;
+  }
+  const act = activityStatus(lastCommit);
+  const parentMMR = computeMMR({
+    memCount, mutCount, customSkills, ageDays, forkCount,
+    activityFactor: act.factor,
+  });
+  // Child inherits 30% of parent's above-baseline as the lineage gift.
+  const gift = Math.round(Math.max(0, (parentMMR - 1000) * 0.30));
+  return { parentMMR, gift, parentRepoLabel: owner + "/" + repo };
 }
 
 // Calibration check — has the organism graduated from placement?
