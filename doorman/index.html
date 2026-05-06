@@ -204,9 +204,20 @@
   footer a { color: #58a6ff; text-decoration: none; }
   .typing { display: inline-flex; gap: 4px; align-items: center; }
   .typing span {
-    width: 6px; height: 6px; border-radius: 50%;
+    width: 7px; height: 7px; border-radius: 50%;
     background: #8b949e; animation: bounce 1.2s infinite;
   }
+  /* Pending-reply bubble: assistant-styled, but holds bouncing dots
+     instead of text. Smaller padding so it doesn't tower over a 3-dot
+     placeholder. */
+  .msg.assistant.pending {
+    padding: 12px 14px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .msg.assistant.pending .pending-label {
+    font-size: 11px; color: #6e7681; font-style: italic;
+  }
+  .msg.assistant.pending .pending-label:empty { display: none; }
   .typing span:nth-child(2) { animation-delay: .2s; }
   .typing span:nth-child(3) { animation-delay: .4s; }
   @keyframes bounce {
@@ -1522,6 +1533,32 @@ function renderMsg(role, text) {
   return div;
 }
 
+// Pending-reply bubble: an assistant-styled bubble with three bouncing
+// dots, dropped into the chat where the LLM's reply will eventually
+// land. The visitor sees the doorman is "thinking" instead of staring
+// at silence. Replaced (or removed) once the reply / error arrives.
+function renderPending(label) {
+  const log = document.getElementById("chat-log");
+  const div = document.createElement("div");
+  div.className = "msg assistant pending";
+  div.innerHTML =
+    `<div class="typing"><span></span><span></span><span></span></div>` +
+    (label ? `<div class="pending-label">${escapeHtml(label)}</div>` : "");
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+  return div;
+}
+function setPendingLabel(div, label) {
+  if (!div) return;
+  let el = div.querySelector(".pending-label");
+  if (!el) {
+    el = document.createElement("div");
+    el.className = "pending-label";
+    div.appendChild(el);
+  }
+  el.textContent = label || "";
+}
+
 async function sendMessage() {
   const input = document.getElementById("chat-input");
   const userMsg = input.value.trim();
@@ -1534,7 +1571,7 @@ async function sendMessage() {
   renderMsg("user", userMsg);
   history.push({ role: "user", content: userMsg });
 
-  const pending = renderMsg("system", "…");
+  const pending = renderPending();
   const sendBtn = document.getElementById("btn-send");
   sendBtn.disabled = true;
 
@@ -1608,6 +1645,11 @@ async function sendMessage() {
         });
         // Execute every tool call in this turn, append results
         for (const tc of msg.tool_calls) {
+          // Surface what the LLM is doing in the pending bubble so the
+          // visitor isn't staring at silent dots while a tool runs.
+          const pretty = String(tc.function.name || "tool")
+            .replace(/([a-z])([A-Z])/g, "$1 $2");
+          setPendingLabel(pending, "calling " + pretty + "…");
           const result = await dispatchToolCall(tc);
           history.push({
             role: "tool",
@@ -1620,6 +1662,8 @@ async function sendMessage() {
             renderMsg("system", "memory saved");
           }
         }
+        // Tools done → back to thinking while the LLM composes the reply.
+        setPendingLabel(pending, "");
         refreshIndicator();
         continue; // call again — let LLM produce its final reply
       }
