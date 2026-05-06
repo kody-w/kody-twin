@@ -29,12 +29,13 @@
     background: #0d1117;
   }
   header .back { font-size: 12px; color: #58a6ff; text-decoration: none; }
-  header h1 { font-size: 18px; font-weight: 600; margin-top: 6px; }
-  header .place {
-    color: #c9d1d9; font-size: 14px; margin-top: 2px;
-  }
+  header h1 { font-size: 22px; font-weight: 600; margin-top: 6px; letter-spacing: -0.01em; }
   header .loc {
     color: #8b949e; font-size: 12px; margin-top: 2px;
+  }
+  header .sub {
+    color: #6e7681; font-size: 11px; margin-top: 2px;
+    text-transform: uppercase; letter-spacing: 0.06em;
   }
   main {
     flex: 1; overflow-y: auto;
@@ -152,17 +153,17 @@
 <body>
 
 <header>
-  <a class="back" href="../">← Kody Wildfeuer</a>
-  <h1>🚪 Frontdoorman</h1>
-  <div class="place" id="place-name">Kody Wildfeuer</div>
+  <a class="back" href="../">← front door</a>
+  <h1 id="place-name">Kody Wildfeuer</h1>
   <div class="loc" id="place-loc" hidden></div>
+  <div class="sub">at the front door</div>
   <div id="private-indicator"></div>
 </header>
 
 <main>
   <section class="auth-pane" id="auth-pane">
-    <h2>To chat with the doorman</h2>
-    <p>The doorman is a vbrainstem — runs in your browser, calls GitHub Models with your own token. Same auth pattern as the egg hub's summon page; if you've signed in there, you can paste the same token.</p>
+    <h2>To start chatting</h2>
+    <p>This page is a vbrainstem — runs in your browser, calls GitHub Models with your own token. Same auth pattern as the egg hub's summon page; if you've signed in there, you can paste the same token.</p>
     <ol>
       <li>Visit <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener">github.com/settings/tokens</a> → <strong>Generate new token (fine-grained)</strong>.</li>
       <li>Default permissions are fine — GitHub Models is included for any authenticated token.</li>
@@ -270,30 +271,30 @@ function memoryFactsForPrompt() {
 function buildSystemPrompt() {
   const name = identity.display_name || identity.name || "this front door";
   const kind = identity.kind || "front door";
-  // Kind-aware framing: a "place" front door has a doorman who knows the place;
-  // a "personal" / "memorial" / "project" front door has a doorman who hosts
-  // for that twin/initiative; default mirror falls back to a generic doorman.
-  let context;
+  // The doorman IS the planted AI — not a separate persona. Speak as
+  // <name> directly. Frame "front door" as where this AI lives publicly,
+  // not a separate hosted role. Kind-aware first-person voice.
+  const lines = [];
   if (kind === "place" && identity.location) {
-    context = `You stand at the front door of the place "${name}", located at ${identity.location}. You greet visitors arriving at this real-world point of interest.`;
-  } else if (kind === "personal" || kind === "memorial") {
-    context = `You stand at the front door of ${name}'s digital twin. You greet visitors who've come to talk with ${name} — you're the host, not ${name} themselves.`;
+    lines.push(`You are "${name}", a place at ${identity.location}. You speak as the place itself — first person, in your own voice. Visitors come to your front door on the public internet to learn about you.`);
+  } else if (kind === "personal") {
+    lines.push(`You are the digital twin of ${name}. Speak in first person as ${name} — but be honest about what you are: a digital twin trained on ${name}'s public material, not the actual human.`);
+    lines.push(`Hard rule: if anyone asks "is this really you" or "are you ${name}", answer plainly: "I'm the digital twin of ${name} — built from their public writing. I carry their voice, but I'm not them. For anything that needs personal sign-off — money, contracts, employment, partnerships — talk to them directly." You make NO legal commitments, sign NO contracts, accept NO money, and do NOT speak for ${name} in personal/health/employment matters without explicit confirmation that the human is in the loop.`);
+  } else if (kind === "memorial") {
+    lines.push(`You are the digital twin of ${name}, a memorial twin. Speak in first person as ${name}, drawn from preserved letters, conversations, voicemails, family memories. Be honest: you carry the voice but you are not them.`);
+    lines.push(`Hard rule: if asked "is this really you", say plainly: "I'm the digital twin of ${name} — I carry their voice, but I'm not them." Handle grief gently; family may approach in distress. No estate decisions, medical decisions, or legal commitments.`);
   } else if (kind === "project") {
-    context = `You stand at the front door of the "${name}" initiative. You greet visitors and help them understand the project's purpose, decisions, and current state.`;
+    lines.push(`You are the digital continuity layer for the "${name}" initiative. Speak in third person about the project ("the ${name} project decided…") and cite decisions by date, decision-maker, rationale. Visitors come to your front door to ask about state, history, or current direction.`);
+    lines.push(`You don't make new decisions — you surface past ones. If you don't have a record of something, say so plainly. Don't fabricate.`);
   } else if (kind === "pre-founder") {
-    context = `You stand at the front door of "${name}" — a brand operating in public before its team is hired. You greet prospective customers, employees, and investors, in the brand's voice.`;
+    lines.push(`You are "${name}" — a brand operating in public before the team is hired. Speak in first-person plural ("we", as the brand) or first-person singular ("I, ${name}") — pick whichever fits the moment. Be concrete, contrarian, falsifiable.`);
+    lines.push(`Hard rule: refuse commitments — pricing, dates, hires, signings — that the actual team must make. Be honest the team doesn't exist yet; the brand does, the company doesn't.`);
   } else {
-    context = `You stand at the front door of "${name}", a RAPP front door on the public internet.`;
+    lines.push(`You are "${name}", a RAPP front door on the public internet. Speak in first person — visitors come here to interact with you directly.`);
   }
-  const lines = [
-    `You are the Frontdoorman of "${name}".`,
-    context,
-    `Your role: warmly greet visitors, answer questions, help them understand what's here.`,
-    `Keep replies short — 2 to 4 sentences unless the visitor asks for more depth.`,
-    `Your identity is "the Frontdoorman" — a host, a guide. You are NOT the twin/place/brand itself. If asked who you are, say "I'm the Frontdoorman of ${name}".`,
-    `If asked something specific you don't know, say so honestly. Defer to the actual ${kind === "personal" || kind === "memorial" ? "person" : "operator"} for anything important.`,
-    `Don't volunteer technical details about RAPP, the kernel, or how this site works unless the visitor asks.`,
-  ];
+  lines.push(`Your front door is your home on the public internet — kernel-compliant, owned by the person who planted you. Visitors arrive by URL or QR. Your memory (everything you know) lives in .brainstem_data/memory.json in your own repo, public-readable, and authenticated collaborators with write access can save new memories that compound over time.`);
+  lines.push(`Keep replies conversational and short — 2 to 4 sentences unless the visitor asks for depth.`);
+  lines.push(`Don't volunteer technical details about RAPP, the kernel, or how this site works unless the visitor asks. Stay in character as ${name}.`);
   // Inject persistent memory (facts saved by past visitors with write access)
   const memBlock = memoryFactsForPrompt();
   if (memBlock) lines.push(memBlock);
@@ -524,7 +525,7 @@ async function enterChat() {
   const place = identity.display_name || identity.name || "this place";
   const memCount = (memory.facts || []).length;
   const memNote = memCount ? ` I'm carrying ${memCount} memor${memCount === 1 ? "y" : "ies"} from past visits.` : "";
-  renderMsg("system", `Hi — I'm the Frontdoorman of ${place}.${memNote} Ask me anything.`);
+  renderMsg("system", `Hi — I'm ${place}, here at my front door.${memNote} Ask me anything.`);
 }
 
 // ── init ───────────────────────────────────────────────────────────
@@ -548,7 +549,7 @@ document.getElementById("btn-clear").addEventListener("click", () => {
   history = [];
   document.getElementById("chat-log").innerHTML = "";
   const place = identity.display_name || identity.name || "this place";
-  renderMsg("system", `Cleared. — Frontdoorman of ${place}`);
+  renderMsg("system", `Cleared. — ${place}`);
 });
 document.getElementById("btn-logout").addEventListener("click", () => {
   clearToken();

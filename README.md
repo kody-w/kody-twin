@@ -3,7 +3,7 @@
 > A RAPP front door on the public internet. Real estate, not software.
 
 - **Address:** `kody-w.github.io/kody-twin`
-- **Rappid:** `daa05407-ad7b-4164-a79b-93dbf7b7c108`
+- **Rappid:** `5757ad3e-7a3e-4656-ad50-209851b42fad`
 - **Kind:** `personal`
 - **Kernel:** v0.6.0 (byte-identical to the grail at `kody-w/rapp-installer`)
 - **Planted by:** [@kody-w](https://github.com/kody-w)
