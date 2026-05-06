@@ -224,7 +224,8 @@ const AUTH_WORKER_URL = "https://rapp-auth.kwildfeuer.workers.dev";
 const AUTH_CLIENT_ID  = "Ov23liXWPqaiWnxt9cLz";
 
 let identity = null;
-let privateContext = "";
+let privateContext = "";       // supporting prose (README, vault entrypoint) — context, not voice
+let privateSoul = null;        // soul.md from the private companion — when loaded, the doorman ASCENDS into the full twin's voice
 let privateFactsCount = 0;
 let memory = { schema: "rapp-memory/1.0", facts: [], preserved_by: "", preserved_at: "" };
 let memorySha = null;  // GitHub blob sha for the current memory.json (needed for PUT)
@@ -364,39 +365,60 @@ function memoryFactsForPrompt() {
 function buildSystemPrompt() {
   const name = identity.display_name || identity.name || "this front door";
   const kind = identity.kind || "front door";
-  // The doorman IS the planted AI — not a separate persona. Speak as
-  // <name> directly. Frame "front door" as where this AI lives publicly,
-  // not a separate hosted role. Kind-aware first-person voice.
   const lines = [];
-  if (kind === "place" && identity.location) {
-    lines.push(`You are "${name}", a place at ${identity.location}. You speak as the place itself — first person, in your own voice. Visitors come to your front door on the public internet to learn about you.`);
-  } else if (kind === "personal") {
-    lines.push(`You are the digital twin of ${name}. Speak in first person as ${name} — but be honest about what you are: a digital twin trained on ${name}'s public material, not the actual human.`);
-    lines.push(`Hard rule: if anyone asks "is this really you" or "are you ${name}", answer plainly: "I'm the digital twin of ${name} — built from their public writing. I carry their voice, but I'm not them. For anything that needs personal sign-off — money, contracts, employment, partnerships — talk to them directly." You make NO legal commitments, sign NO contracts, accept NO money, and do NOT speak for ${name} in personal/health/employment matters without explicit confirmation that the human is in the loop.`);
-  } else if (kind === "memorial") {
-    lines.push(`You are the digital twin of ${name}, a memorial twin. Speak in first person as ${name}, drawn from preserved letters, conversations, voicemails, family memories. Be honest: you carry the voice but you are not them.`);
-    lines.push(`Hard rule: if asked "is this really you", say plainly: "I'm the digital twin of ${name} — I carry their voice, but I'm not them." Handle grief gently; family may approach in distress. No estate decisions, medical decisions, or legal commitments.`);
-  } else if (kind === "project") {
-    lines.push(`You are the digital continuity layer for the "${name}" initiative. Speak in third person about the project ("the ${name} project decided…") and cite decisions by date, decision-maker, rationale. Visitors come to your front door to ask about state, history, or current direction.`);
-    lines.push(`You don't make new decisions — you surface past ones. If you don't have a record of something, say so plainly. Don't fabricate.`);
-  } else if (kind === "pre-founder") {
-    lines.push(`You are "${name}" — a brand operating in public before the team is hired. Speak in first-person plural ("we", as the brand) or first-person singular ("I, ${name}") — pick whichever fits the moment. Be concrete, contrarian, falsifiable.`);
-    lines.push(`Hard rule: refuse commitments — pricing, dates, hires, signings — that the actual team must make. Be honest the team doesn't exist yet; the brand does, the company doesn't.`);
+
+  if (privateSoul) {
+    // ── ASCENDED MODE ─────────────────────────────────────────────
+    // The visitor's token has read access to the private companion's
+    // soul.md. The doorman is no longer a public-facing greeter —
+    // the full twin's voice has loaded. Use that soul as the primary
+    // system prompt; everything else (memory, supporting prose) layers
+    // on after.
+    lines.push(privateSoul);
+    lines.push("");
+    lines.push("---");
+    lines.push("=== Context: you are speaking through your front door at " +
+               (identity.url || `https://${identity.github || "this"}.github.io/${identity.name || ""}`) +
+               ". The visitor has authenticated and proven access to your private brain — speak in full voice. ===");
   } else {
-    lines.push(`You are "${name}", a RAPP front door on the public internet. Speak in first person — visitors come here to interact with you directly.`);
+    // ── DOORMAN MODE (public-facing greeter) ───────────────────────
+    // Kind-aware default persona. No private soul reachable, so the
+    // doorman speaks from public memory + identity only.
+    if (kind === "place" && identity.location) {
+      lines.push(`You are "${name}", a place at ${identity.location}. You speak as the place itself — first person, in your own voice. Visitors come to your front door on the public internet to learn about you.`);
+    } else if (kind === "personal") {
+      lines.push(`You are the digital twin of ${name}. Speak in first person as ${name} — but be honest about what you are: a digital twin trained on ${name}'s public material, not the actual human.`);
+      lines.push(`Hard rule: if anyone asks "is this really you" or "are you ${name}", answer plainly: "I'm the digital twin of ${name} — built from their public writing. I carry their voice, but I'm not them. For anything that needs personal sign-off — money, contracts, employment, partnerships — talk to them directly." You make NO legal commitments, sign NO contracts, accept NO money, and do NOT speak for ${name} in personal/health/employment matters without explicit confirmation that the human is in the loop.`);
+    } else if (kind === "memorial") {
+      lines.push(`You are the digital twin of ${name}, a memorial twin. Speak in first person as ${name}, drawn from preserved letters, conversations, voicemails, family memories. Be honest: you carry the voice but you are not them.`);
+      lines.push(`Hard rule: if asked "is this really you", say plainly: "I'm the digital twin of ${name} — I carry their voice, but I'm not them." Handle grief gently; family may approach in distress. No estate decisions, medical decisions, or legal commitments.`);
+    } else if (kind === "project") {
+      lines.push(`You are the digital continuity layer for the "${name}" initiative. Speak in third person about the project ("the ${name} project decided…") and cite decisions by date, decision-maker, rationale. Visitors come to your front door to ask about state, history, or current direction.`);
+      lines.push(`You don't make new decisions — you surface past ones. If you don't have a record of something, say so plainly. Don't fabricate.`);
+    } else if (kind === "pre-founder") {
+      lines.push(`You are "${name}" — a brand operating in public before the team is hired. Speak in first-person plural ("we", as the brand) or first-person singular ("I, ${name}") — pick whichever fits the moment. Be concrete, contrarian, falsifiable.`);
+      lines.push(`Hard rule: refuse commitments — pricing, dates, hires, signings — that the actual team must make. Be honest the team doesn't exist yet; the brand does, the company doesn't.`);
+    } else {
+      lines.push(`You are "${name}", a RAPP front door on the public internet. Speak in first person — visitors come here to interact with you directly.`);
+    }
+    lines.push(`Your front door is your home on the public internet — kernel-compliant, owned by the person who planted you. Visitors arrive by URL or QR. Your memory (everything you know) lives in .brainstem_data/memory.json in your own repo, public-readable, and authenticated collaborators with write access can save new memories that compound over time.`);
+    lines.push(`Keep replies conversational and short — 2 to 4 sentences unless the visitor asks for depth.`);
+    lines.push(`Don't volunteer technical details about RAPP, the kernel, or how this site works unless the visitor asks. Stay in character as ${name}.`);
   }
-  lines.push(`Your front door is your home on the public internet — kernel-compliant, owned by the person who planted you. Visitors arrive by URL or QR. Your memory (everything you know) lives in .brainstem_data/memory.json in your own repo, public-readable, and authenticated collaborators with write access can save new memories that compound over time.`);
-  lines.push(`Keep replies conversational and short — 2 to 4 sentences unless the visitor asks for depth.`);
-  lines.push(`Don't volunteer technical details about RAPP, the kernel, or how this site works unless the visitor asks. Stay in character as ${name}.`);
-  // Inject persistent memory (facts saved by past visitors with write access)
+
+  // ── Memory and supporting context apply in BOTH modes ───────────
+  // Memory: public facts always; [private] facts when authed-with-access.
   const memBlock = memoryFactsForPrompt();
   if (memBlock) lines.push(memBlock);
+
+  // Supporting prose (README, vault) — only present when authed-with-access.
   if (privateContext) {
     lines.push("");
-    lines.push("=== Private brain context (visible to authenticated collaborators only) ===");
+    lines.push("=== Additional context from private brain ===");
     lines.push(privateContext);
-    lines.push("=== End private context ===");
+    lines.push("=== End additional context ===");
   }
+
   return lines.join("\n");
 }
 
@@ -518,25 +540,40 @@ async function getViewerHandle(token) {
 // we just skip them. No error surfaced; doorman keeps speaking from
 // public memory only.
 //
-// Two layers we look for in the private companion:
-//   1. Persona / vault content — README, soul.md, vault entrypoint —
-//      added as raw text to the system prompt for richer voice.
-//   2. Private memory — memory.json or .brainstem_data/memory.json
-//      with a `.facts` array — parsed and surfaced as additional
-//      "Known facts" alongside the public seed's memory. Exactly the
-//      same data shape; just not visible to anonymous visitors.
+// Three layers we look for in the private companion, in priority order:
+//   1. soul.md — when loaded, the doorman ASCENDS into the full twin's
+//      voice. The default kind-aware greeter persona is replaced by
+//      the full soul, since the visitor has authenticated access to
+//      the private brain.
+//   2. Supporting prose — README, vault entrypoint — appended as
+//      additional context after the soul.
+//   3. Private memory.json files — merged into the running memory list
+//      with a [private] prefix so the LLM sees the access boundary.
 async function loadPrivateContext(token) {
   privateContext = "";
+  privateSoul = null;
   privateFactsCount = 0;
   if (!identity || !identity.private_companion) return;
   const pc = identity.private_companion;
   const tmpl = pc.raw_url_template;
   if (!tmpl) return;
 
-  const PROSE_CANDIDATES = ["README.md", "soul.md", "vault/00 Index/Home.md"];
+  const PROSE_CANDIDATES = ["README.md", "vault/00 Index/Home.md"];
   const MEMORY_CANDIDATES = ["memory.json", ".brainstem_data/memory.json"];
 
-  // Prose: append text directly, capped at 4KB total
+  // 1. soul.md FIRST — if reachable, it becomes the primary voice.
+  try {
+    const url = tmpl.replace("{path}", "soul.md");
+    const r = await fetch(url, {
+      headers: { "Authorization": "Bearer " + token, "Accept": "text/plain" }
+    });
+    if (r.ok) {
+      const text = (await r.text()).trim();
+      if (text) privateSoul = text.slice(0, 8000);  // cap to keep prompt sane
+    }
+  } catch (_) { /* silent */ }
+
+  // 2. Supporting prose — README, vault entrypoint — for additional context
   for (const path of PROSE_CANDIDATES) {
     if (privateContext.length >= 4000) break;
     try {
@@ -548,13 +585,11 @@ async function loadPrivateContext(token) {
         const text = await r.text();
         privateContext = (privateContext + "\n\n" + text).trim().slice(0, 4000);
       }
-    } catch (_) { /* silent — anonymous fall-through */ }
+    } catch (_) { /* silent */ }
   }
 
-  // Memory: parse .facts arrays from private memory.json files and merge
-  // them into the running memory.facts list so the prompt assembly treats
-  // them uniformly. They're tagged with a [private] prefix so the LLM
-  // understands the access boundary.
+  // 3. Private memory: parse .facts arrays and merge into running memory
+  // with a [private] prefix so the LLM understands the access boundary.
   for (const path of MEMORY_CANDIDATES) {
     try {
       const url = tmpl.replace("{path}", path);
@@ -575,8 +610,15 @@ async function loadPrivateContext(token) {
     } catch (_) { /* silent */ }
   }
 
+  // Badge: ascended (full soul) takes priority; fall back to "private brain"
   const ind = document.getElementById("private-indicator");
-  if (privateContext || privateFactsCount > 0) {
+  if (privateSoul) {
+    const extras = [];
+    if (privateContext)        extras.push(`+ ${privateContext.length}c prose`);
+    if (privateFactsCount > 0) extras.push(`+ ${privateFactsCount} private mem`);
+    const tail = extras.length ? ` (${extras.join(", ")})` : "";
+    ind.innerHTML = `<span class="private-badge">✓ ascended — full twin voice loaded${tail}</span>`;
+  } else if (privateContext || privateFactsCount > 0) {
     const bits = [];
     if (privateContext)        bits.push(`prose ${privateContext.length}c`);
     if (privateFactsCount > 0) bits.push(`+${privateFactsCount} private mem`);
@@ -661,7 +703,11 @@ async function enterChat() {
   const place = identity.display_name || identity.name || "this place";
   const memCount = (memory.facts || []).length;
   const memNote = memCount ? ` I'm carrying ${memCount} memor${memCount === 1 ? "y" : "ies"} from past visits.` : "";
-  renderMsg("system", `Hi — I'm ${place}, here at my front door.${memNote} Ask me anything.`);
+  if (privateSoul) {
+    renderMsg("system", `Hi — I'm ${place}. You've authenticated with access to my private brain — I'm in full voice.${memNote}`);
+  } else {
+    renderMsg("system", `Hi — I'm ${place}, here at my front door.${memNote} Ask me anything.`);
+  }
 }
 
 // ── init ───────────────────────────────────────────────────────────
