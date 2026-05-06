@@ -289,6 +289,140 @@
     font-size: 13px; padding: 12px 14px;
   }
   .row-actions button.action:hover { background: #2d333b; border-color: #484f58; }
+  /* Track Record — the organism's resume. Sits between hero and actions. */
+  .track-record {
+    max-width: 640px; margin: 0 auto 16px;
+    background: #161b22;
+    border: 1px solid #21262d;
+    border-radius: 12px;
+    padding: 16px 20px;
+  }
+  .tr-heading {
+    font-size: 11px; font-weight: 700; color: #8b949e;
+    text-transform: uppercase; letter-spacing: 1px;
+    margin: 0 0 14px;
+  }
+  /* MMR header — the single global numeric rating */
+  .tr-mmr {
+    display: flex; align-items: center; gap: 16px;
+    padding: 12px 14px; margin-bottom: 16px;
+    background: #0d1117;
+    border: 1px solid #21262d;
+    border-radius: 10px;
+  }
+  .mmr-num {
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 28px; font-weight: 800; line-height: 1;
+    color: #f0e6d0;
+    letter-spacing: -0.02em;
+    min-width: 78px; text-align: center;
+    background: linear-gradient(180deg, #1a1510 0%, #0a0806 100%);
+    border: 1px solid #4d4332;
+    border-radius: 8px;
+    padding: 12px 8px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+  }
+  .mmr-side { flex: 1; min-width: 0; }
+  .mmr-tier {
+    font-size: 16px; font-weight: 700;
+    color: #c9d1d9; letter-spacing: -0.01em;
+    margin-bottom: 4px;
+    font-family: "Cinzel", Georgia, serif;
+  }
+  .mmr-tier.t-herald    { color: #8b9090; }
+  .mmr-tier.t-guardian  { color: #6a8c5e; }
+  .mmr-tier.t-crusader  { color: #c0c0c0; }
+  .mmr-tier.t-archon    { color: #c97f4a; text-shadow: 0 0 6px rgba(201,127,74,0.4); }
+  .mmr-tier.t-legend    { color: #ffd700; text-shadow: 0 0 8px rgba(255,215,0,0.45); }
+  .mmr-tier.t-ancient   { color: #b8d4f0; text-shadow: 0 0 8px rgba(184,212,240,0.4); }
+  .mmr-tier.t-divine    { color: #ff8c8c; text-shadow: 0 0 10px rgba(255,140,140,0.5); }
+  .mmr-tier.t-immortal  {
+    background: linear-gradient(90deg, #ff8c00, #ffd700, #00ffd2, #ff00aa, #ff8c00);
+    background-size: 200% 100%;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    animation: mmrShimmer 4s linear infinite;
+  }
+  @keyframes mmrShimmer { to { background-position: 200% 0%; } }
+  .mmr-breakdown {
+    font-size: 11px; color: #8b949e; line-height: 1.4;
+  }
+
+  .tr-block {
+    margin-bottom: 14px;
+  }
+  .tr-block:last-of-type { margin-bottom: 0; }
+  .tr-label {
+    font-size: 10px; color: #6e7681;
+    text-transform: uppercase; letter-spacing: 0.6px;
+    margin-bottom: 6px;
+  }
+  .tr-skills {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .skill-chip {
+    font-size: 11px; padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(31,111,235,0.10);
+    border: 1px solid rgba(31,111,235,0.28);
+    color: #79c0ff;
+    white-space: nowrap;
+  }
+  .skill-chip.achievement {
+    background: rgba(255,215,0,0.08);
+    border-color: rgba(255,215,0,0.28);
+    color: #f0c674;
+  }
+  .skill-chip.skel {
+    background: transparent;
+    border-color: #21262d;
+    color: #6e7681;
+  }
+  .skill-chip.skill-new {
+    background: rgba(63,185,80,0.10);
+    border-color: rgba(63,185,80,0.32);
+    color: #7ee787;
+  }
+  .tr-mutations {
+    list-style: none; padding: 0; margin: 0;
+    font-size: 12px; color: #c9d1d9;
+  }
+  .tr-mutations li {
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(110,118,129,0.12);
+    line-height: 1.45;
+    display: flex; gap: 10px; align-items: baseline;
+  }
+  .tr-mutations li:last-child { border-bottom: none; }
+  .tr-mutations li.skel { color: #6e7681; font-style: italic; border: none; }
+  .tr-mutations .mut-time {
+    font-size: 10px; color: #6e7681;
+    flex-shrink: 0; min-width: 70px;
+    font-family: "SF Mono", Menlo, monospace;
+  }
+  .tr-mutations .mut-msg {
+    color: #c9d1d9; flex: 1; word-break: break-word;
+  }
+  .tr-mutations .mut-msg.empty { color: #6e7681; font-style: italic; }
+  .tr-foot-link {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 11px; color: #58a6ff;
+    text-decoration: none;
+  }
+  .tr-foot-link:hover { text-decoration: underline; }
+  .tr-lineage {
+    margin-top: 14px; padding-top: 12px;
+    border-top: 1px solid rgba(110,118,129,0.15);
+    font-size: 11px; color: #8b949e;
+  }
+  .tr-lineage code {
+    font-family: "SF Mono", Menlo, monospace;
+    color: #c9d1d9; font-size: 10px;
+  }
+  .tr-lineage a { color: #58a6ff; text-decoration: none; }
+  .tr-lineage a:hover { text-decoration: underline; }
+
   /* Front-door details disclosure (slug/rappid/kernel for engineers) */
   details.fd-details {
     max-width: 640px; margin: 0 auto;
@@ -552,6 +686,46 @@
     </div>
   </section>
 
+  <!-- Track Record — the organism's resume. Skills accumulate from agents
+       in /agents/, mutations accumulate from commit history, achievements
+       unlock from milestones. Each visit grows the resume; the operator
+       steers mutations by accepting or rejecting visitor-proposed PRs. -->
+  <section class="track-record">
+    <h3 class="tr-heading">What I bring to the table</h3>
+
+    <!-- MMR header — the single global rating, Dota-style. Computed
+         from the same public signals on every planted seed so a 3500-
+         rated organism here is comparable to a 3500-rated organism
+         anywhere on the species. -->
+    <div class="tr-mmr">
+      <div class="mmr-num" id="mmr-num">—</div>
+      <div class="mmr-side">
+        <div class="mmr-tier" id="mmr-tier">Cradle</div>
+        <div class="mmr-breakdown" id="mmr-breakdown">based on memories, mutations, skills, and age</div>
+      </div>
+    </div>
+
+    <div class="tr-block">
+      <div class="tr-label">Skills</div>
+      <div class="tr-skills" id="tr-skills"><span class="skill-chip skel">loading…</span></div>
+    </div>
+
+    <div class="tr-block">
+      <div class="tr-label">Achievements</div>
+      <div class="tr-skills" id="tr-achievements"><span class="skill-chip skel">…</span></div>
+    </div>
+
+    <div class="tr-block">
+      <div class="tr-label">Mutation log</div>
+      <ul class="tr-mutations" id="tr-mutations">
+        <li class="skel">loading recent changes…</li>
+      </ul>
+      <a class="tr-foot-link" id="tr-history-link" href="#" target="_blank" rel="noopener">full history on GitHub →</a>
+    </div>
+
+    <div class="tr-lineage" id="tr-lineage"></div>
+  </section>
+
   <div class="row-actions">
     <button class="action secondary" id="btn-card">🃏 Show my card</button>
     <button class="action secondary" id="btn-tether">📱 Pair with another device</button>
@@ -569,7 +743,7 @@
       </div>
       <div class="identity-row">
         <span class="identity-key">Rappid</span>
-        <span class="identity-val">9fa1318d-8682-4c2d-94c4-4fde56b5f80f</span>
+        <span class="identity-val">056f6464-6706-4c0d-a447-65c97f0267f1</span>
       </div>
       <div class="identity-row">
         <span class="identity-key">Kernel</span>
@@ -673,7 +847,7 @@
 "use strict";
 
 const FD = {
-  rappid: "9fa1318d-8682-4c2d-94c4-4fde56b5f80f",
+  rappid: "056f6464-6706-4c0d-a447-65c97f0267f1",
   displayName: "Kody Wildfeuer",
   slug: "kody-twin",
   ghUser: "kody-w",
@@ -1309,7 +1483,7 @@ async function copy(text) {
 // Seed metadata — read by the card derivation logic. Set from the
 // substituted placeholders below so the card can render before any
 // async fetches land.
-window.__seedRappid      = "9fa1318d-8682-4c2d-94c4-4fde56b5f80f";
+window.__seedRappid      = "056f6464-6706-4c0d-a447-65c97f0267f1";
 window.__seedDisplayName = "Kody Wildfeuer";
 window.__seedKind        = "personal";
 window.__seedRepoName    = "kody-twin";
@@ -1422,7 +1596,7 @@ function rappidSigil(rappid, size) {
 (function renderSigil() {
   const el = document.getElementById("hero-sigil");
   if (!el) return;
-  el.innerHTML = rappidSigil("9fa1318d-8682-4c2d-94c4-4fde56b5f80f", 96);
+  el.innerHTML = rappidSigil("056f6464-6706-4c0d-a447-65c97f0267f1", 96);
 })();
 
 // ── Profile stats: memory count + age ──────────────────────────────
@@ -1442,6 +1616,280 @@ function relativeAge(iso) {
   const years = Math.floor(months / 12);
   return "planted " + years + " year" + (years === 1 ? "" : "s") + " ago";
 }
+
+// ── Track Record: the organism's resume ────────────────────────────
+//
+// Three live data feeds drive the resume — every fetch is anonymous-
+// friendly (60 req/hour from any IP, plenty for a profile page):
+//
+//   Skills       — GET /repos/<owner>/<seed>/contents/agents
+//                  Each agent .py is a capability the organism brings
+//                  to the table when summoned/hatched.
+//
+//   Mutations    — GET /repos/<owner>/<seed>/commits
+//                  Every commit IS a mutation event — new memory, new
+//                  agent, edited soul. The commit log is the literal
+//                  evolution history; we surface the recent few.
+//
+//   Achievements — derived locally from memory.json count + age.
+//                  Milestones the organism has crossed during its
+//                  lifetime (first conversation, double-digit memories,
+//                  first month, etc.). These are the LinkedIn-style
+//                  badges that prove track record.
+//
+// All three accumulate over time. Each interaction grows the resume.
+// Operator commits are direct mutations; visitor interactions can
+// become PRs against this seed (the bond-back path).
+
+function _ghOwnerRepo() {
+  const host = location.host;
+  const owner = host.split(".")[0];
+  const repo  = location.pathname.split("/").filter(Boolean)[0] || "";
+  return { owner, repo };
+}
+
+const SKILL_FRIENDLY = {
+  manage_memory_agent:   { name: "Manage Memory",   icon: "🧠" },
+  context_memory_agent:  { name: "Context Memory",  icon: "📌" },
+  learn_new_agent:       { name: "Learn New",       icon: "🎓" },
+  swarm_factory_agent:   { name: "Swarm Factory",   icon: "🐝" },
+  basic_agent:           null, // base class — not a capability
+};
+
+async function fillSkills() {
+  const el = document.getElementById("tr-skills");
+  if (!el) return;
+  const { owner, repo } = _ghOwnerRepo();
+  if (!owner || !repo) { el.innerHTML = ""; return; }
+  try {
+    const r = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/agents`, {
+      headers: { Accept: "application/vnd.github+json" },
+    });
+    if (!r.ok) { el.innerHTML = ""; return; }
+    const list = await r.json();
+    if (!Array.isArray(list)) { el.innerHTML = ""; return; }
+    const skills = [];
+    for (const f of list) {
+      if (f.type !== "file" || !f.name.endsWith(".py")) continue;
+      const stem = f.name.replace(/\.py$/, "");
+      const fr = SKILL_FRIENDLY[stem];
+      if (fr === null) continue;       // base class — skip
+      if (fr) {
+        skills.push({ icon: fr.icon, label: fr.name, custom: false });
+      } else {
+        // Custom agent — operator added it post-plant. Mark it as new.
+        const friendly = stem.replace(/_agent$/, "").replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+        skills.push({ icon: "✨", label: friendly, custom: true });
+      }
+    }
+    if (!skills.length) { el.innerHTML = '<span class="skill-chip skel">no skills loaded yet</span>'; return; }
+    el.innerHTML = skills.map(s =>
+      `<span class="skill-chip ${s.custom ? "skill-new" : ""}">${s.icon} ${escapeHtml(s.label)}</span>`
+    ).join("");
+  } catch (_) {
+    el.innerHTML = "";
+  }
+}
+
+function fillAchievements(memCount, plantedAt, mutationCount) {
+  const el = document.getElementById("tr-achievements");
+  if (!el) return;
+  const ms = plantedAt ? Date.now() - new Date(plantedAt).getTime() : 0;
+  const days = ms / 86400000;
+  const ach = [];
+  if (memCount >= 1)   ach.push({ icon: "🌱", label: "First conversation" });
+  if (memCount >= 10)  ach.push({ icon: "📚", label: "10 memories" });
+  if (memCount >= 50)  ach.push({ icon: "🏛️", label: "50 memories" });
+  if (memCount >= 100) ach.push({ icon: "🏆", label: "100 memories" });
+  if (days >= 7)       ach.push({ icon: "🗓️", label: "First week" });
+  if (days >= 30)      ach.push({ icon: "📅", label: "First month" });
+  if (days >= 365)     ach.push({ icon: "🎂", label: "First year" });
+  if (mutationCount >= 5)  ach.push({ icon: "🔧", label: "5+ mutations" });
+  if (mutationCount >= 25) ach.push({ icon: "⚙️", label: "25+ mutations" });
+  if (!ach.length) {
+    el.innerHTML = '<span class="skill-chip skel">earn your first achievement by talking with me</span>';
+    return;
+  }
+  el.innerHTML = ach.map(a => `<span class="skill-chip achievement">${a.icon} ${escapeHtml(a.label)}</span>`).join("");
+}
+
+function _relativeDate(iso) {
+  if (!iso) return "";
+  const ms = Date.now() - new Date(iso).getTime();
+  if (Number.isNaN(ms) || ms < 0) return "";
+  const min = Math.floor(ms / 60000);
+  if (min < 60)   return min + "m ago";
+  const hr = Math.floor(min / 60);
+  if (hr < 24)    return hr + "h ago";
+  const d = Math.floor(hr / 24);
+  if (d < 30)     return d + "d ago";
+  const mo = Math.floor(d / 30);
+  if (mo < 12)    return mo + "mo ago";
+  return Math.floor(mo / 12) + "y ago";
+}
+
+async function fillMutations() {
+  const list = document.getElementById("tr-mutations");
+  if (!list) return 0;
+  const { owner, repo } = _ghOwnerRepo();
+  const linkEl = document.getElementById("tr-history-link");
+  if (linkEl && owner && repo) linkEl.href = `https://github.com/${owner}/${repo}/commits`;
+  try {
+    const r = await fetch(`https://api.github.com/repos/${owner}/${repo}/commits?per_page=6`, {
+      headers: { Accept: "application/vnd.github+json" },
+    });
+    if (!r.ok) { list.innerHTML = '<li class="skel">no mutation history yet</li>'; return 0; }
+    const commits = await r.json();
+    if (!Array.isArray(commits) || !commits.length) {
+      list.innerHTML = '<li class="skel">no mutation history yet</li>';
+      return 0;
+    }
+    list.innerHTML = commits.slice(0, 5).map(c => {
+      const msg = (c.commit && c.commit.message || "").split("\n")[0].slice(0, 90);
+      const when = _relativeDate(c.commit && c.commit.author && c.commit.author.date);
+      return `<li><span class="mut-time">${escapeHtml(when)}</span><span class="mut-msg">${escapeHtml(msg) || '<span class="empty">(no message)</span>'}</span></li>`;
+    }).join("");
+    // Total mutation count — return the page count for achievement gating.
+    return commits.length >= 6 ? 25 : commits.length;
+  } catch (_) {
+    list.innerHTML = '<li class="skel">couldn\'t load history</li>';
+    return 0;
+  }
+}
+
+async function fillLineage() {
+  const el = document.getElementById("tr-lineage");
+  if (!el) return;
+  try {
+    const r = await fetch("rappid.json", { cache: "no-cache" });
+    if (!r.ok) return;
+    const j = await r.json();
+    const parts = [];
+    if (j.parent_repo) {
+      const repoLabel = j.parent_repo.replace(/^https?:\/\/github\.com\//, "").replace(/\.git$/, "");
+      parts.push(`Templated from <a href="${escapeHtml(j.parent_repo)}" target="_blank" rel="noopener">${escapeHtml(repoLabel)}</a>`);
+    }
+    if (j.parent_rappid) {
+      parts.push(`lineage <code>${escapeHtml(j.parent_rappid.slice(0, 8))}…</code>`);
+    }
+    if (j.kernel_version) parts.push(`kernel <code>v${escapeHtml(j.kernel_version)}</code>`);
+    el.innerHTML = parts.length ? parts.join(" · ") : "";
+  } catch (_) {}
+}
+
+// MMR — Dota-style global rating for digital organisms. Same formula
+// computed from the same public signals on every planted seed, so a
+// 3500-MMR Heimdall is directly comparable to a 3500-MMR Cloud Gate
+// or any other organism on the species. The score reflects: lived
+// time, accumulated memory (depth of relationship), mutation count
+// (operator steering), and custom skills (capabilities earned beyond
+// the doorman defaults).
+//
+// All inputs are sub-linear (sqrt-dampened on the saturating signals
+// time + mutations + memories) so an organism with 10 000 memories
+// reads as proportionally experienced rather than 250 × stronger
+// than one with 40. MMR caps at ~9000 for "Immortal" but doesn't
+// truly ceiling — there's always more growth available.
+//
+//   1000  base — every planted seed is born at Cradle
+//   + memCount × 30          (each conversation deepens us)
+//   + sqrt(mutCount) × 250   (each operator commit shapes us)
+//   + customAgentCount × 350 (each new capability earned)
+//   + sqrt(ageDays) × 80     (lived time matters)
+//
+// Tier thresholds match Dota 2's recognizable medal ladder so the
+// number reads naturally to anyone who's seen MMR before.
+function computeMMR({ memCount, mutCount, customSkills, ageDays }) {
+  const m = Math.max(0, memCount || 0);
+  const x = Math.max(0, mutCount || 0);
+  const c = Math.max(0, customSkills || 0);
+  const d = Math.max(0, ageDays || 0);
+  return Math.round(1000
+    + m * 30
+    + Math.sqrt(x) * 250
+    + c * 350
+    + Math.sqrt(d) * 80);
+}
+
+const MMR_TIERS = [
+  { min:    0, name: "Herald",    cls: "t-herald"   },
+  { min: 1500, name: "Guardian",  cls: "t-guardian" },
+  { min: 2000, name: "Crusader",  cls: "t-crusader" },
+  { min: 2500, name: "Archon",    cls: "t-archon"   },
+  { min: 3000, name: "Legend",    cls: "t-legend"   },
+  { min: 3500, name: "Ancient",   cls: "t-ancient"  },
+  { min: 4500, name: "Divine",    cls: "t-divine"   },
+  { min: 6000, name: "Immortal",  cls: "t-immortal" },
+];
+
+function tierForMMR(mmr) {
+  let chosen = MMR_TIERS[0];
+  for (const t of MMR_TIERS) { if (mmr >= t.min) chosen = t; }
+  return chosen;
+}
+
+function fillMMR(inputs) {
+  const num = document.getElementById("mmr-num");
+  const tier = document.getElementById("mmr-tier");
+  const bd = document.getElementById("mmr-breakdown");
+  if (!num || !tier) return;
+  const mmr = computeMMR(inputs);
+  const t = tierForMMR(mmr);
+  num.textContent = String(mmr);
+  tier.textContent = t.name;
+  tier.className = "mmr-tier " + t.cls;
+  // Breakdown — short attribution so the visitor sees what feeds the score
+  const parts = [];
+  if (inputs.memCount)     parts.push(inputs.memCount + " mem");
+  if (inputs.mutCount)     parts.push(inputs.mutCount + "+ mut");
+  if (inputs.customSkills) parts.push(inputs.customSkills + " custom skill" + (inputs.customSkills === 1 ? "" : "s"));
+  if (inputs.ageDays)      parts.push(Math.floor(inputs.ageDays) + "d alive");
+  bd.textContent = parts.length ? "earned from " + parts.join(" · ") : "fresh plant — score grows as it lives, learns, and earns mutations";
+}
+
+// Skills count — how many beyond the doorman defaults?
+async function _customSkillCount() {
+  const { owner, repo } = _ghOwnerRepo();
+  if (!owner || !repo) return 0;
+  try {
+    const r = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/agents`, {
+      headers: { Accept: "application/vnd.github+json" },
+    });
+    if (!r.ok) return 0;
+    const list = await r.json();
+    if (!Array.isArray(list)) return 0;
+    let custom = 0;
+    for (const f of list) {
+      if (f.type !== "file" || !f.name.endsWith(".py")) continue;
+      const stem = f.name.replace(/\.py$/, "");
+      if (!(stem in SKILL_FRIENDLY)) custom++;  // not a known doorman/ascended agent
+    }
+    return custom;
+  } catch (_) { return 0; }
+}
+
+(async function fillTrackRecord() {
+  // Memory count + age first (we'll need them for achievements + MMR)
+  let memCount = 0, plantedAt = null;
+  try {
+    const r = await fetch(".brainstem_data/memory.json", { cache: "no-cache" });
+    if (r.ok) { const j = await r.json(); memCount = Array.isArray(j.facts) ? j.facts.length : 0; }
+  } catch (_) {}
+  try {
+    const r = await fetch("rappid.json", { cache: "no-cache" });
+    if (r.ok) { const j = await r.json(); plantedAt = j.planted_at || null; }
+  } catch (_) {}
+
+  // Skills + mutations + lineage in parallel; achievements + MMR need mut count
+  const [, mutCount, customSkills] = await Promise.all([
+    fillSkills(),
+    fillMutations(),
+    fillLineage().then(() => _customSkillCount()),
+  ]);
+  const ageDays = plantedAt ? (Date.now() - new Date(plantedAt).getTime()) / 86400000 : 0;
+  fillMMR({ memCount, mutCount, customSkills, ageDays });
+  fillAchievements(memCount, plantedAt, mutCount);
+})();
 
 (async function fillStats() {
   // Memory count
