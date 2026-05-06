@@ -196,6 +196,14 @@
     padding: 4px 10px; font-size: 11px;
   }
   .actions button:hover { color: #c9d1d9; background: #21262d; }
+  .actions select {
+    background: #161b22; color: #c9d1d9;
+    border: 1px solid #21262d; border-radius: 4px;
+    padding: 3px 6px; font-size: 11px; cursor: pointer;
+    max-width: 200px; text-overflow: ellipsis;
+  }
+  .actions select:hover { border-color: #30363d; }
+  .actions select:focus { outline: none; border-color: #1f6feb; }
   footer {
     padding: 8px 20px;
     border-top: 1px solid #21262d;
@@ -303,6 +311,10 @@
   <div class="actions" id="chat-actions" hidden>
     <button id="btn-add-memory">+ Save a memory</button>
     <button id="btn-clear">Clear chat</button>
+    <span style="flex:1"></span>
+    <select id="model-sel" title="Pick the Copilot model the doorman runs on">
+      <option value="">loading models…</option>
+    </select>
     <button id="btn-logout">Sign out</button>
   </div>
 
@@ -488,6 +500,79 @@ async function ensureCopilotToken() {
   const fresh = s.copilotToken && Date.now() < (s.copilotExpiresAt || 0) - 60000;
   if (fresh) return s.copilotToken;
   return copilotExchange();
+}
+
+// ── Copilot model catalog ─────────────────────────────────────────
+//
+// Pulls the visitor's available Copilot models through the auth worker
+// (`/api/copilot/models`) — same path the canonical brainstem uses. The
+// list reflects what THIS visitor's Copilot subscription unlocks: GPT-4o,
+// Claude Sonnet/Opus, o-series, Gemini, etc. Filters non-chat / disabled
+// entries, sorts by friendly name, picks a sensible default.
+let availableModels = [
+  // Tiny static fallback so the dropdown isn't empty on first auth /
+  // worker hiccup. Overwritten as soon as fetchCopilotModels lands.
+  { id: "claude-sonnet-4", name: "Claude Sonnet 4" },
+  { id: "gpt-4o",          name: "GPT-4o" },
+];
+
+async function fetchCopilotModels() {
+  try {
+    const tok = await ensureCopilotToken();
+    const ep  = loadSettings().copilotEndpoint || COPILOT_DEFAULT_API;
+    const r = await fetch(
+      AUTH_WORKER_URL + "/api/copilot/models?endpoint=" + encodeURIComponent(ep),
+      { headers: { "Authorization": "Bearer " + tok } }
+    );
+    if (!r.ok) { console.warn("[doorman] /api/copilot/models", r.status); return; }
+    const d = await r.json();
+    const list = Array.isArray(d) ? d : (d.data || d.models || []);
+    const seen = new Set();
+    const out = [];
+    for (const m of list) {
+      const id = m.id || m.model || "";
+      if (!id) continue;
+      const caps = m.capabilities || {};
+      if (caps.type && caps.type !== "chat") continue;
+      if (m.model_picker_enabled === false && !id.includes("gpt-4o")) continue;
+      const friendly = m.name || (m.vendor ? `${m.vendor} · ${id}` : id);
+      if (!seen.has(id)) { seen.add(id); out.push({ id, name: friendly }); }
+    }
+    out.sort((a, b) => a.name.localeCompare(b.name));
+    if (!out.length) return;
+    availableModels = out;
+    // If the saved model isn't in the catalog (deprecated / region-gated),
+    // fall back to a strong default so chat doesn't 400.
+    const saved = loadSettings().model;
+    if (saved && !out.find(m => m.id === saved)) {
+      const def = out.find(m => /claude-sonnet-4|gpt-4o(?!-mini)/i.test(m.id)) || out[0];
+      saveSettings({ model: def.id });
+    }
+    renderModelOptions();
+    console.log(`[doorman] loaded ${out.length} Copilot models`);
+  } catch (e) {
+    console.warn("[doorman] fetchCopilotModels:", e.message);
+  }
+}
+
+function renderModelOptions() {
+  const sel = document.getElementById("model-sel");
+  if (!sel) return;
+  const saved = loadSettings().model || MODEL;
+  sel.innerHTML = "";
+  for (const m of availableModels) {
+    const o = document.createElement("option");
+    o.value = m.id; o.textContent = m.name;
+    sel.appendChild(o);
+  }
+  // If the saved choice isn't in the catalog yet, pin a placeholder so
+  // the visitor sees their pick reflected even mid-fetch.
+  if (saved && !availableModels.find(m => m.id === saved)) {
+    const o = document.createElement("option");
+    o.value = saved; o.textContent = saved + " (loading…)";
+    sel.appendChild(o);
+  }
+  sel.value = saved;
 }
 
 function activeChatUrl() {
@@ -1713,6 +1798,11 @@ async function enterChat() {
   }
   if (viewerLogin) await loadUserPrivateIssues(token);
   refreshIndicator();        // badge reflects soul + memory + agents + per-user mem
+  // Render the model dropdown with the static fallback right away so the
+  // visitor sees something selectable, then refresh asynchronously when
+  // the Copilot catalog lands.
+  renderModelOptions();
+  fetchCopilotModels().catch(() => { /* dropdown keeps its fallback */ });
   // Lazy-load Pyodide + agents (non-blocking — chat works against JS
   // tool impls in the meantime; once Pyodide finishes loading, future
   // tool calls hit the real .py implementations).
@@ -1855,6 +1945,12 @@ document.getElementById("btn-clear").addEventListener("click", () => {
 document.getElementById("btn-logout").addEventListener("click", () => {
   clearToken();
   location.reload();
+});
+document.getElementById("model-sel").addEventListener("change", (e) => {
+  const id = e.target.value;
+  if (!id) return;
+  saveSettings({ model: id });
+  renderMsg("system", "model → " + id);
 });
 // Memory UI: open / cancel / commit
 document.getElementById("btn-add-memory").addEventListener("click", () => {
