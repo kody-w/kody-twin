@@ -1597,8 +1597,8 @@ async function runCopilotSignin() {
     const link = document.getElementById("cpsignin-link");
     link.href = verification_uri;
     document.getElementById("cpsignin-step2").style.display = "block";
-    // Auto-open GitHub in a new tab so the visitor doesn't have to click
-    try { window.open(verification_uri, "_blank", "noopener,noreferrer"); } catch (_) {}
+    // No auto-open — visitor copies the code first, then clicks "Open GitHub →"
+    // themselves. Auto-opening yanked focus before they could read/copy.
     const interval = (pendingDeviceLogin?.interval || 5) * 1000;
     const expires  = pendingDeviceLogin?.expires_at || (Date.now() + 900000);
     while (Date.now() < expires && pendingDeviceLogin) {
