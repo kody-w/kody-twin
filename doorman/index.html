@@ -154,6 +154,17 @@
     font-size: 11px; color: #6e7681; text-align: center;
   }
   footer a { color: #58a6ff; text-decoration: none; }
+  .typing { display: inline-flex; gap: 4px; align-items: center; }
+  .typing span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #8b949e; animation: bounce 1.2s infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: .2s; }
+  .typing span:nth-child(3) { animation-delay: .4s; }
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-6px); }
+  }
 </style>
 </head>
 <body>
@@ -197,35 +208,26 @@
       <div style="padding:20px;">
         <div id="cpsignin-error" style="display:none;background:rgba(248,81,73,0.1);border:1px solid rgba(248,81,73,0.3);color:#f85149;padding:10px 12px;border-radius:8px;margin-bottom:14px;font-size:13px;"></div>
         <div id="cpsignin-step1">
-          <div style="text-align:center;margin-bottom:16px;">
-            <div style="display:inline-block;width:64px;height:64px;background:#1f6feb;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
-              <span style="font-size:34px;">🧠</span>
-            </div>
-            <h2 style="font-size:20px;font-weight:600;margin-top:8px;">RAPP Brainstem</h2>
-          </div>
-          <p style="font-size:13px;color:#8b949e;margin-bottom:14px;text-align:center;">Sign in with your GitHub account to use Copilot AI.</p>
+          <p style="font-size:13px;color:#8b949e;margin-bottom:14px;">Same device-code flow the local <code>brainstem.py</code> uses. Unlocks the full Copilot model catalog (Claude Sonnet/Opus, GPT-4o, o-series, Gemini, etc.) — your Copilot subscription is the engine.</p>
           <button id="cpsignin-go" style="background:#238636;border:1px solid #2ea043;color:white;border-radius:8px;padding:12px;width:100%;font-size:14px;font-weight:600;cursor:pointer;">Sign in with GitHub →</button>
-          <p style="font-size:11px;color:#6e7681;text-align:center;margin-top:12px;">Same device-code flow the local <code>brainstem.py</code> uses. Unlocks the full Copilot model catalog (Claude Sonnet/Opus, GPT-4o, o-series, Gemini, etc.). Your Copilot subscription is the engine.</p>
         </div>
         <div id="cpsignin-step2" style="display:none;">
-          <p style="font-size:13px;color:#c9d1d9;margin-bottom:10px;text-align:center;">Enter this code on GitHub:</p>
+          <p style="font-size:13px;color:#8b949e;margin-bottom:10px;">Open GitHub and enter this code:</p>
           <div style="background:#0d1117;border:1px solid #238636;border-radius:8px;padding:18px;text-align:center;margin-bottom:14px;">
             <div style="font-family:'SF Mono',monospace;font-size:32px;letter-spacing:6px;color:#3fb950;font-weight:700;" id="cpsignin-code">XXXX-XXXX</div>
-            <button id="cpsignin-copy-code" title="Copy code" style="margin-top:10px;background:#21262d;border:1px solid #30363d;color:#c9d1d9;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;">Copy code</button>
           </div>
-          <a href="#" id="cpsignin-link" target="_blank" rel="noopener" style="display:block;text-align:center;background:#1f6feb;color:white;border-radius:8px;padding:11px;text-decoration:none;font-size:14px;font-weight:500;margin-bottom:10px;">Open GitHub →</a>
-          <p style="font-size:12px;color:#6e7681;text-align:center;">If a new tab didn't open, click the link above.</p>
-          <p style="font-size:12px;color:#8b949e;text-align:center;margin-top:14px;">Waiting for authorization…</p>
+          <a href="#" id="cpsignin-link" target="_blank" rel="noopener" style="display:block;text-align:center;background:#238636;border:1px solid #2ea043;color:white;border-radius:8px;padding:12px;text-decoration:none;font-size:14px;font-weight:600;margin-bottom:14px;">Open https://github.com/login/device →</a>
+          <p style="font-size:12px;color:#6e7681;text-align:center;">
+            <span class="typing" style="vertical-align:middle;"><span></span><span></span><span></span></span>
+            waiting for you to authorize…
+          </p>
         </div>
         <div id="cpsignin-step3" style="display:none;">
-          <div style="text-align:center;padding:20px 0;">
-            <div style="font-size:48px;margin-bottom:12px;color:#3fb950;">✓</div>
-            <p style="font-size:15px;font-weight:600;color:#c9d1d9;">Signed in! Loading agents…</p>
+          <div style="text-align:center;padding:20px;">
+            <div style="font-size:48px;margin-bottom:12px;">✓</div>
+            <div style="font-size:16px;color:#3fb950;font-weight:600;">Signed in to GitHub Copilot</div>
+            <div style="font-size:12px;color:#6e7681;margin-top:6px;">Loading Copilot model catalog…</div>
           </div>
-        </div>
-        <div style="border-top:1px solid #21262d;margin-top:18px;padding-top:14px;display:flex;gap:18px;justify-content:center;font-size:12px;">
-          <a href="#" id="cpsignin-switch" style="color:#58a6ff;text-decoration:none;">🔄 Switch account</a>
-          <a href="https://github.com/marketplace/copilot" target="_blank" rel="noopener" style="color:#fb923c;text-decoration:none;">🆘 Get help</a>
         </div>
       </div>
     </div>
@@ -1627,20 +1629,6 @@ async function runCopilotSignin() {
 document.getElementById("btn-signin-github").addEventListener("click", openSigninModal);
 document.getElementById("cpsignin-go").addEventListener("click", runCopilotSignin);
 document.getElementById("cpsignin-close").addEventListener("click", closeSigninModal);
-document.getElementById("cpsignin-switch").addEventListener("click", async (e) => {
-  e.preventDefault();
-  clearAuthState();
-  pendingDeviceLogin = null;
-  await runCopilotSignin();
-});
-document.getElementById("cpsignin-copy-code").addEventListener("click", async () => {
-  const code = document.getElementById("cpsignin-code").textContent;
-  try { await navigator.clipboard.writeText(code); } catch (_) {}
-  const btn = document.getElementById("cpsignin-copy-code");
-  const orig = btn.textContent;
-  btn.textContent = "Copied ✓";
-  setTimeout(() => { btn.textContent = orig; }, 1500);
-});
 
 document.getElementById("btn-save-pat").addEventListener("click", async () => {
   const tok = document.getElementById("pat-input").value.trim();
