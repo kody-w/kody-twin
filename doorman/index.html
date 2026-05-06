@@ -215,6 +215,7 @@ const STORAGE_KEY     = "rapp_settings";  // mirrors vbrainstem (per-origin)
 
 let identity = null;
 let privateContext = "";
+let privateFactsCount = 0;
 let memory = { schema: "rapp-memory/1.0", facts: [], preserved_by: "", preserved_at: "" };
 let memorySha = null;  // GitHub blob sha for the current memory.json (needed for PUT)
 let history = [];
@@ -418,15 +419,34 @@ async function getViewerHandle(token) {
 }
 
 // ── private companion: best-effort fetch ───────────────────────────
+//
+// Silent escalation pattern. Same raw.githubusercontent.com URL shape
+// for public and private repos — private content resolves ONLY when the
+// visitor's token has read access. No access? The fetches return 404 and
+// we just skip them. No error surfaced; doorman keeps speaking from
+// public memory only.
+//
+// Two layers we look for in the private companion:
+//   1. Persona / vault content — README, soul.md, vault entrypoint —
+//      added as raw text to the system prompt for richer voice.
+//   2. Private memory — memory.json or .brainstem_data/memory.json
+//      with a `.facts` array — parsed and surfaced as additional
+//      "Known facts" alongside the public seed's memory. Exactly the
+//      same data shape; just not visible to anonymous visitors.
 async function loadPrivateContext(token) {
   privateContext = "";
+  privateFactsCount = 0;
   if (!identity || !identity.private_companion) return;
   const pc = identity.private_companion;
   const tmpl = pc.raw_url_template;
   if (!tmpl) return;
-  // Try a small set of well-known files
-  const candidates = ["README.md", "soul.md", "vault/00 Index/Home.md"];
-  for (const path of candidates) {
+
+  const PROSE_CANDIDATES = ["README.md", "soul.md", "vault/00 Index/Home.md"];
+  const MEMORY_CANDIDATES = ["memory.json", ".brainstem_data/memory.json"];
+
+  // Prose: append text directly, capped at 4KB total
+  for (const path of PROSE_CANDIDATES) {
+    if (privateContext.length >= 4000) break;
     try {
       const url = tmpl.replace("{path}", path);
       const r = await fetch(url, {
@@ -434,17 +454,41 @@ async function loadPrivateContext(token) {
       });
       if (r.ok) {
         const text = await r.text();
-        privateContext = (privateContext + "\n\n" + text).trim();
-        if (privateContext.length > 4000) {
-          privateContext = privateContext.slice(0, 4000);
-          break;
+        privateContext = (privateContext + "\n\n" + text).trim().slice(0, 4000);
+      }
+    } catch (_) { /* silent — anonymous fall-through */ }
+  }
+
+  // Memory: parse .facts arrays from private memory.json files and merge
+  // them into the running memory.facts list so the prompt assembly treats
+  // them uniformly. They're tagged with a [private] prefix so the LLM
+  // understands the access boundary.
+  for (const path of MEMORY_CANDIDATES) {
+    try {
+      const url = tmpl.replace("{path}", path);
+      const r = await fetch(url, {
+        headers: { "Authorization": "Bearer " + token, "Accept": "application/json" }
+      });
+      if (r.ok) {
+        const j = await r.json();
+        if (Array.isArray(j.facts)) {
+          for (const f of j.facts) {
+            if (typeof f === "string" && f.trim()) {
+              memory.facts.push("[private] " + f.trim());
+              privateFactsCount++;
+            }
+          }
         }
       }
-    } catch (_) { /* keep trying */ }
+    } catch (_) { /* silent */ }
   }
+
   const ind = document.getElementById("private-indicator");
-  if (privateContext) {
-    ind.innerHTML = '<span class="private-badge">✓ private brain loaded — full depth</span>';
+  if (privateContext || privateFactsCount > 0) {
+    const bits = [];
+    if (privateContext)        bits.push(`prose ${privateContext.length}c`);
+    if (privateFactsCount > 0) bits.push(`+${privateFactsCount} private mem`);
+    ind.innerHTML = `<span class="private-badge">✓ private brain loaded — ${bits.join(", ")}</span>`;
   }
 }
 
