@@ -323,6 +323,61 @@
     border: 1px solid #21262d; font-size: 10px;
   }
 
+  /* Dream Catcher pane — two-slot diff for parallel dimension reassimilation */
+  .dc-grid {
+    display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 10px;
+  }
+  @media (min-width: 540px) { .dc-grid { grid-template-columns: 1fr 1fr; } }
+  .dc-slot {
+    background: #0d1117;
+    border: 1px solid #21262d; border-radius: 10px;
+    padding: 12px;
+  }
+  .dc-slot-label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+    color: #8b949e; margin-bottom: 8px;
+  }
+  .dc-slot .verify-drop {
+    padding: 18px 12px; min-height: 64px;
+    font-size: 12px;
+  }
+  .dc-egg-info {
+    margin-top: 10px;
+    font-size: 11px; color: #8b949e; line-height: 1.5;
+  }
+  .dc-egg-info code {
+    font-family: "SF Mono", Menlo, monospace; font-size: 10px;
+    background: #0d1117; padding: 1px 5px; border-radius: 3px;
+    border: 1px solid #21262d; color: #c9d1d9;
+  }
+  .dc-frame-list {
+    list-style: none; padding: 0; margin: 0; font-size: 12px;
+  }
+  .dc-frame-list li {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(110,118,129,0.15);
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .dc-frame-list li:last-child { border-bottom: none; }
+  .dc-frame-list li.new {
+    background: rgba(63,185,80,0.06);
+    border-left: 3px solid #3fb950;
+  }
+  .dc-frame-list li.shared {
+    color: #6e7681;
+  }
+  .dc-frame-icon { width: 18px; flex-shrink: 0; }
+  .dc-frame-body { flex: 1; min-width: 0; }
+  .dc-frame-pk {
+    font-family: "SF Mono", Menlo, monospace; font-size: 10px;
+    color: #6e7681;
+  }
+  .dc-frame-msg {
+    color: #c9d1d9; word-break: break-word;
+    font-size: 12px; margin-top: 2px;
+  }
+  .dc-frame-list li.new .dc-frame-msg { color: #7ee787; }
+
   /* Verify panel — drop-target + per-file pass/fail readout */
   .verify-drop {
     border: 2px dashed #30363d; border-radius: 10px;
@@ -829,6 +884,7 @@
     <button class="action secondary" id="btn-propose-skill" title="Submit a new agent.py to this organism via PR — the lineage evolution path.">🌱 Propose a skill</button>
     <button class="action secondary" id="btn-export-egg" title="Backup the public organism — rappid, soul, agents, public memory.">🥚 Export .egg</button>
     <button class="action secondary" id="btn-verify-egg" title="Drop in any .egg and verify nothing was modified offline.">🔬 Verify an .egg</button>
+    <button class="action secondary" id="btn-dreamcatcher" title="Diff two eggs of the same lineage to find frames the parallel dimension has that the canonical doesn't.">🕸️ Dream Catcher</button>
     <button class="action secondary" id="btn-publish-egg" title="Open a pre-filled submission to the public Egg Hub.">🌐 Back up to Egg Hub</button>
     <button class="action secondary" id="btn-install">💻 Install kernel locally</button>
   </div>
@@ -842,7 +898,7 @@
       </div>
       <div class="identity-row">
         <span class="identity-key">Rappid</span>
-        <span class="identity-val">da4ea931-52dd-46d5-8e14-3b35ba497b12</span>
+        <span class="identity-val">f4da892f-150d-4551-b929-78c71add4378</span>
       </div>
       <div class="identity-row">
         <span class="identity-key">Kernel</span>
@@ -923,6 +979,37 @@
     </div>
   </section>
 
+  <!-- Dream Catcher — reassimilation pane. Drop the canonical egg
+       (left) and a parallel-dimension egg (right), see what frames
+       the parallel has that the canonical doesn't. Operator reviews
+       each new frame and chooses which to bond back via PR.
+       Pattern: kody-w/rappterbook engine/merge/merge_frame.py.
+       Frames are content-addressed (sha256 chain) so splicing a
+       middle frame breaks the chain visibly. PK = utc + frame_n. -->
+  <section class="pane" id="pane-dreamcatcher" hidden>
+    <h2>🕸️ Dream Catcher · reassimilate parallel dimensions</h2>
+    <p>Each hatched egg is a parallel dimension that lives offline and accumulates its own mutations. The Dream Catcher folds those parallel streams back into the canonical organism. Drop the canonical egg on the left and a parallel dimension on the right — the diff shows what frames the parallel has that the canonical doesn't. Pick what's worth reassimilating; the rest stays on its branch.</p>
+    <div class="dc-grid">
+      <div class="dc-slot">
+        <div class="dc-slot-label">📍 Canonical</div>
+        <div id="dc-drop-canonical" class="verify-drop">
+          <input type="file" id="dc-file-canonical" accept=".egg,.zip" style="display:none">
+          <div class="verify-drop-prompt">drop canonical egg<br><span style="font-size:11px;color:#6e7681">or <button class="small primary" id="btn-dc-pick-canonical">pick</button></span></div>
+        </div>
+        <div class="dc-egg-info" id="dc-info-canonical"></div>
+      </div>
+      <div class="dc-slot">
+        <div class="dc-slot-label">🌌 Parallel dimension</div>
+        <div id="dc-drop-parallel" class="verify-drop">
+          <input type="file" id="dc-file-parallel" accept=".egg,.zip" style="display:none">
+          <div class="verify-drop-prompt">drop parallel egg<br><span style="font-size:11px;color:#6e7681">or <button class="small primary" id="btn-dc-pick-parallel">pick</button></span></div>
+        </div>
+        <div class="dc-egg-info" id="dc-info-parallel"></div>
+      </div>
+    </div>
+    <div id="dc-results" hidden></div>
+  </section>
+
   <!-- Verify .egg — drop in any cartridge to check it hasn't been
        tampered with offline. Recomputes every file's sha256 against
        the manifest's stated hash table. Non-GMO check. -->
@@ -994,7 +1081,7 @@
 "use strict";
 
 const FD = {
-  rappid: "da4ea931-52dd-46d5-8e14-3b35ba497b12",
+  rappid: "f4da892f-150d-4551-b929-78c71add4378",
   displayName: "Kody Wildfeuer",
   slug: "kody-twin",
   ghUser: "kody-w",
@@ -1790,6 +1877,214 @@ function submitProposedSkill() {
   window.open(u.toString(), "_blank", "noopener,noreferrer");
 }
 
+// ── Dream Catcher (parallel-dimension reassimilation) ─────────────
+//
+// Pattern from kody-w/rappterbook engine/merge/merge_frame.py and
+// engine/merge/assign_streams.py. Each parallel hatched dimension
+// accumulates its own frame stream — frames are content-addressed
+// events with PK = (utc, frame_n) — and the Dream Catcher folds
+// deltas from N parallel streams into the canonical organism.
+//
+// Frame schema (rapp-frame/1.0):
+//   { stream_id: "<rappid>:<short-instance-id>",
+//     frame_n: 0,
+//     utc: ISO timestamp,
+//     kind: "memory_added"|"agent_loaded"|"soul_edited"|"commit"|...,
+//     payload: { ... },
+//     prev_hash: "<sha of previous frame in this stream>",
+//     hash: "<sha of {prev_hash + utc + frame_n + kind + payload}>" }
+//
+// The hash chain catches splicing — edit a middle frame and every
+// later frame's prev_hash mismatches. Same idea as a Git commit
+// chain or a hash-linked log.
+//
+// Frame sources, in priority order, when an egg is read:
+//   1. data/frames.json inside the egg (if the seed wrote one)
+//   2. provenance.state_at_seal.recent_mutations (Git-derived snapshot)
+//   3. nothing — older eggs don't have frame logs yet, treated as
+//      a single implicit frame at sealed_at
+
+const STREAM_SHORT = (rappid, sealedAt) => {
+  // Stream id = rappid + first 4 chars of sha256(sealed_at). Gives
+  // each hatched egg a unique stream identifier even when rappids match.
+  if (!rappid) return "unknown";
+  const tag = (sealedAt || "").slice(0, 19);
+  return rappid.slice(0, 8) + ":" + tag.replace(/[^0-9]/g, "").slice(0, 8);
+};
+
+async function _framesFromEgg(zip, manifest) {
+  // 1. Explicit frames.json in the egg
+  const fj = zip.file("data/frames.json");
+  if (fj) {
+    try {
+      const j = JSON.parse(await fj.async("string"));
+      if (Array.isArray(j.frames)) return { frames: j.frames, source: "data/frames.json" };
+    } catch (_) {}
+  }
+  // 2. Synthesize from state_at_seal.recent_mutations (the Git log
+  //    snapshot the egg builder captured). One frame per Git commit.
+  const sas = manifest && manifest.provenance && manifest.provenance.state_at_seal;
+  if (sas && Array.isArray(sas.recent_mutations) && sas.recent_mutations.length) {
+    const rappid = manifest.rappid;
+    const sealed = manifest.provenance.sealed_at;
+    const stream = STREAM_SHORT(rappid, sealed);
+    const frames = [];
+    let prev = "";
+    // Reverse — Git API returns newest-first, frames are chronological.
+    const ordered = sas.recent_mutations.slice().reverse();
+    for (let i = 0; i < ordered.length; i++) {
+      const m = ordered[i];
+      const payload = { sha: m.sha, message: m.message };
+      const body = (prev || "") + "|" + (m.date || "") + "|" + i + "|commit|" + JSON.stringify(payload);
+      const h = await sha256Hex(body);
+      frames.push({
+        stream_id: stream,
+        frame_n: i,
+        utc: m.date || sealed,
+        kind: "commit",
+        payload,
+        prev_hash: prev,
+        hash: h,
+      });
+      prev = h;
+    }
+    return { frames, source: "state_at_seal.recent_mutations (synthesized)" };
+  }
+  // 3. Empty — older egg, no frame log
+  return { frames: [], source: "(no frame log)" };
+}
+
+let _dcCanonical = null, _dcParallel = null;
+
+async function _dcLoadEgg(file, slot) {
+  const arrayBuf = await file.arrayBuffer();
+  const zip = await JSZip.loadAsync(arrayBuf);
+  const manifestEntry = zip.file("manifest.json");
+  if (!manifestEntry) throw new Error("not a brainstem-egg — no manifest.json");
+  const manifest = JSON.parse(await manifestEntry.async("string"));
+  const { frames, source } = await _framesFromEgg(zip, manifest);
+  return { manifest, frames, source, name: file.name };
+}
+
+async function _dcHandleSlot(file, slot) {
+  const info = document.getElementById("dc-info-" + slot);
+  info.innerHTML = "loading…";
+  try {
+    const data = await _dcLoadEgg(file, slot);
+    if (slot === "canonical") _dcCanonical = data;
+    else                       _dcParallel  = data;
+    const m = data.manifest;
+    info.innerHTML =
+      `<div><strong>${escapeHtml(m.display_name || "(unnamed)")}</strong> · <code>${escapeHtml((m.rappid || "").slice(0,8))}…</code></div>` +
+      `<div>${escapeHtml(m.tier || "doorman")} tier · ${data.frames.length} frame${data.frames.length === 1 ? "" : "s"}` +
+      (m.provenance && m.provenance.sealed_at ? ` · sealed ${escapeHtml(new Date(m.provenance.sealed_at).toLocaleString())}` : "") +
+      `</div>` +
+      `<div style="font-size:10px;color:#6e7681;margin-top:4px;">frame source: ${escapeHtml(data.source)}</div>`;
+    if (_dcCanonical && _dcParallel) _dcRenderDiff();
+  } catch (e) {
+    info.innerHTML = `<div style="color:#f85149">✗ ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function _dcRenderDiff() {
+  const wrap = document.getElementById("dc-results");
+  wrap.hidden = false;
+  if (!_dcCanonical || !_dcParallel) return;
+
+  // Lineage check — both eggs must share the same rappid for
+  // reassimilation to make semantic sense.
+  const c = _dcCanonical, p = _dcParallel;
+  const cRap = c.manifest.rappid;
+  const pRap = p.manifest.rappid;
+  let lineageWarn = "";
+  if (cRap && pRap && cRap !== pRap) {
+    lineageWarn = `<div class="verify-summary tampered">⚠ different rappids: <code>${escapeHtml(cRap.slice(0,8))}</code> vs <code>${escapeHtml(pRap.slice(0,8))}</code>. These are different organisms — reassimilation crossing species lines isn't supported.</div>`;
+  }
+
+  // Frame-set diff. Hash is the identity — if a frame's hash exists
+  // in canonical, it's already-known to the lineage. Otherwise it's
+  // a parallel-only frame and a candidate for reassimilation.
+  const canonHashes = new Set(c.frames.map(f => f.hash).filter(Boolean));
+  const sharedFrames = p.frames.filter(f => canonHashes.has(f.hash));
+  const newFrames    = p.frames.filter(f => !canonHashes.has(f.hash));
+
+  // Sort all parallel frames by UTC for the timeline view
+  const ordered = p.frames.slice().sort((a, b) => (a.utc || "").localeCompare(b.utc || ""));
+
+  let summaryClass, summaryText;
+  if (newFrames.length === 0) {
+    summaryClass = "ok";
+    summaryText = `✓ parallel dimension is fully reflected in canonical — ${sharedFrames.length} frame${sharedFrames.length === 1 ? "" : "s"} match. Nothing to reassimilate.`;
+  } else {
+    summaryClass = "partial";
+    summaryText = `🕸️ ${newFrames.length} parallel-only frame${newFrames.length === 1 ? "" : "s"} found, not yet in canonical. Review each below; reassimilation happens by replaying the frame as a commit on the seed repo (a PR per frame, or batch a single PR with all of them).`;
+  }
+
+  const rows = ordered.map(f => {
+    const isNew = !canonHashes.has(f.hash);
+    const utcShort = (f.utc || "").slice(0, 19).replace("T", " ");
+    const msg = f.kind === "commit"
+      ? (f.payload && f.payload.message || "(no message)")
+      : `${f.kind}: ${JSON.stringify(f.payload).slice(0, 80)}`;
+    return `<li class="${isNew ? "new" : "shared"}">
+      <span class="dc-frame-icon">${isNew ? "🌱" : "·"}</span>
+      <div class="dc-frame-body">
+        <div class="dc-frame-pk">${escapeHtml(utcShort)} · frame_n=${f.frame_n} · <code>${escapeHtml((f.hash || "").slice(0,10))}…</code></div>
+        <div class="dc-frame-msg">${escapeHtml(msg)}</div>
+      </div>
+    </li>`;
+  }).join("");
+
+  let reassimAction = "";
+  if (newFrames.length > 0) {
+    // Build a pre-filled GitHub Issue summarizing the reassimilation
+    // request. The operator reviews each frame on GitHub and merges
+    // selectively — this stops short of auto-creating PRs because
+    // the operator should see what's being bonded back.
+    const owner = (location.host || "").split(".")[0];
+    const repo = (location.pathname.split("/").filter(Boolean)[0] || "");
+    const title = `dream-catcher: ${newFrames.length} frame${newFrames.length === 1 ? "" : "s"} from parallel dimension`;
+    const body = [
+      "<!-- Dream Catcher reassimilation request -->",
+      "",
+      "## Source",
+      `- Canonical egg: \`${c.manifest.rappid || "(unknown)"}\` sealed ${c.manifest.provenance && c.manifest.provenance.sealed_at || "(unknown)"}`,
+      `- Parallel egg: \`${p.manifest.rappid || "(unknown)"}\` sealed ${p.manifest.provenance && p.manifest.provenance.sealed_at || "(unknown)"}`,
+      "",
+      "## Parallel-only frames (candidates for reassimilation)",
+      "",
+      "| utc | frame_n | kind | message | hash |",
+      "|---|---|---|---|---|",
+      ...newFrames.map(f =>
+        `| ${(f.utc || "").slice(0,19)} | ${f.frame_n} | ${f.kind} | ${(f.payload && f.payload.message || JSON.stringify(f.payload)).replace(/\|/g, " ").slice(0,80)} | \`${(f.hash || "").slice(0,10)}\` |`
+      ),
+      "",
+      "## To reassimilate",
+      "",
+      "Review each frame above. For each one worth bonding back into the canonical lineage:",
+      "1. Cherry-pick the change as a commit on this repo (operator only)",
+      "2. Or open a PR with the change",
+      "",
+      "Mutations not reassimilated stay on their parallel branch — that's the design. Each parallel dimension can keep its own divergent path.",
+    ].join("\n");
+    const u = new URL(`https://github.com/${owner}/${repo}/issues/new`);
+    u.searchParams.set("title", title);
+    u.searchParams.set("body", body);
+    u.searchParams.set("labels", "dream-catcher,reassimilation");
+    reassimAction = `<div style="margin-top:14px;"><a class="small primary" style="display:inline-block;text-decoration:none;padding:8px 14px;background:#1f6feb;color:white;border-radius:8px;font-size:12px;font-weight:600;" href="${escapeHtml(u.toString())}" target="_blank" rel="noopener">📜 Open reassimilation issue on GitHub →</a></div>`;
+  }
+
+  wrap.innerHTML =
+    lineageWarn +
+    `<div class="verify-summary ${summaryClass}">${summaryText}</div>` +
+    `<ul class="dc-frame-list">${rows}</ul>` +
+    reassimAction;
+}
+
+function showDreamCatcher() {
+  showPane("pane-dreamcatcher");
+}
+
 // ── Egg verifier (non-GMO check) ───────────────────────────────────
 //
 // Drop any .egg in. We unzip it, read the manifest's provenance block,
@@ -2088,7 +2383,7 @@ async function copy(text) {
 // Seed metadata — read by the card derivation logic. Set from the
 // substituted placeholders below so the card can render before any
 // async fetches land.
-window.__seedRappid      = "da4ea931-52dd-46d5-8e14-3b35ba497b12";
+window.__seedRappid      = "f4da892f-150d-4551-b929-78c71add4378";
 window.__seedDisplayName = "Kody Wildfeuer";
 window.__seedKind        = "personal";
 window.__seedRepoName    = "kody-twin";
@@ -2107,6 +2402,30 @@ document.getElementById("btn-propose-template").onclick = (e) => {
   document.getElementById("propose-code").value = "";
   _resetProposeTemplate();
 };
+document.getElementById("btn-dreamcatcher").onclick = showDreamCatcher;
+
+// Dream Catcher slot wiring — both slots use the same drag-drop pattern
+(function wireDreamCatcher() {
+  for (const slot of ["canonical", "parallel"]) {
+    const drop = document.getElementById("dc-drop-" + slot);
+    const input = document.getElementById("dc-file-" + slot);
+    const pick  = document.getElementById("btn-dc-pick-" + slot);
+    if (!drop || !input) continue;
+    drop.addEventListener("click", e => { if (e.target.tagName !== "BUTTON") input.click(); });
+    pick.addEventListener("click", e => { e.stopPropagation(); input.click(); });
+    input.addEventListener("change", () => {
+      if (input.files && input.files[0]) _dcHandleSlot(input.files[0], slot);
+    });
+    drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("dragover"); });
+    drop.addEventListener("dragleave", () => drop.classList.remove("dragover"));
+    drop.addEventListener("drop", e => {
+      e.preventDefault();
+      drop.classList.remove("dragover");
+      const f = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (f) _dcHandleSlot(f, slot);
+    });
+  }
+})();
 
 // Verify pane: drag-drop + file picker. Both routes call the same
 // _handleVerifyFile so the verifier UI doesn't care how the file got
@@ -2239,7 +2558,7 @@ function rappidSigil(rappid, size) {
 (function renderSigil() {
   const el = document.getElementById("hero-sigil");
   if (!el) return;
-  el.innerHTML = rappidSigil("da4ea931-52dd-46d5-8e14-3b35ba497b12", 96);
+  el.innerHTML = rappidSigil("f4da892f-150d-4551-b929-78c71add4378", 96);
 })();
 
 // ── Profile stats: memory count + age ──────────────────────────────
