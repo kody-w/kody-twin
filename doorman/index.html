@@ -11,6 +11,12 @@
 <meta name="theme-color" content="#0d1117">
 <title>Doorman — Kody Wildfeuer</title>
 <meta name="description" content="The frontdoorman of Kody Wildfeuer. Chat with the place.">
+<!-- Pyodide — real Python in the browser. Lazy-loaded after auth so the
+     anonymous fast path stays light. Used to run the same agent.py files
+     (manage_memory, context_memory, learn_new, swarm_factory) that the
+     local Python brainstem runs. Same agent contract, different storage
+     shim adapted to GitHub raw URLs + localStorage. -->
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js" defer></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; }
@@ -955,11 +961,264 @@ const ASCENDED_TOOLS = [
   },
 ];
 
-// TOOL_DEFS gets recomputed each chat turn based on whether ascension
-// fired — see chatToolDefs() called from sendMessage().
+// TOOL_DEFS gets recomputed each chat turn based on whether Pyodide has
+// loaded the agents (preferred) and whether ascension fired (gates the
+// 2 ascended-tier tools).
 function chatToolDefs() {
+  // Pyodide-loaded agents take priority — they're the canonical tool defs
+  // pulled directly from the .py agents' self.metadata.
+  const pyDefs = pyAgentsToolDefs();
+  if (pyDefs.length > 0) return pyDefs;
+  // Fallback: hardcoded JS-impl tools (used while Pyodide is still loading
+  // or if it failed). Anonymous fast path returns instantly via these.
   if (privateSoul) return DOORMAN_TOOLS.concat(ASCENDED_TOOLS);
   return DOORMAN_TOOLS;
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  Pyodide — agents.py running in the browser (the real vbrainstem)
+// ─────────────────────────────────────────────────────────────────
+//
+// Same agent.py files as a local brainstem (kody-w/RAPP raw URLs).
+// Same agent contract: a class extending BasicAgent with .metadata
+// and .perform(**kwargs). Different storage shim — instead of writing
+// to local disk via AzureFileStorageManager, the shim writes to
+// localStorage on this device (anon + fallback) and the LLM-driven
+// per-user / public flow you've already seen.
+
+let pyodide = null;
+let pyAgents = {};            // agent_name (e.g. "ManageMemory") → { instance: PyProxy, metadata: object }
+let pyodideLoadingPromise = null;
+
+const SEED_AGENT_BASE = "https://raw.githubusercontent.com/kody-w/RAPP/main/rapp_brainstem/agents/";
+const PYODIDE_AGENTS = [
+  { file: "manage_memory_agent.py",  className: "ManageMemoryAgent",  tier: "doorman"  },
+  { file: "context_memory_agent.py", className: "ContextMemoryAgent", tier: "doorman"  },
+  { file: "learn_new_agent.py",      className: "LearnNewAgent",      tier: "ascended" },
+  { file: "swarm_factory_agent.py",  className: "SwarmFactoryAgent",  tier: "ascended" },
+];
+
+// Build OpenAI-format tool defs from Pyodide-loaded agents' metadata.
+function pyAgentsToolDefs() {
+  const defs = [];
+  for (const [name, info] of Object.entries(pyAgents)) {
+    if (!info || !info.metadata) continue;
+    const m = info.metadata;
+    defs.push({
+      type: "function",
+      function: {
+        name: name,
+        description: m.description || ("Run " + name),
+        parameters: m.parameters || { type: "object", properties: {}, required: [] },
+      },
+    });
+  }
+  return defs;
+}
+
+// Lazy-load Pyodide and the agents. Idempotent — call multiple times.
+async function initPyodide() {
+  if (pyodide && Object.keys(pyAgents).length) return pyodide;
+  if (pyodideLoadingPromise) return pyodideLoadingPromise;
+  pyodideLoadingPromise = (async () => {
+    try {
+      // Wait for the CDN script to define loadPyodide (deferred load)
+      let waited = 0;
+      while (typeof loadPyodide === "undefined" && waited < 12000) {
+        await new Promise(r => setTimeout(r, 100));
+        waited += 100;
+      }
+      if (typeof loadPyodide === "undefined") {
+        console.info("[doorman] Pyodide CDN didn't load; falling back to JS tool impls");
+        return null;
+      }
+      renderMsg("system", "loading agents…");
+      pyodide = await loadPyodide({
+        indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/",
+      });
+
+      // Storage shim: JS callbacks the Python AzureFileStorageManager
+      // proxies into. Reads check localStorage first, then in-session
+      // memory. Writes go to localStorage (per-front-door, per-device).
+      const storagePrefix = () => "rapp_doorman_storage:" + location.pathname + ":";
+
+      globalThis.__vb_storage_read = (path) => {
+        try {
+          const v = localStorage.getItem(storagePrefix() + path);
+          if (v !== null) return v;
+        } catch (_) {}
+        // Bootstrap fallback for the well-known seed memory path:
+        // the JS layer already loaded memory.json from raw URLs into
+        // memory.facts; surface that as a JSON blob the agent can parse.
+        if (path === "memory.json" || path.endsWith("/memory.json")) {
+          try {
+            return JSON.stringify({
+              schema: memory.schema || "rapp-memory/1.0",
+              facts: memory.facts || [],
+              memories: (memory.facts || []).map((f, i) => ({ id: i, content: f })),
+            });
+          } catch (_) {}
+        }
+        return null;
+      };
+      globalThis.__vb_storage_write = (path, content) => {
+        try {
+          localStorage.setItem(storagePrefix() + path, content);
+          return true;
+        } catch (_) { return false; }
+      };
+      globalThis.__vb_storage_list = (dir) => {
+        const prefix = storagePrefix() + (dir || "").replace(/^\/+|\/+$/g, "");
+        const out = [];
+        try {
+          for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k && k.startsWith(prefix)) {
+              out.push(k.substring(prefix.length).replace(/^\//, ""));
+            }
+          }
+        } catch (_) {}
+        return out;
+      };
+      globalThis.__vb_storage_exists = (path) => {
+        try { return localStorage.getItem(storagePrefix() + path) !== null; }
+        catch (_) { return false; }
+      };
+
+      // Set up the Python sandbox: mock `agents.basic_agent.BasicAgent`
+      // and `utils.azure_file_storage.AzureFileStorageManager` so the
+      // unmodified agent.py files import cleanly.
+      await pyodide.runPythonAsync(`
+import sys, types, json as _json
+
+class BasicAgent:
+    """Minimal stand-in for the real BasicAgent — agents subclass this."""
+    def __init__(self, name=None, metadata=None):
+        if name is not None:    self.name = name
+        if metadata is not None: self.metadata = metadata
+    def system_context(self):
+        return None
+
+_agents_mod = types.ModuleType("agents")
+_basic_mod  = types.ModuleType("agents.basic_agent")
+_basic_mod.BasicAgent = BasicAgent
+_agents_mod.basic_agent = _basic_mod
+sys.modules["agents"] = _agents_mod
+sys.modules["agents.basic_agent"] = _basic_mod
+
+class AzureFileStorageManager:
+    """Storage shim — proxies file IO to the JS layer (localStorage-backed)."""
+    def __init__(self, *args, **kwargs):
+        from js import __vb_storage_read, __vb_storage_write, __vb_storage_list, __vb_storage_exists
+        self._read   = __vb_storage_read
+        self._write  = __vb_storage_write
+        self._list   = __vb_storage_list
+        self._exists = __vb_storage_exists
+    def read_json(self, path):
+        v = self._read(path)
+        if v is None or v == "":
+            return None
+        try:
+            return _json.loads(v)
+        except Exception:
+            return None
+    def write_json(self, path, data):
+        try:
+            self._write(path, _json.dumps(data))
+            return True
+        except Exception:
+            return False
+    def read_text(self, path):
+        v = self._read(path)
+        return "" if v is None else v
+    def write_text(self, path, content):
+        return bool(self._write(path, content))
+    def list_files(self, directory):
+        try:
+            res = self._list(directory)
+            return list(res) if res else []
+        except Exception:
+            return []
+    def file_exists(self, path):
+        try: return bool(self._exists(path))
+        except Exception: return False
+    # Some agents use these legacy names — alias to the same backend
+    def read_blob(self, path):       return self.read_text(path)
+    def write_blob(self, path, c):   return self.write_text(path, c)
+    def list_blobs(self, directory): return self.list_files(directory)
+
+_utils_mod   = types.ModuleType("utils")
+_storage_mod = types.ModuleType("utils.azure_file_storage")
+_storage_mod.AzureFileStorageManager = AzureFileStorageManager
+_utils_mod.azure_file_storage = _storage_mod
+sys.modules["utils"] = _utils_mod
+sys.modules["utils.azure_file_storage"] = _storage_mod
+      `);
+
+      // Load each agent .py — same source as a local brainstem
+      const token = getToken();
+      for (const cfg of PYODIDE_AGENTS) {
+        if (cfg.tier === "ascended" && !privateSoul) continue;
+        try {
+          const r = await fetch(SEED_AGENT_BASE + cfg.file, { cache: "no-cache" });
+          if (!r.ok) {
+            console.info("[doorman] couldn't fetch", cfg.file, r.status);
+            continue;
+          }
+          const source = await r.text();
+          await pyodide.runPythonAsync(source);
+          // Instantiate and capture metadata
+          const cls = pyodide.globals.get(cfg.className);
+          if (!cls) {
+            console.info("[doorman] class", cfg.className, "not found in", cfg.file);
+            continue;
+          }
+          const instance = cls();
+          const metadataPy = instance.metadata;
+          const metadata = metadataPy.toJs ? metadataPy.toJs({ dict_converter: Object.fromEntries }) : metadataPy;
+          const agentName = instance.name || cfg.className.replace(/Agent$/, "");
+          pyAgents[agentName] = { instance, metadata, source };
+          // Stash on Pyodide globals for tool dispatch
+          pyodide.globals.set("_agent_" + agentName, instance);
+          console.info("[doorman] loaded agent", agentName, "from", cfg.file);
+        } catch (e) {
+          console.info("[doorman] agent load failed for", cfg.file, ":", e && e.message);
+        }
+      }
+
+      const loaded = Object.keys(pyAgents);
+      if (loaded.length) {
+        renderMsg("system", "loaded " + loaded.length + " agent" + (loaded.length === 1 ? "" : "s") + " (Pyodide): " + loaded.join(", "));
+      }
+      refreshIndicator();
+      return pyodide;
+    } catch (e) {
+      console.info("[doorman] Pyodide init failed:", e && e.message);
+      pyodide = null;
+      return null;
+    }
+  })();
+  return pyodideLoadingPromise;
+}
+
+// Dispatch a tool call to a Pyodide-loaded agent. Returns a string result
+// (per the tool API). Falls back to JS handlers if the Pyodide agent
+// isn't available (e.g. Pyodide still loading or load failed).
+async function dispatchPyodideToolCall(tc, args) {
+  const info = pyAgents[tc.function.name];
+  if (!info) return null;  // signal: not handled here, caller should fall back
+  try {
+    pyodide.globals.set("_call_args", pyodide.toPy(args));
+    const result = await pyodide.runPythonAsync(`
+import json
+_a = _call_args.to_py() if hasattr(_call_args, 'to_py') else dict(_call_args)
+_r = _agent_${tc.function.name}.perform(**_a)
+_r if isinstance(_r, str) else json.dumps(_r)
+`);
+    return typeof result === "string" ? result : String(result);
+  } catch (e) {
+    return "agent error: " + (e && e.message ? e.message : String(e));
+  }
 }
 
 // Tool dispatchers — JS implementations of the agents' perform() methods
@@ -1030,6 +1289,12 @@ async function toolSwarmFactory(args) {
 async function dispatchToolCall(tc) {
   let args = {};
   try { args = JSON.parse(tc.function.arguments || "{}"); } catch (_) { /* keep default */ }
+  // Try Pyodide-loaded agents first (real .py running in-browser)
+  if (pyodide && pyAgents[tc.function.name]) {
+    const result = await dispatchPyodideToolCall(tc, args);
+    if (result !== null) return result;
+  }
+  // Fallback: JS-impl tools (used while Pyodide loads, or if loading failed)
   if (tc.function.name === "ManageMemory")  return toolManageMemory(args);
   if (tc.function.name === "ContextMemory") return toolContextMemory(args);
   if (tc.function.name === "LearnNew")      return toolLearnNew(args);
@@ -1165,6 +1430,10 @@ async function enterChat() {
   }
   if (viewerLogin) await loadUserPrivateIssues(token);
   refreshIndicator();        // badge reflects soul + memory + agents + per-user mem
+  // Lazy-load Pyodide + agents (non-blocking — chat works against JS
+  // tool impls in the meantime; once Pyodide finishes loading, future
+  // tool calls hit the real .py implementations).
+  initPyodide().catch(() => { /* silent — JS fallbacks remain available */ });
   const place = identity.display_name || identity.name || "this place";
   const memCount = (memory.facts || []).length;
   const memNote = memCount ? ` I'm carrying ${memCount} memor${memCount === 1 ? "y" : "ies"} from past visits.` : "";
