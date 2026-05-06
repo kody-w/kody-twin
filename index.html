@@ -743,7 +743,7 @@
       </div>
       <div class="identity-row">
         <span class="identity-key">Rappid</span>
-        <span class="identity-val">056f6464-6706-4c0d-a447-65c97f0267f1</span>
+        <span class="identity-val">e5bfd63d-9187-456a-84b4-bde6976323d0</span>
       </div>
       <div class="identity-row">
         <span class="identity-key">Kernel</span>
@@ -847,7 +847,7 @@
 "use strict";
 
 const FD = {
-  rappid: "056f6464-6706-4c0d-a447-65c97f0267f1",
+  rappid: "e5bfd63d-9187-456a-84b4-bde6976323d0",
   displayName: "Kody Wildfeuer",
   slug: "kody-twin",
   ghUser: "kody-w",
@@ -1483,7 +1483,7 @@ async function copy(text) {
 // Seed metadata — read by the card derivation logic. Set from the
 // substituted placeholders below so the card can render before any
 // async fetches land.
-window.__seedRappid      = "056f6464-6706-4c0d-a447-65c97f0267f1";
+window.__seedRappid      = "e5bfd63d-9187-456a-84b4-bde6976323d0";
 window.__seedDisplayName = "Kody Wildfeuer";
 window.__seedKind        = "personal";
 window.__seedRepoName    = "kody-twin";
@@ -1596,7 +1596,7 @@ function rappidSigil(rappid, size) {
 (function renderSigil() {
   const el = document.getElementById("hero-sigil");
   if (!el) return;
-  el.innerHTML = rappidSigil("056f6464-6706-4c0d-a447-65c97f0267f1", 96);
+  el.innerHTML = rappidSigil("e5bfd63d-9187-456a-84b4-bde6976323d0", 96);
 })();
 
 // ── Profile stats: memory count + age ──────────────────────────────
@@ -1730,7 +1730,7 @@ function _relativeDate(iso) {
 
 async function fillMutations() {
   const list = document.getElementById("tr-mutations");
-  if (!list) return 0;
+  if (!list) return { count: 0, lastDate: null };
   const { owner, repo } = _ghOwnerRepo();
   const linkEl = document.getElementById("tr-history-link");
   if (linkEl && owner && repo) linkEl.href = `https://github.com/${owner}/${repo}/commits`;
@@ -1738,23 +1738,42 @@ async function fillMutations() {
     const r = await fetch(`https://api.github.com/repos/${owner}/${repo}/commits?per_page=6`, {
       headers: { Accept: "application/vnd.github+json" },
     });
-    if (!r.ok) { list.innerHTML = '<li class="skel">no mutation history yet</li>'; return 0; }
+    if (!r.ok) { list.innerHTML = '<li class="skel">no mutation history yet</li>'; return { count: 0, lastDate: null }; }
     const commits = await r.json();
     if (!Array.isArray(commits) || !commits.length) {
       list.innerHTML = '<li class="skel">no mutation history yet</li>';
-      return 0;
+      return { count: 0, lastDate: null };
     }
     list.innerHTML = commits.slice(0, 5).map(c => {
       const msg = (c.commit && c.commit.message || "").split("\n")[0].slice(0, 90);
       const when = _relativeDate(c.commit && c.commit.author && c.commit.author.date);
       return `<li><span class="mut-time">${escapeHtml(when)}</span><span class="mut-msg">${escapeHtml(msg) || '<span class="empty">(no message)</span>'}</span></li>`;
     }).join("");
-    // Total mutation count — return the page count for achievement gating.
-    return commits.length >= 6 ? 25 : commits.length;
+    const lastDate = commits[0] && commits[0].commit && commits[0].commit.author && commits[0].commit.author.date;
+    // Page returns up to 6 commits per request; >= 6 means "at least 6
+    // mutations" (we'd need pagination for an exact count). Good enough
+    // for achievement gating, MMR uses sqrt-dampened so the cap is fine.
+    return { count: commits.length, lastDate: lastDate || null };
   } catch (_) {
     list.innerHTML = '<li class="skel">couldn\'t load history</li>';
-    return 0;
+    return { count: 0, lastDate: null };
   }
+}
+
+// Fork count = offspring. Each fork is a child organism — they boost the
+// parent's MMR like pedigree boosts a thoroughbred. Pulled straight off
+// the seed's repo metadata; anonymous-friendly.
+async function _forkCount() {
+  const { owner, repo } = _ghOwnerRepo();
+  if (!owner || !repo) return 0;
+  try {
+    const r = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+      headers: { Accept: "application/vnd.github+json" },
+    });
+    if (!r.ok) return 0;
+    const data = await r.json();
+    return Math.max(0, data.forks_count || 0);
+  } catch (_) { return 0; }
 }
 
 async function fillLineage() {
@@ -1782,33 +1801,140 @@ async function fillLineage() {
 // 3500-MMR Heimdall is directly comparable to a 3500-MMR Cloud Gate
 // or any other organism on the species. The score reflects: lived
 // time, accumulated memory (depth of relationship), mutation count
-// (operator steering), and custom skills (capabilities earned beyond
-// the doorman defaults).
+// (operator steering), custom skills (capabilities earned beyond
+// the doorman defaults), AND offspring (organisms forked from this
+// one — pedigree counts).
 //
-// All inputs are sub-linear (sqrt-dampened on the saturating signals
-// time + mutations + memories) so an organism with 10 000 memories
-// reads as proportionally experienced rather than 250 × stronger
-// than one with 40. MMR caps at ~9000 for "Immortal" but doesn't
-// truly ceiling — there's always more growth available.
+// Calibration: organisms with < CALIBRATION_MUTATIONS commits and
+// fewer than CALIBRATION_DAYS days of life are in placement mode;
+// their MMR isn't locked in yet — they show "📐 Calibrating" with a
+// progress bar instead of a tier badge. Same idea as Dota 2's first
+// 10 calibration games before MMR locks in.
+//
+// Activity decay: inactivity costs MMR. An organism whose last commit
+// was 90 days ago reads "slowing" and gets a 10% penalty; 180+ days
+// is "dormant" and -30%; 3+ years is "stasis" and floored at 1000.
+// This way, the cream rises — popular, actively-stewarded organisms
+// climb past the abandoned ones with similar raw memory counts.
 //
 //   1000  base — every planted seed is born at Cradle
 //   + memCount × 30          (each conversation deepens us)
 //   + sqrt(mutCount) × 250   (each operator commit shapes us)
 //   + customAgentCount × 350 (each new capability earned)
 //   + sqrt(ageDays) × 80     (lived time matters)
+//   + sqrt(forkCount) × 400  (offspring planted from this lineage)
+//   × activityFactor         (0.7 → 1.0 based on last commit recency)
 //
 // Tier thresholds match Dota 2's recognizable medal ladder so the
 // number reads naturally to anyone who's seen MMR before.
-function computeMMR({ memCount, mutCount, customSkills, ageDays }) {
+
+const CALIBRATION_MUTATIONS = 5;
+const CALIBRATION_DAYS      = 7;
+
+function activityStatus(lastCommitIso) {
+  if (!lastCommitIso) return { kind: "unknown", label: "no activity yet", factor: 1.0 };
+  const daysSince = (Date.now() - new Date(lastCommitIso).getTime()) / 86400000;
+  if (daysSince <= 30)   return { kind: "active",   label: "✓ Active",   factor: 1.0  };
+  if (daysSince <= 180)  return { kind: "slowing",  label: "〰 Slowing",  factor: 0.85 };
+  if (daysSince <= 1095) return { kind: "dormant",  label: "💤 Dormant",  factor: 0.65 };
+  return                          { kind: "stasis",  label: "❄ Stasis",   factor: 0.45 };
+}
+
+function computeMMR({ memCount, mutCount, customSkills, ageDays, forkCount, activityFactor, lineageGift }) {
   const m = Math.max(0, memCount || 0);
   const x = Math.max(0, mutCount || 0);
   const c = Math.max(0, customSkills || 0);
   const d = Math.max(0, ageDays || 0);
-  return Math.round(1000
+  const f = Math.max(0, forkCount || 0);
+  const af = (typeof activityFactor === "number" && activityFactor > 0) ? activityFactor : 1.0;
+  const lg = Math.max(0, lineageGift || 0);
+  const raw = 1000
     + m * 30
     + Math.sqrt(x) * 250
     + c * 350
-    + Math.sqrt(d) * 80);
+    + Math.sqrt(d) * 80
+    + Math.sqrt(f) * 400;
+  // Stasis floors at 1000 — even a long-dormant elder doesn't go below
+  // baseline. The factor is applied to the SCORE-ABOVE-BASELINE so the
+  // organism's existence is preserved even when uncared-for. Lineage
+  // gift sits OUTSIDE the activity factor — your inherited genes don't
+  // wither just because you took a year off.
+  const above = Math.max(0, raw - 1000);
+  return Math.round(1000 + above * af + lg);
+}
+
+// Parent lineage lookup — when a seed has a parent_repo, fetch the
+// parent's current public signals and compute their MMR. The child
+// inherits 30% of the parent's above-baseline as a head start. This
+// is the genes-and-epigenetics layer: who your parent is at the time
+// you visit them shapes the gift you read on this card.
+//
+// Pure read — anonymous-friendly. Skips silently if parent_repo isn't
+// set or isn't a github.com URL.
+async function _parentLineageGift(rappidObj) {
+  if (!rappidObj || !rappidObj.parent_repo) return null;
+  const m = rappidObj.parent_repo.match(/github\.com\/([^/]+)\/([^/]+?)(?:\.git)?\/?$/);
+  if (!m) return null;
+  const [, owner, repo] = m;
+  try {
+    const [repoR, commitsR, memR, agentsR] = await Promise.all([
+      fetch(`https://api.github.com/repos/${owner}/${repo}`),
+      fetch(`https://api.github.com/repos/${owner}/${repo}/commits?per_page=6`),
+      fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/.brainstem_data/memory.json`),
+      fetch(`https://api.github.com/repos/${owner}/${repo}/contents/agents`),
+    ]);
+    if (!repoR.ok) return null;
+    const repoJ = await repoR.json();
+    const ageDays   = repoJ.created_at ? (Date.now() - new Date(repoJ.created_at).getTime()) / 86400000 : 0;
+    const forkCount = repoJ.forks_count || 0;
+    let mutCount = 0, lastCommit = null;
+    if (commitsR.ok) {
+      const arr = await commitsR.json();
+      if (Array.isArray(arr)) {
+        mutCount = arr.length;
+        if (arr[0] && arr[0].commit && arr[0].commit.author) lastCommit = arr[0].commit.author.date;
+      }
+    }
+    let memCount = 0;
+    if (memR.ok) {
+      try { const j = await memR.json(); memCount = Array.isArray(j.facts) ? j.facts.length : 0; }
+      catch (_) {}
+    }
+    let customSkills = 0;
+    if (agentsR.ok) {
+      try {
+        const arr = await agentsR.json();
+        if (Array.isArray(arr)) {
+          customSkills = arr.filter(f =>
+            f.type === "file" && f.name.endsWith(".py") &&
+            !(f.name.replace(/\.py$/, "") in SKILL_FRIENDLY)
+          ).length;
+        }
+      } catch (_) {}
+    }
+    const act = activityStatus(lastCommit);
+    const parentMMR = computeMMR({
+      memCount, mutCount, customSkills, ageDays, forkCount,
+      activityFactor: act.factor,
+    });
+    // Child inherits 30% of parent's above-baseline as the lineage gift.
+    // Tunable: too high and lineage dynasties dominate; too low and it
+    // doesn't matter who your parent is. 30% felt right in playtest
+    // — parent at 4000 → child starts at +900 (Crusader-tier from day one).
+    const gift = Math.round(Math.max(0, (parentMMR - 1000) * 0.30));
+    return { parentMMR, gift, parentRepoLabel: owner + "/" + repo };
+  } catch (_) { return null; }
+}
+
+// Calibration check — has the organism graduated from placement?
+function calibrationProgress({ mutCount, ageDays }) {
+  const m = mutCount || 0;
+  const d = ageDays || 0;
+  const calibrating = (m < CALIBRATION_MUTATIONS) && (d < CALIBRATION_DAYS);
+  // Progress: pick whichever signal is closer to graduation
+  const mutProg = Math.min(1, m / CALIBRATION_MUTATIONS);
+  const ageProg = Math.min(1, d / CALIBRATION_DAYS);
+  return { calibrating, progress: Math.max(mutProg, ageProg) };
 }
 
 const MMR_TIERS = [
@@ -1833,18 +1959,45 @@ function fillMMR(inputs) {
   const tier = document.getElementById("mmr-tier");
   const bd = document.getElementById("mmr-breakdown");
   if (!num || !tier) return;
-  const mmr = computeMMR(inputs);
+
+  const cal = calibrationProgress(inputs);
+  const act = activityStatus(inputs.lastCommit);
+
+  if (cal.calibrating) {
+    // Placement mode — show progress instead of a tier locked-in number.
+    // Same shape of UI; the visitor sees the organism is still calibrating.
+    num.textContent = "📐";
+    tier.textContent = "Calibrating";
+    tier.className = "mmr-tier";
+    const pct = Math.round(cal.progress * 100);
+    bd.textContent = `placement matches ${pct}% complete · MMR locks in after ${CALIBRATION_MUTATIONS} mutations or ${CALIBRATION_DAYS} days`;
+    return;
+  }
+
+  const mmr = computeMMR({ ...inputs, activityFactor: act.factor });
   const t = tierForMMR(mmr);
   num.textContent = String(mmr);
   tier.textContent = t.name;
   tier.className = "mmr-tier " + t.cls;
-  // Breakdown — short attribution so the visitor sees what feeds the score
+
   const parts = [];
   if (inputs.memCount)     parts.push(inputs.memCount + " mem");
-  if (inputs.mutCount)     parts.push(inputs.mutCount + "+ mut");
+  if (inputs.mutCount)     parts.push(inputs.mutCount + (inputs.mutCount >= 6 ? "+" : "") + " mut");
   if (inputs.customSkills) parts.push(inputs.customSkills + " custom skill" + (inputs.customSkills === 1 ? "" : "s"));
+  if (inputs.forkCount)    parts.push(inputs.forkCount + " fork" + (inputs.forkCount === 1 ? "" : "s") + " 🌳");
   if (inputs.ageDays)      parts.push(Math.floor(inputs.ageDays) + "d alive");
-  bd.textContent = parts.length ? "earned from " + parts.join(" · ") : "fresh plant — score grows as it lives, learns, and earns mutations";
+  // Activity status as a colored chip baked into the breakdown
+  let activityNote = "";
+  if (act.kind === "active")        activityNote = ` · <span style="color:#7ee787">${act.label}</span>`;
+  else if (act.kind === "slowing")  activityNote = ` · <span style="color:#d29922">${act.label}</span> (-15%)`;
+  else if (act.kind === "dormant")  activityNote = ` · <span style="color:#8b949e">${act.label}</span> (-35%)`;
+  else if (act.kind === "stasis")   activityNote = ` · <span style="color:#6e7681">${act.label}</span> (frozen)`;
+  // Lineage gift — show if the parent's MMR contributed inheritance
+  let lineageNote = "";
+  if (inputs.lineage && inputs.lineage.gift > 0) {
+    lineageNote = ` · <span style="color:#a78bfa" title="Inherited from your parent organism — genes + epigenetics. 30% of parent's above-baseline MMR.">+${inputs.lineage.gift} lineage gift from <a href="https://github.com/${escapeHtml(inputs.lineage.parentRepoLabel)}" target="_blank" rel="noopener" style="color:inherit">${escapeHtml(inputs.lineage.parentRepoLabel)}</a> (${inputs.lineage.parentMMR} MMR)</span>`;
+  }
+  bd.innerHTML = (parts.length ? "earned from " + escapeHtml(parts.join(" · ")) : "fresh plant") + activityNote + lineageNote;
 }
 
 // Skills count — how many beyond the doorman defaults?
@@ -1869,25 +2022,36 @@ async function _customSkillCount() {
 }
 
 (async function fillTrackRecord() {
-  // Memory count + age first (we'll need them for achievements + MMR)
-  let memCount = 0, plantedAt = null;
+  // Memory count + age + parent first (needed for achievements + MMR)
+  let memCount = 0, plantedAt = null, rappidObj = null;
   try {
     const r = await fetch(".brainstem_data/memory.json", { cache: "no-cache" });
     if (r.ok) { const j = await r.json(); memCount = Array.isArray(j.facts) ? j.facts.length : 0; }
   } catch (_) {}
   try {
     const r = await fetch("rappid.json", { cache: "no-cache" });
-    if (r.ok) { const j = await r.json(); plantedAt = j.planted_at || null; }
+    if (r.ok) { rappidObj = await r.json(); plantedAt = rappidObj.planted_at || null; }
   } catch (_) {}
 
-  // Skills + mutations + lineage in parallel; achievements + MMR need mut count
-  const [, mutCount, customSkills] = await Promise.all([
+  // Fetch all signal sources in parallel — each independent.
+  const [skillsRes, mutationsRes, customSkills, forkCount, lineage] = await Promise.all([
     fillSkills(),
     fillMutations(),
     fillLineage().then(() => _customSkillCount()),
+    _forkCount(),
+    _parentLineageGift(rappidObj),
   ]);
-  const ageDays = plantedAt ? (Date.now() - new Date(plantedAt).getTime()) / 86400000 : 0;
-  fillMMR({ memCount, mutCount, customSkills, ageDays });
+  void skillsRes;
+
+  const ageDays   = plantedAt ? (Date.now() - new Date(plantedAt).getTime()) / 86400000 : 0;
+  const mutCount  = mutationsRes && mutationsRes.count || 0;
+  const lastCommit = mutationsRes && mutationsRes.lastDate || null;
+  const lineageGift = lineage ? lineage.gift : 0;
+
+  fillMMR({
+    memCount, mutCount, customSkills, ageDays,
+    forkCount, lastCommit, lineageGift, lineage,
+  });
   fillAchievements(memCount, plantedAt, mutCount);
 })();
 
