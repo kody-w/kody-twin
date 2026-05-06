@@ -380,6 +380,28 @@
     display: flex; flex-direction: column;
     color: #d8c8a8; overflow: hidden;
   }
+  /* Evolution-stage frame variants — same card, different stage paint. */
+  .holo-card.stage-elder {
+    border-color: #ffd700;
+    box-shadow: 0 0 18px rgba(255,215,0,0.25) inset;
+  }
+  .holo-card.stage-ascended {
+    border-color: #ff8c00;
+    box-shadow: 0 0 24px rgba(255,140,0,0.32) inset, 0 0 18px rgba(255,140,0,0.18);
+  }
+  /* Ascended-only foil: a moving rainbow scrim over the whole card.
+     Tells the operator at a glance "this is the form only you see". */
+  .holo-card.stage-ascended .holo-shine {
+    background: linear-gradient(125deg,
+      rgba(255,0,128,0.10) 0%, rgba(0,200,255,0.13) 25%,
+      rgba(255,215,0,0.12) 50%, rgba(128,0,255,0.13) 75%,
+      rgba(0,255,128,0.10) 100%);
+    background-size: 250% 250%;
+    animation: holoShine 4s ease-in-out infinite;
+  }
+  .holo-card.stage-veteran  { border-color: #c0c0c0; }
+  .holo-card.stage-doorman  { border-color: #c9a84c; }
+  .holo-card.stage-hatchling { border-color: #6a5a30; }
   .holo-shine {
     position: absolute; inset: 0; pointer-events: none;
     background: linear-gradient(125deg,
@@ -547,7 +569,7 @@
       </div>
       <div class="identity-row">
         <span class="identity-key">Rappid</span>
-        <span class="identity-val">d111455a-bc20-4d34-ba37-3001b320c2ea</span>
+        <span class="identity-val">9fa1318d-8682-4c2d-94c4-4fde56b5f80f</span>
       </div>
       <div class="identity-row">
         <span class="identity-key">Kernel</span>
@@ -651,7 +673,7 @@
 "use strict";
 
 const FD = {
-  rappid: "d111455a-bc20-4d34-ba37-3001b320c2ea",
+  rappid: "9fa1318d-8682-4c2d-94c4-4fde56b5f80f",
   displayName: "Kody Wildfeuer",
   slug: "kody-twin",
   ghUser: "kody-w",
@@ -906,6 +928,59 @@ function _eraFromAge(plantedAt) {
   return "Ancient Set";
 }
 
+// Evolution chain — Pokémon-style stage progression for digital
+// organisms. The chain is one-way and monotonic; once an organism
+// reaches Veteran it never reverts even if memories are pruned. The
+// stage tier is also encoded as a number 0..4 so future cards can
+// gate visual treatments per tier (foil, holo, etc).
+//
+//   0 Hatchling — just planted, no memories (cradle stage)
+//   1 Doorman   — accumulating memories, the public open form
+//   2 Veteran   — 30+ days OR 25+ memories, established presence
+//   3 Ascended  — operator unlocked (set when viewer holds keys)
+//   4 Elder     — 1+ year OR 100+ memories, long-living legacy form
+//
+// Ascended is special: it's a viewer-perspective overlay, not a
+// permanent stage of the organism. When this front-door card is
+// rendered for an operator (push access to the seed repo), the card
+// shows the Ascended stage as a foil instead of the public stage.
+function _evolutionStage(memCount, plantedAt, viewerIsAscended) {
+  if (viewerIsAscended) return { name: "Ascended", icon: "✦", tier: 3 };
+  const ms = plantedAt ? Date.now() - new Date(plantedAt).getTime() : 0;
+  const days = (Number.isNaN(ms) || ms < 0) ? 0 : ms / 86400000;
+  if (days >= 365 || memCount >= 100) return { name: "Elder",     icon: "◆", tier: 4 };
+  if (days >= 30  || memCount >= 25)  return { name: "Veteran",   icon: "◇", tier: 2 };
+  if (memCount >= 1)                  return { name: "Doorman",   icon: "◈", tier: 1 };
+  return { name: "Hatchling", icon: "◦", tier: 0 };
+}
+
+// Cheap operator detection from the front door — checks rapp_settings
+// (set by the doorman's auth flow on the same origin) for a ghu_*
+// token, then asks the GitHub Contents API whether that token has push
+// access to this seed repo. Returns false on anything < authoritative
+// "yes". Anonymous-by-default; never blocks card render.
+async function _viewerIsOperator() {
+  try {
+    const raw = localStorage.getItem("rapp_settings");
+    if (!raw) return false;
+    const s = JSON.parse(raw);
+    const tok = s && s.ghuToken;
+    if (!tok || !tok.startsWith("ghu_")) return false;
+    // Pull owner/repo from the page URL: <user>.github.io/<repo>/
+    const host = location.host;
+    const owner = host.split(".")[0];
+    const parts = location.pathname.split("/").filter(Boolean);
+    const repo  = parts[0] || "";
+    if (!owner || !repo) return false;
+    const r = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+      headers: { "Authorization": "Bearer " + tok, "Accept": "application/vnd.github+json" },
+    });
+    if (!r.ok) return false;
+    const data = await r.json();
+    return !!(data.permissions && data.permissions.push);
+  } catch (_) { return false; }
+}
+
 async function deriveCardData() {
   if (_cardData) return _cardData;
   const kind = (window.__seedKind || "mirror").toLowerCase();
@@ -942,10 +1017,17 @@ async function deriveCardData() {
   // The organism gets stronger as it learns; hard ceiling so a
   // 1000-memory archive doesn't read as 1000/n.
   const liveStrength = Math.min(9, traits.power + Math.floor(memCount / 3));
+
+  // Evolution stage — the doorman→ascended→elder chain. If the viewer
+  // holds operator keys (ghu_* with push access on this seed), they
+  // see the Ascended foil; everyone else sees the public stage.
+  const isOp = await _viewerIsOperator();
+  const stage = _evolutionStage(memCount, plantedAt, isOp);
+
   const data = {
     name:       window.__seedDisplayName || "Front Door",
     title:      defaults.title,
-    type_line:  defaults.type_line,
+    type_line:  defaults.type_line + " — " + stage.icon + " " + stage.name,
     set_line:   "RAPP · " + _eraFromAge(plantedAt),
     pip:        traits.pip.letter,
     pipColor:   traits.pip.color,
@@ -956,6 +1038,7 @@ async function deriveCardData() {
     abilities:  defaults.abilities.slice(),
     flavor:     defaults.flavor,
     mem_count:  memCount,
+    stage,
   };
   // Operator override — optional card.json at seed root
   try {
@@ -995,6 +1078,16 @@ async function openCard() {
   // Power / toughness — rappid-derived stats
   const pt = document.getElementById("card-pt");
   if (pt) pt.textContent = data.power + "/" + data.toughness;
+  // Apply evolution-stage class so the card frame can theme the
+  // higher tiers — Ascended foil for operators, Elder gold for the
+  // long-running organisms. The base 'holo-card' frame stays.
+  const holo = document.getElementById("holo-card");
+  if (holo) {
+    holo.classList.remove("stage-hatchling", "stage-doorman", "stage-veteran", "stage-ascended", "stage-elder");
+    if (data.stage && data.stage.name) {
+      holo.classList.add("stage-" + data.stage.name.toLowerCase());
+    }
+  }
   // Sigil → art well
   document.getElementById("card-art").innerHTML = rappidSigil(window.__seedRappid || "", 200);
   // Abilities
@@ -1216,7 +1309,7 @@ async function copy(text) {
 // Seed metadata — read by the card derivation logic. Set from the
 // substituted placeholders below so the card can render before any
 // async fetches land.
-window.__seedRappid      = "d111455a-bc20-4d34-ba37-3001b320c2ea";
+window.__seedRappid      = "9fa1318d-8682-4c2d-94c4-4fde56b5f80f";
 window.__seedDisplayName = "Kody Wildfeuer";
 window.__seedKind        = "personal";
 window.__seedRepoName    = "kody-twin";
@@ -1329,7 +1422,7 @@ function rappidSigil(rappid, size) {
 (function renderSigil() {
   const el = document.getElementById("hero-sigil");
   if (!el) return;
-  el.innerHTML = rappidSigil("d111455a-bc20-4d34-ba37-3001b320c2ea", 96);
+  el.innerHTML = rappidSigil("9fa1318d-8682-4c2d-94c4-4fde56b5f80f", 96);
 })();
 
 // ── Profile stats: memory count + age ──────────────────────────────
