@@ -213,8 +213,9 @@
         </div>
         <div id="cpsignin-step2" style="display:none;">
           <p style="font-size:13px;color:#8b949e;margin-bottom:10px;">Open GitHub and enter this code:</p>
-          <div style="background:#0d1117;border:1px solid #238636;border-radius:8px;padding:18px;text-align:center;margin-bottom:14px;">
+          <div id="cpsignin-code-box" title="Tap to copy" style="background:#0d1117;border:1px solid #238636;border-radius:8px;padding:18px 14px 14px;text-align:center;margin-bottom:14px;cursor:pointer;user-select:all;-webkit-user-select:all;">
             <div style="font-family:'SF Mono',monospace;font-size:32px;letter-spacing:6px;color:#3fb950;font-weight:700;" id="cpsignin-code">XXXX-XXXX</div>
+            <button id="cpsignin-copy-code" type="button" style="margin-top:12px;background:#21262d;border:1px solid #30363d;color:#c9d1d9;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;">📋 Copy code</button>
           </div>
           <a href="#" id="cpsignin-link" target="_blank" rel="noopener" style="display:block;text-align:center;background:#238636;border:1px solid #2ea043;color:white;border-radius:8px;padding:12px;text-decoration:none;font-size:14px;font-weight:600;margin-bottom:14px;">Open https://github.com/login/device →</a>
           <p style="font-size:12px;color:#6e7681;text-align:center;">
@@ -1629,6 +1630,44 @@ async function runCopilotSignin() {
 document.getElementById("btn-signin-github").addEventListener("click", openSigninModal);
 document.getElementById("cpsignin-go").addEventListener("click", runCopilotSignin);
 document.getElementById("cpsignin-close").addEventListener("click", closeSigninModal);
+
+async function copyDeviceCode() {
+  const code = document.getElementById("cpsignin-code").textContent.trim();
+  if (!code || code === "XXXX-XXXX") return;
+  let ok = false;
+  try {
+    await navigator.clipboard.writeText(code);
+    ok = true;
+  } catch (_) {
+    // Fallback for older / non-secure-context browsers
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = code;
+      ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+    } catch (__) {}
+  }
+  const btn = document.getElementById("cpsignin-copy-code");
+  const orig = btn.textContent;
+  btn.textContent = ok ? "✓ Copied" : "Press & hold to copy";
+  btn.style.background = ok ? "#238636" : "#21262d";
+  btn.style.borderColor = ok ? "#2ea043" : "#30363d";
+  btn.style.color = "#fff";
+  setTimeout(() => {
+    btn.textContent = orig;
+    btn.style.background = "#21262d";
+    btn.style.borderColor = "#30363d";
+    btn.style.color = "#c9d1d9";
+  }, 1600);
+}
+document.getElementById("cpsignin-copy-code").addEventListener("click", (e) => {
+  e.stopPropagation();
+  copyDeviceCode();
+});
+document.getElementById("cpsignin-code-box").addEventListener("click", copyDeviceCode);
 
 document.getElementById("btn-save-pat").addEventListener("click", async () => {
   const tok = document.getElementById("pat-input").value.trim();
