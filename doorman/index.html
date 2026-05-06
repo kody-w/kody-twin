@@ -93,6 +93,12 @@
   .chat-log {
     flex: 1; overflow-y: auto;
     padding-bottom: 12px;
+    /* Flex column so bubbles can self-align (.msg.user → right,
+       .msg.assistant → left) and respect their max-width. Without
+       this, align-self + margin-left:auto on children does nothing
+       and bubbles stretch to full width. */
+    display: flex;
+    flex-direction: column;
   }
   .msg {
     margin: 10px 0;
@@ -100,7 +106,8 @@
     border-radius: 14px;
     font-size: 14px;
     line-height: 1.5;
-    max-width: 85%;
+    max-width: min(720px, 85%);
+    width: fit-content;
     word-wrap: break-word;
   }
   .msg.user {
