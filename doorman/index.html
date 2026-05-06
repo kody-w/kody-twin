@@ -162,17 +162,22 @@
 
 <main>
   <section class="auth-pane" id="auth-pane">
-    <h2>To start chatting</h2>
-    <p>This page is a vbrainstem — runs in your browser, calls GitHub Models with your own token. Same auth pattern as the egg hub's summon page; if you've signed in there, you can paste the same token.</p>
-    <ol>
-      <li>Visit <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener">github.com/settings/tokens</a> → <strong>Generate new token (fine-grained)</strong>.</li>
-      <li>Default permissions are fine — GitHub Models is included for any authenticated token.</li>
-      <li>Paste it below. Stored locally in your browser only (never sent anywhere except GitHub Models + the private companion repo, if any).</li>
-    </ol>
-    <div class="row">
-      <input type="password" id="pat-input" placeholder="github_pat_…  or  ghp_…" autocomplete="off">
-      <button id="btn-save-pat">Save</button>
+    <h2>Sign in to chat</h2>
+    <p>This page is a vbrainstem — same GitHub OAuth flow as the egg hub's summon page. Same browser, same <code>kody-w.github.io</code> origin, so signing in here also signs you in across every other RAPP front door on the same domain (and vice versa).</p>
+    <div class="row" style="margin-top:14px;">
+      <button id="btn-signin-github" style="flex:1;">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align:-2px;margin-right:6px;"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        Sign in with GitHub
+      </button>
     </div>
+    <details style="margin-top:14px;">
+      <summary style="cursor:pointer;color:#58a6ff;font-size:12px;">Or paste a token instead</summary>
+      <p style="font-size:12px;margin-top:10px;">Generate a fine-grained PAT at <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener">github.com/settings/tokens</a>. Default permissions are fine — GitHub Models is included for any authenticated token.</p>
+      <div class="row">
+        <input type="password" id="pat-input" placeholder="github_pat_…  or  ghp_…" autocomplete="off">
+        <button id="btn-save-pat">Save</button>
+      </div>
+    </details>
   </section>
 
   <div class="chat-log" id="chat-log" hidden></div>
@@ -211,7 +216,12 @@
 const RAPPID_JSON_URL = "../rappid.json";
 const GH_MODELS_URL   = "https://models.github.ai/inference/chat/completions";
 const MODEL           = "openai/gpt-4o-mini";
-const STORAGE_KEY     = "rapp_settings";  // mirrors vbrainstem (per-origin)
+const STORAGE_KEY     = "rapp_settings";  // shared with egg hub vbrainstem (same kody-w.github.io origin → same localStorage)
+// GitHub OAuth — exact same client_id + auth worker as the egg hub's
+// summon vbrainstem. Sign in once on any RAPP front door under
+// kody-w.github.io and you're signed in everywhere on the domain.
+const AUTH_WORKER_URL = "https://rapp-auth.kwildfeuer.workers.dev";
+const AUTH_CLIENT_ID  = "Ov23liXWPqaiWnxt9cLz";
 
 let identity = null;
 let privateContext = "";
@@ -240,7 +250,89 @@ function clearToken() {
   let s = {};
   try { s = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch {}
   delete s.ghToken;
+  delete s.ghUser;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+}
+function getCachedUser() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    return s.ghUser || null;
+  } catch { return null; }
+}
+function setCachedUser(u) {
+  let s = {};
+  try { s = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch {}
+  s.ghUser = u;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+}
+
+// ── GitHub OAuth web flow (mirrors egg hub vbrainstem) ─────────────
+function startGitHubSignIn() {
+  // Mark "we initiated OAuth in this session" so the callback handler
+  // knows the ?code= is one we expect. Without this, a stale code from
+  // a bookmark / copy-pasted URL would silently 404 the worker.
+  try { localStorage.setItem("rapp_oauthPending", String(Date.now())); } catch {}
+  const redirect = window.location.origin + window.location.pathname;
+  const url = `https://github.com/login/oauth/authorize?client_id=${AUTH_CLIENT_ID}&scope=read:user&redirect_uri=${encodeURIComponent(redirect)}`;
+  window.location.href = url;
+}
+
+async function handleGitHubAuthCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get("code");
+  if (!code) return false;
+  // Strip the code from the URL immediately so refresh doesn't re-submit.
+  const cleanUrl = window.location.origin + window.location.pathname + (window.location.hash || "");
+  window.history.replaceState({}, "", cleanUrl);
+  // Only attempt the exchange if we initiated the OAuth flow recently.
+  const pending = parseInt(localStorage.getItem("rapp_oauthPending") || "0", 10);
+  const fresh = pending && (Date.now() - pending) < 10 * 60 * 1000;
+  localStorage.removeItem("rapp_oauthPending");
+  if (!fresh) return false;
+  // Belt-and-suspenders: short-circuit re-entry with the same code.
+  const lastTried = localStorage.getItem("rapp_lastOAuthCode") || "";
+  if (lastTried === code) return false;
+  localStorage.setItem("rapp_lastOAuthCode", code);
+  if (getToken()) return true; // already have one, skip exchange
+  try {
+    const resp = await fetch(AUTH_WORKER_URL + "/api/auth/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code }),
+    });
+    if (!resp.ok) {
+      console.info("[doorman] OAuth code rejected (already used or expired) — ignoring.");
+      return false;
+    }
+    const data = await resp.json();
+    if (data.access_token) {
+      setToken(data.access_token);
+      // Best-effort: fetch + cache the user's handle for display
+      fetchAndCacheUser(data.access_token).catch(() => {});
+      return true;
+    }
+    console.info("[doorman] OAuth response had no access_token:", data.error || "unknown");
+  } catch (e) {
+    console.info("[doorman] OAuth callback skipped:", e.message);
+  }
+  return false;
+}
+
+async function fetchAndCacheUser(token) {
+  try {
+    const r = await fetch("https://api.github.com/user", {
+      headers: { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json" }
+    });
+    if (!r.ok) return null;
+    const u = await r.json();
+    if (u.login) {
+      setCachedUser({ login: u.login, avatar: u.avatar_url || "" });
+      return u;
+    }
+  } catch (_) { /* silent */ }
+  return null;
 }
 
 // ── identity / persona ─────────────────────────────────────────────
@@ -575,17 +667,24 @@ async function enterChat() {
 // ── init ───────────────────────────────────────────────────────────
 (async function init() {
   await loadIdentity();
+  // Handle ?code= callback from GitHub OAuth redirect (no-op if not present)
+  await handleGitHubAuthCallback();
   if (getToken()) {
     enterChat();
   }
 })();
 
 // ── wire ───────────────────────────────────────────────────────────
+document.getElementById("btn-signin-github").addEventListener("click", () => {
+  startGitHubSignIn();
+});
 document.getElementById("btn-save-pat").addEventListener("click", async () => {
   const tok = document.getElementById("pat-input").value.trim();
   if (!tok) return;
   setToken(tok);
   document.getElementById("pat-input").value = "";
+  // Try to fetch the user's handle so they know who's signed in
+  fetchAndCacheUser(tok).catch(() => {});
   await enterChat();
 });
 document.getElementById("btn-send").addEventListener("click", sendMessage);

@@ -13,11 +13,11 @@
   "planted_from": null,
   "kernel_version": "0.6.0",
   "private_companion": {
-    "repo": "https://github.com/kody-w/twin.git",
-    "purpose": "The brain repo \u2014 vault notes, soul.md, agents. Visitors with GitHub read access to kody-w/twin chat with the doorman backed by the full corpus; anonymous visitors see only public seed-level identity.",
-    "access_required": "Read access to kody-w/twin.",
-    "raw_url_template": "https://raw.githubusercontent.com/kody-w/twin/main/{path}",
-    "tree_url_template": "https://api.github.com/repos/kody-w/twin/contents/{path}",
+    "repo": "https://github.com/kody-w/twin-private.git",
+    "purpose": "Private brain repo. Authenticated visitors with read access to kody-w/twin-private get richer context (private memory + private prose). Anonymous visitors see only public seed memory.",
+    "access_required": "Read access to kody-w/twin-private.",
+    "raw_url_template": "https://raw.githubusercontent.com/kody-w/twin-private/main/{path}",
+    "tree_url_template": "https://api.github.com/repos/kody-w/twin-private/contents/{path}",
     "auth": {
       "scheme": "github_token",
       "scope_required": "repo (or fine-grained Contents: Read on the private_companion repo)"
