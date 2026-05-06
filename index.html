@@ -184,60 +184,199 @@
   }
   footer a { color: #58a6ff; text-decoration: none; }
   footer a:hover { text-decoration: underline; }
+  /* ── Hero (the page's centerpiece) ─────────────────────────── */
+  .hero {
+    text-align: center;
+    padding: 36px 24px 28px;
+    margin: 0 auto 18px;
+    max-width: 640px;
+    background: radial-gradient(
+        ellipse at top,
+        rgba(31,111,235,0.10) 0%,
+        rgba(31,111,235,0.00) 65%
+      ),
+      #161b22;
+    border: 1px solid #21262d;
+    border-radius: 16px;
+  }
+  .hero-sigil {
+    width: 96px; height: 96px;
+    margin: 0 auto 14px;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px #21262d, 0 6px 20px rgba(0,0,0,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 44px;
+    background: #0d1117;
+  }
+  .hero-sigil svg { display: block; width: 100%; height: 100%; }
+  .hero-handle {
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 12px; color: #6e7681;
+    margin-top: 4px;
+  }
+  .hero-handle a { color: inherit; text-decoration: none; }
+  .hero-handle a:hover { color: #58a6ff; }
+  .hero-stats {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 6px; margin-top: 18px;
+  }
+  .stat-chip {
+    font-size: 11px; color: #8b949e;
+    background: rgba(110,118,129,0.10);
+    border: 1px solid rgba(110,118,129,0.20);
+    padding: 4px 10px; border-radius: 999px;
+    white-space: nowrap;
+  }
+  .hero-title {
+    font-size: 32px; line-height: 1.1; font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 6px;
+  }
+  .hero-place {
+    font-size: 13px; color: #8b949e; margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .hero-place:empty { display: none; }
+  .hero-blurb {
+    font-size: 15px; line-height: 1.55; color: #c9d1d9;
+    max-width: 480px; margin: 0 auto 22px;
+  }
+  .hero-cta {
+    display: inline-block;
+    background: #238636; border: 1px solid #2ea043;
+    color: white;
+    border-radius: 12px;
+    padding: 14px 28px;
+    font-size: 16px; font-weight: 600;
+    text-decoration: none;
+    transition: background 0.15s, transform 0.05s;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset, 0 4px 12px rgba(35,134,54,0.18);
+  }
+  .hero-cta:hover { background: #2ea043; }
+  .hero-cta:active { transform: translateY(1px); }
+  .hero-meta {
+    margin-top: 18px;
+    font-size: 12px; color: #8b949e;
+  }
+  .hero-meta a { color: #58a6ff; text-decoration: none; }
+  .hero-meta a:hover { text-decoration: underline; }
+  /* Secondary action row (live below the hero) */
+  .row-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    max-width: 640px;
+    margin: 0 auto 16px;
+  }
+  @media (min-width: 540px) { .row-actions { grid-template-columns: repeat(3, 1fr); } }
+  .row-actions button.action {
+    background: #21262d; color: #c9d1d9;
+    border: 1px solid #30363d;
+    font-size: 13px; padding: 12px 14px;
+  }
+  .row-actions button.action:hover { background: #2d333b; border-color: #484f58; }
+  /* Front-door details disclosure (slug/rappid/kernel for engineers) */
+  details.fd-details {
+    max-width: 640px; margin: 0 auto;
+    background: #161b22;
+    border: 1px solid #21262d;
+    border-radius: 12px;
+    padding: 0;
+  }
+  details.fd-details > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 12px 18px;
+    font-size: 12px; color: #8b949e;
+    user-select: none;
+  }
+  details.fd-details > summary::-webkit-details-marker { display: none; }
+  details.fd-details > summary::before {
+    content: "▸ ";
+    display: inline-block; transition: transform 0.15s;
+  }
+  details.fd-details[open] > summary::before { content: "▾ "; }
+  details.fd-details > .identity {
+    background: transparent; border: none; border-top: 1px solid #21262d;
+    border-radius: 0; margin: 0; padding: 14px 18px;
+  }
+  /* Tether fallback disclosure */
+  details.tether-fallback {
+    margin-top: 16px;
+    border-top: 1px solid #21262d; padding-top: 14px;
+  }
+  details.tether-fallback > summary {
+    list-style: none;
+    cursor: pointer;
+    font-size: 12px; color: #8b949e;
+    user-select: none;
+  }
+  details.tether-fallback > summary::-webkit-details-marker { display: none; }
+  details.tether-fallback > summary::before {
+    content: "▸ "; display: inline-block;
+  }
+  details.tether-fallback[open] > summary::before { content: "▾ "; }
+  details.tether-fallback > .fallback-body { margin-top: 12px; }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>Kody Wildfeuer</h1>
-  <div class="sub">A RAPP front door · planted by <a href="https://github.com/kody-w" style="color:#58a6ff;text-decoration:none;">@kody-w</a></div>
-</header>
-
 <main>
-  <section class="identity">
-    <div class="identity-row">
-      <span class="identity-key">Slug</span>
-      <span class="identity-val">kody-twin</span>
-    </div>
-    <div class="identity-row">
-      <span class="identity-key">Rappid</span>
-      <span class="identity-val">009e9726-7a86-4449-b37b-c16c553fd838</span>
-    </div>
-    <div class="identity-row">
-      <span class="identity-key">Kernel</span>
-      <span class="identity-val">v0.6.0 (grail-synced)</span>
-    </div>
-    <div style="margin-top:12px;">
-      <span class="chip">kind: <code>mirror</code></span>
-      
+  <section class="hero">
+    <div class="hero-sigil" id="hero-sigil">🧠</div>
+    <h1 class="hero-title">Kody Wildfeuer</h1>
+    <div class="hero-handle"><a href="https://github.com/kody-w/kody-twin">@kody-w/kody-twin</a></div>
+    <div class="hero-place"></div>
+    <p class="hero-blurb">An AI digital twin. Talk to Kody Wildfeuer — they remember every conversation and pick up where you left off next time you visit.</p>
+    <a class="hero-cta" href="./doorman/">💬 Talk to Kody Wildfeuer →</a>
+    <div class="hero-stats">
+      <span class="stat-chip" id="stat-mem">·</span>
+      <span class="stat-chip" id="stat-age">·</span>
+      <span class="stat-chip">⚡ frozen kernel · v0.6.0</span>
     </div>
   </section>
 
-  <div class="actions">
-    <a class="action" href="./doorman/" style="text-decoration:none;text-align:center;">💬 Step in &amp; chat</a>
-    <button class="action secondary" id="btn-tether">Tether (cross-device chat)</button>
-    <button class="action secondary" id="btn-qr">Show QR</button>
-    <button class="action secondary" id="btn-install">Install Brainstem</button>
+  <div class="row-actions">
+    <button class="action secondary" id="btn-tether">📱 Pair with another device</button>
+    <button class="action secondary" id="btn-qr">🔗 Share QR</button>
+    <button class="action secondary" id="btn-install">💻 Install kernel locally</button>
   </div>
 
+  <details class="fd-details">
+    <summary>Front-door details</summary>
+    <section class="identity">
+      <div class="identity-row">
+        <span class="identity-key">Slug</span>
+        <span class="identity-val">kody-twin</span>
+      </div>
+      <div class="identity-row">
+        <span class="identity-key">Rappid</span>
+        <span class="identity-val">6066513c-a05b-4211-b65a-193541afbe3e</span>
+      </div>
+      <div class="identity-row">
+        <span class="identity-key">Kernel</span>
+        <span class="identity-val">v0.6.0 (grail-synced)</span>
+      </div>
+      <div style="margin-top:12px;">
+        <span class="chip">kind: <code>personal</code></span>
+        
+      </div>
+    </section>
+  </details>
+
   <section class="pane" id="pane-tether" hidden>
-    <h2>Tether — cross-device chat</h2>
-    <p>Two devices, one channel. Open this page on another device, copy that one's ID, paste here, connect. WebRTC end-to-end encrypted (DTLS). Signaling via PeerJS public broker; once connected, the broker drops out.</p>
+    <h2>📱 Pair with another device</h2>
+    <p>Open the camera on your phone and point it at the code below. The other device lands on this same chat — both ends share an end-to-end-encrypted channel (WebRTC / DTLS). The broker drops out once you're connected.</p>
 
-    <div>
-      <span class="identity-key">My peer ID:</span>
-      <div class="my-id" id="my-id"><span class="status-dot" id="peer-status"></span><span id="my-id-text">(connecting to broker...)</span></div>
-      <button class="small" id="btn-copy-id">Copy ID</button>
-      <button class="small" id="btn-show-tether-qr">Show QR for this ID</button>
-    </div>
-
-    <div class="input-row" style="margin-top:16px;">
-      <input type="text" id="peer-id-input" placeholder="Paste peer's ID here">
-      <button class="small primary" id="btn-connect">Connect</button>
+    <div id="tether-qr-wrap" style="text-align:center;padding:18px 0;">
+      <div id="tether-qr-loading" style="color:#8b949e;font-size:13px;padding:32px 0;">Generating pairing code…</div>
+      <img class="qr-img" id="tether-qr-img" alt="Scan to pair" hidden>
+      <div class="qr-url" id="tether-qr-url" hidden></div>
     </div>
 
     <div class="chat-log" id="chat-log">
-      <div class="msg system">Tether will appear here once connected.</div>
+      <div class="msg system">Once a device scans the code, your two devices share a private channel here.</div>
     </div>
 
     <div class="input-row">
@@ -245,11 +384,18 @@
       <button class="small primary" id="btn-send" disabled>Send</button>
     </div>
 
-    <div id="tether-qr-pane" hidden style="margin-top:16px;">
-      <p>Scan to land on this front door + this peer ID:</p>
-      <img class="qr-img" id="tether-qr-img" alt="Peer ID QR">
-      <div class="qr-url" id="tether-qr-url"></div>
-    </div>
+    <details class="tether-fallback">
+      <summary>Can't scan? Pair by ID instead.</summary>
+      <div class="fallback-body">
+        <span class="identity-key">My ID</span>
+        <div class="my-id" id="my-id"><span class="status-dot" id="peer-status"></span><span id="my-id-text">(connecting to broker…)</span></div>
+        <button class="small" id="btn-copy-id">Copy ID</button>
+        <div class="input-row" style="margin-top:10px;">
+          <input type="text" id="peer-id-input" placeholder="Or paste another device's ID">
+          <button class="small primary" id="btn-connect">Connect</button>
+        </div>
+      </div>
+    </details>
   </section>
 
   <section class="pane" id="pane-qr" hidden>
@@ -277,7 +423,7 @@
 "use strict";
 
 const FD = {
-  rappid: "009e9726-7a86-4449-b37b-c16c553fd838",
+  rappid: "6066513c-a05b-4211-b65a-193541afbe3e",
   displayName: "Kody Wildfeuer",
   slug: "kody-twin",
   ghUser: "kody-w",
@@ -338,6 +484,10 @@ async function ensurePeer() {
       clearTimeout(t);
       setStatus("ok");
       document.getElementById("my-id-text").textContent = id;
+      // QR-first: as soon as the broker assigns us an ID, render the
+      // pairing QR. The other device scans → lands on this same URL
+      // with ?peer=<id> → autoTether() dials this peer.
+      autoRenderTetherQR(id);
       resolve(peer);
     });
     peer.on("connection", c => {
@@ -402,19 +552,19 @@ function showFrontDoorQR() {
   document.getElementById("qr-url").textContent = url;
 }
 
-function showTetherQR() {
-  const myId = document.getElementById("my-id-text").textContent;
-  if (!myId || myId.includes("...") || myId.includes("timeout") || myId.includes("failed")) {
-    appendMsg("No peer ID yet — wait for the broker handshake to finish.", "system");
-    return;
-  }
-  const tetherPane = document.getElementById("tether-qr-pane");
-  tetherPane.hidden = false;
+function autoRenderTetherQR(myId) {
+  if (!myId) return;
   const url = location.origin + location.pathname + "?peer=" + encodeURIComponent(myId);
-  document.getElementById("tether-qr-img").src =
-    "https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=" +
-    encodeURIComponent(url);
-  document.getElementById("tether-qr-url").textContent = url;
+  const img = document.getElementById("tether-qr-img");
+  const cap = document.getElementById("tether-qr-url");
+  const loading = document.getElementById("tether-qr-loading");
+  if (!img) return; // pane not in DOM (e.g. unit-test)
+  img.src = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=" +
+            encodeURIComponent(url);
+  img.hidden = false;
+  cap.textContent = url;
+  cap.hidden = false;
+  if (loading) loading.style.display = "none";
 }
 
 function showInstall() { showPane("pane-install"); }
@@ -428,7 +578,6 @@ document.getElementById("btn-tether").onclick = openTether;
 document.getElementById("btn-qr").onclick = showFrontDoorQR;
 document.getElementById("btn-install").onclick = showInstall;
 document.getElementById("btn-connect").onclick = connectToPeer;
-document.getElementById("btn-show-tether-qr").onclick = showTetherQR;
 document.getElementById("btn-send").onclick = sendMessage;
 document.getElementById("btn-copy-id").onclick = () => {
   copy(document.getElementById("my-id-text").textContent);
@@ -452,6 +601,124 @@ document.getElementById("peer-id-input").addEventListener("keydown", e => {
     document.getElementById("peer-id-input").value = peerId;
     // Give the broker a moment to connect us, then dial
     setTimeout(connectToPeer, 1500);
+  }
+})();
+
+// ── Rappid-derived sigil ───────────────────────────────────────────
+// Every planted seed has a unique UUID rappid. This generates a
+// deterministic, distinctive SVG portrait for the hero — like an
+// avatar on a profile page. Hashing the rappid into hue + shape +
+// accents means the same seed always gets the same look, so visitors
+// recognize a place by sight.
+function rappidSigil(rappid, size) {
+  const hash = (rappid || "").replace(/-/g, "").slice(0, 16) || "deadbeef00000000";
+  const h1 = parseInt(hash.slice(0, 4),  16) || 0;
+  const h2 = parseInt(hash.slice(4, 8),  16) || 0;
+  const h3 = parseInt(hash.slice(8,12),  16) || 0;
+  const h4 = parseInt(hash.slice(12,16), 16) || 0;
+  const hueA   = h1 % 360;
+  const hueB   = (hueA + 60 + (h2 % 180)) % 360;
+  const shape  = h3 % 4;
+  const cx = size / 2, cy = size / 2;
+  let layer = "";
+  if (shape === 0) {
+    const pts = [];
+    for (let i = 0; i < 6; i++) {
+      const a = (Math.PI / 3) * i - Math.PI / 6;
+      pts.push((cx + Math.cos(a) * size * 0.30).toFixed(1) + "," +
+               (cy + Math.sin(a) * size * 0.30).toFixed(1));
+    }
+    layer = '<polygon points="' + pts.join(" ") + '" fill="hsl(' + hueB + ',75%,58%)"/>';
+  } else if (shape === 1) {
+    const pts = cx + "," + (cy - size*0.32) + " " +
+                (cx - size*0.28) + "," + (cy + size*0.18) + " " +
+                (cx + size*0.28) + "," + (cy + size*0.18);
+    layer = '<polygon points="' + pts + '" fill="hsl(' + hueB + ',75%,58%)"/>';
+  } else if (shape === 2) {
+    layer = '<circle cx="' + cx + '" cy="' + cy + '" r="' + (size*0.30) + '" ' +
+            'fill="none" stroke="hsl(' + hueB + ',75%,58%)" stroke-width="' + (size*0.10) + '"/>';
+  } else {
+    const w = size * 0.55;
+    layer = '<rect x="' + (cx - w/2) + '" y="' + (cy - w/2) + '" ' +
+            'width="' + w + '" height="' + w + '" rx="' + (w*0.20) + '" ' +
+            'fill="hsl(' + hueB + ',75%,58%)"/>';
+  }
+  const dotR = size * 0.06;
+  const dotHue = (hueA + 180) % 360;
+  layer += '<circle cx="' + cx + '" cy="' + cy + '" r="' + dotR + '" fill="hsl(' + dotHue + ',80%,75%)"/>';
+  // Subtle orbit ring — additional accent based on h4
+  if (h4 % 2 === 0) {
+    layer += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (size*0.42) + '" ' +
+             'fill="none" stroke="hsla(' + hueB + ',60%,70%,0.35)" stroke-width="1"/>';
+  }
+  const gid = "g" + (h1.toString(36)) + (h2.toString(36));
+  return '<svg viewBox="0 0 ' + size + ' ' + size + '" xmlns="http://www.w3.org/2000/svg">' +
+         '<defs><linearGradient id="' + gid + '" x1="0" y1="0" x2="1" y2="1">' +
+           '<stop offset="0%" stop-color="hsl(' + hueA + ',45%,28%)"/>' +
+           '<stop offset="100%" stop-color="hsl(' + hueA + ',35%,12%)"/>' +
+         '</linearGradient></defs>' +
+         '<rect width="' + size + '" height="' + size + '" fill="url(#' + gid + ')"/>' +
+         layer +
+         '</svg>';
+}
+
+(function renderSigil() {
+  const el = document.getElementById("hero-sigil");
+  if (!el) return;
+  el.innerHTML = rappidSigil("6066513c-a05b-4211-b65a-193541afbe3e", 96);
+})();
+
+// ── Profile stats: memory count + age ──────────────────────────────
+// "Signs of life" for the front door — the things that change between
+// visits. Memory count comes from public .brainstem_data/memory.json;
+// age is computed from rappid.json's planted_at field.
+function relativeAge(iso) {
+  if (!iso) return "";
+  const ms = Date.now() - new Date(iso).getTime();
+  if (Number.isNaN(ms) || ms < 0) return "";
+  const days = Math.floor(ms / 86400000);
+  if (days < 1)  return "planted today";
+  if (days < 2)  return "planted yesterday";
+  if (days < 30) return "planted " + days + " days ago";
+  const months = Math.floor(days / 30);
+  if (months < 12) return "planted " + months + " month" + (months === 1 ? "" : "s") + " ago";
+  const years = Math.floor(months / 12);
+  return "planted " + years + " year" + (years === 1 ? "" : "s") + " ago";
+}
+
+(async function fillStats() {
+  // Memory count
+  const memEl = document.getElementById("stat-mem");
+  if (memEl) {
+    try {
+      const r = await fetch(".brainstem_data/memory.json", { cache: "no-cache" });
+      if (r.ok) {
+        const j = await r.json();
+        const n = Array.isArray(j.facts) ? j.facts.length : 0;
+        memEl.textContent = n === 0
+          ? "🧠 ready for its first memory"
+          : "🧠 " + n + " memor" + (n === 1 ? "y" : "ies") + " from past visits";
+      } else {
+        memEl.textContent = "🧠 ready for its first memory";
+      }
+    } catch (_) {
+      memEl.textContent = "🧠 ready for its first memory";
+    }
+  }
+  // Age
+  const ageEl = document.getElementById("stat-age");
+  if (ageEl) {
+    try {
+      const r = await fetch("rappid.json", { cache: "no-cache" });
+      if (r.ok) {
+        const j = await r.json();
+        const txt = relativeAge(j.planted_at);
+        if (txt) ageEl.textContent = "🌱 " + txt;
+        else ageEl.remove();
+      } else {
+        ageEl.remove();
+      }
+    } catch (_) { ageEl.remove(); }
   }
 })();
 </script>
