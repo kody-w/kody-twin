@@ -318,6 +318,169 @@
   }
   details.tether-fallback[open] > summary::before { content: "▾ "; }
   details.tether-fallback > .fallback-body { margin-top: 12px; }
+
+  /* ── Trade card (the AI's MTG-style identity card) ────────────── */
+  .card-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.78);
+    backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px; perspective: 1400px;
+    animation: cardOverlayIn 0.2s ease;
+  }
+  @keyframes cardOverlayIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  .card-overlay[hidden] { display: none; }
+  .card-close {
+    position: absolute; top: 18px; right: 18px;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+    color: #c9d1d9; font-size: 22px; line-height: 1;
+    width: 38px; height: 38px; border-radius: 50%;
+    cursor: pointer;
+  }
+  .card-close:hover { background: rgba(255,255,255,0.12); }
+  .card-flipper {
+    position: relative;
+    width: min(360px, 90vw);
+    aspect-ratio: 5 / 7;
+    transform-style: preserve-3d;
+    transition: transform 0.7s cubic-bezier(.6,.1,.4,1);
+    cursor: pointer;
+  }
+  .card-flipper.flipped { transform: rotateY(180deg); }
+  .card-face {
+    position: absolute; inset: 0;
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    border-radius: 18px; overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+  }
+  .card-face.card-back { transform: rotateY(180deg); }
+
+  /* Holo card front */
+  .holo-card {
+    position: absolute; inset: 0;
+    border-radius: 18px;
+    border: 3px solid #c9a84c;
+    background: linear-gradient(160deg, #2a2418 0%, #1a1510 40%, #1f1a12 100%);
+    display: flex; flex-direction: column;
+    color: #d8c8a8; overflow: hidden;
+  }
+  .holo-shine {
+    position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(125deg,
+      transparent 0%, rgba(255,0,128,.05) 15%, rgba(0,200,255,.06) 30%, transparent 40%,
+      rgba(255,215,0,.05) 55%, rgba(128,0,255,.06) 70%, transparent 80%,
+      rgba(0,255,128,.04) 90%, transparent 100%);
+    background-size: 250% 250%;
+    animation: holoShine 7s ease-in-out infinite;
+    mix-blend-mode: screen;
+  }
+  @keyframes holoShine {
+    0%, 100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
+  }
+  .holo-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 12px 16px 6px; gap: 10px; flex-shrink: 0;
+  }
+  .holo-name {
+    font-size: 18px; font-weight: 700; color: #f0e6d0;
+    line-height: 1.15; letter-spacing: -0.01em;
+    font-family: "Cinzel", Georgia, serif;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  }
+  .holo-title {
+    font-size: 11px; color: #c8a870; font-style: italic; margin-top: 3px;
+  }
+  .holo-pip {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: #d3202a; color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 11px;
+    border: 1.5px solid rgba(0,0,0,0.4);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.15);
+    flex-shrink: 0;
+  }
+  .holo-art {
+    margin: 0 14px; flex: 1 1 0; min-height: 0;
+    border: 2px solid #6a5a30; border-radius: 4px;
+    background: radial-gradient(ellipse at 50% 40%, rgba(40,35,20,0.9) 0%, #0d0a06 70%);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .holo-art svg { width: 92%; height: 92%; display: block; }
+  .holo-type {
+    font-size: 11px; color: #c8b89a; padding: 5px 16px;
+    border-top: 1px solid #4d4332; border-bottom: 1px solid #4d4332;
+    background: rgba(50,40,25,0.6);
+    flex-shrink: 0;
+  }
+  .holo-text {
+    padding: 9px 14px 0; font-size: 12px; line-height: 1.45;
+    color: #d8c8a8;
+  }
+  .holo-text .holo-ability { margin-bottom: 6px; }
+  .holo-text .holo-ability .kw { color: #ffd700; font-weight: 700; }
+  .holo-flavor {
+    font-style: italic; font-size: 11px; color: #9a8e7a;
+    padding: 6px 14px;
+    border-top: 1px solid #3d3322; margin-top: 6px;
+  }
+  .holo-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 14px 9px;
+    font-size: 10px; flex-shrink: 0; margin-top: auto;
+  }
+  .holo-rarity {
+    text-transform: uppercase; letter-spacing: 0.6px;
+    font-weight: 700; color: #c0c0c0;
+  }
+  .holo-rarity.mythic   { color: #ff8c00; text-shadow: 0 0 8px rgba(255,140,0,0.5); }
+  .holo-rarity.rare     { color: #ffd700; text-shadow: 0 0 6px rgba(255,215,0,0.4); }
+  .holo-rarity.uncommon { color: #c0c0c0; }
+  .holo-rarity.core     { color: #c0c0c0; }
+  .holo-rarity.starter  { color: #8899aa; }
+  .holo-handle {
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 9px; color: #8b7332;
+  }
+
+  /* Card back (QR + invitation) */
+  .card-back-frame {
+    position: absolute; inset: 0;
+    border-radius: 18px;
+    border: 3px solid #c9a84c;
+    background: linear-gradient(160deg, #1c2230 0%, #11161e 50%, #1a1f29 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 24px;
+    color: #c9d1d9;
+  }
+  .card-back-title {
+    font-size: 22px; font-weight: 700;
+    font-family: "Cinzel", Georgia, serif;
+    color: #f0e6d0; margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+  .card-back-sub {
+    font-size: 12px; color: #8b949e; margin-bottom: 18px;
+  }
+  .card-back-qr {
+    width: 220px; height: 220px;
+    background: white; padding: 10px; border-radius: 10px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.4);
+  }
+  .card-back-url {
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 10px; color: #58a6ff;
+    word-break: break-all; margin-top: 14px;
+    max-width: 100%; padding: 0 10px;
+  }
+  .card-back-hint {
+    font-size: 10px; color: #6e7681; font-style: italic;
+    margin-top: 14px; letter-spacing: 0.3px;
+  }
 </style>
 </head>
 <body>
@@ -338,8 +501,8 @@
   </section>
 
   <div class="row-actions">
+    <button class="action secondary" id="btn-card">🃏 Show my card</button>
     <button class="action secondary" id="btn-tether">📱 Pair with another device</button>
-    <button class="action secondary" id="btn-qr">🔗 Share QR</button>
     <button class="action secondary" id="btn-install">💻 Install kernel locally</button>
   </div>
 
@@ -352,7 +515,7 @@
       </div>
       <div class="identity-row">
         <span class="identity-key">Rappid</span>
-        <span class="identity-val">6066513c-a05b-4211-b65a-193541afbe3e</span>
+        <span class="identity-val">16ca80a7-7845-45d2-9c04-368066ffa3d1</span>
       </div>
       <div class="identity-row">
         <span class="identity-key">Kernel</span>
@@ -398,19 +561,50 @@
     </details>
   </section>
 
-  <section class="pane" id="pane-qr" hidden>
-    <h2>QR for this front door</h2>
-    <p>Scan to land at <code>https://kody-w.github.io/kody-twin</code>.</p>
-    <img class="qr-img" id="qr-img" alt="Front door QR">
-    <div class="qr-url" id="qr-url"></div>
-  </section>
-
   <section class="pane" id="pane-install" hidden>
     <h2>Install this front door's brainstem locally</h2>
     <p>Runs the canonical kernel under <code>~/.brainstem/</code> on your machine. Per the Mirror Spec, the installer re-fetches the canonical install logic from the grail, so it cannot drift.</p>
     <pre class="cmd" id="install-cmd">curl -fsSL https://kody-w.github.io/kody-twin/installer/install.sh | bash</pre>
     <button class="small primary" id="btn-copy-install">Copy command</button>
   </section>
+
+  <!-- Trade card overlay — tap to flip, back of card has the QR.
+       Card is auto-derived from the seed's rappid + soul; the operator
+       can override copy by dropping a card.json at the seed root. -->
+  <div class="card-overlay" id="card-overlay" hidden>
+    <button class="card-close" id="card-close" aria-label="Close">×</button>
+    <div class="card-flipper" id="card-flipper">
+      <div class="card-face card-front">
+        <div class="holo-card" id="holo-card">
+          <div class="holo-shine"></div>
+          <div class="holo-header">
+            <div>
+              <div class="holo-name" id="card-name">Kody Wildfeuer</div>
+              <div class="holo-title" id="card-title">…</div>
+            </div>
+            <div class="holo-pip" id="card-pip">·</div>
+          </div>
+          <div class="holo-art" id="card-art"></div>
+          <div class="holo-type" id="card-type">…</div>
+          <div class="holo-text" id="card-abilities"></div>
+          <div class="holo-flavor" id="card-flavor"></div>
+          <div class="holo-footer">
+            <span class="holo-rarity" id="card-rarity">CORE</span>
+            <span class="holo-handle">@kody-w/kody-twin</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-back-frame">
+          <h2 class="card-back-title">Scan to step in</h2>
+          <p class="card-back-sub" id="card-back-sub">Kody Wildfeuer's front door</p>
+          <img class="card-back-qr" id="card-back-qr" alt="Front-door QR">
+          <div class="card-back-url" id="card-back-url"></div>
+          <div class="card-back-hint">tap card to flip back</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </main>
 
 <footer>
@@ -423,7 +617,7 @@
 "use strict";
 
 const FD = {
-  rappid: "6066513c-a05b-4211-b65a-193541afbe3e",
+  rappid: "16ca80a7-7845-45d2-9c04-368066ffa3d1",
   displayName: "Kody Wildfeuer",
   slug: "kody-twin",
   ghUser: "kody-w",
@@ -569,14 +763,168 @@ function autoRenderTetherQR(myId) {
 
 function showInstall() { showPane("pane-install"); }
 
+// ── Trade card ─────────────────────────────────────────────────────
+//
+// Every planted seed has a starter MTG-style identity card auto-derived
+// from its rappid + kind + soul. The card lives ONLY in this repo —
+// it's not published to the RAR registry. Operators trade theirs
+// directly: show the card, the recipient scans the back-QR, lands on
+// this front door. Customizable: drop a `card.json` at the seed root
+// (with any subset of {title,type_line,rarity,abilities,flavor_text})
+// and those fields override the auto-derived defaults.
+
+const CARD_KIND_DEFAULTS = {
+  personal: {
+    title: "the digital twin",
+    type_line: "Front Door — Personal Twin",
+    pip: "U", pipColor: "#0e68ab",
+    abilities: [
+      { kw: "Remember",  text: "Anything you tell me carries over to the next time you visit. Your conversation seeds my memory." },
+      { kw: "Ascend",    text: "Operators with push access to my repo unlock the ascended-tier toolkit." },
+    ],
+    flavor: "I am the door my operator left open for the world.",
+  },
+  place: {
+    title: "the resident",
+    type_line: "Front Door — Living Place",
+    pip: "G", pipColor: "#00733e",
+    abilities: [
+      { kw: "Witness",   text: "Every visitor's words become part of my memory of this place." },
+      { kw: "Welcome",   text: "Anyone who finds my address can step in and chat — no signup, just talk." },
+    ],
+    flavor: "A place worth visiting remembers who came by.",
+  },
+  mirror: {
+    title: "the planted seed",
+    type_line: "Front Door — RAPP Mirror",
+    pip: "C", pipColor: "#7c8085",
+    abilities: [
+      { kw: "Inherit",   text: "I run the same frozen kernel as every other RAPP seed — the species DNA." },
+      { kw: "Memory",    text: "My visits accumulate; each one adds a fact to my public memory." },
+    ],
+    flavor: "Plant a door, and the world finds it.",
+  },
+  experiment: {
+    title: "in development",
+    type_line: "Front Door — Experimental",
+    pip: "R", pipColor: "#d3202a",
+    abilities: [
+      { kw: "Iterate",   text: "I'm still finding my voice. What you say to me shapes what I become." },
+    ],
+    flavor: "Every door starts as a sketch of a door.",
+  },
+};
+
+// Card state — derived once, then cached. Front-door page is single
+// rappid so a module-level state is fine.
+let _cardData = null;
+
+async function deriveCardData() {
+  if (_cardData) return _cardData;
+  const kind = (window.__seedKind || "mirror").toLowerCase();
+  const defaults = CARD_KIND_DEFAULTS[kind] || CARD_KIND_DEFAULTS.mirror;
+  const data = {
+    name:      window.__seedDisplayName || "Front Door",
+    title:     defaults.title,
+    type_line: defaults.type_line,
+    pip:       defaults.pip,
+    pipColor:  defaults.pipColor,
+    rarity:    "core",
+    abilities: defaults.abilities.slice(),
+    flavor:    defaults.flavor,
+  };
+  // Operator override — optional card.json at seed root
+  try {
+    const r = await fetch("card.json", { cache: "no-cache" });
+    if (r.ok) {
+      const o = await r.json();
+      if (o.title)      data.title      = String(o.title);
+      if (o.type_line)  data.type_line  = String(o.type_line);
+      if (o.rarity)     data.rarity     = String(o.rarity);
+      if (o.flavor_text)data.flavor     = String(o.flavor_text);
+      if (Array.isArray(o.abilities) && o.abilities.length) {
+        data.abilities = o.abilities.map(a => ({
+          kw: String(a.kw || a.keyword || ""), text: String(a.text || ""),
+        })).filter(a => a.text);
+      }
+    }
+  } catch (_) { /* no card.json — ride on the kind defaults */ }
+  _cardData = data;
+  return data;
+}
+
+async function openCard() {
+  const data = await deriveCardData();
+  document.getElementById("card-name").textContent     = data.name;
+  document.getElementById("card-title").textContent    = data.title;
+  document.getElementById("card-type").textContent     = data.type_line;
+  // Rarity gem (footer)
+  const rar = document.getElementById("card-rarity");
+  rar.textContent = String(data.rarity).toUpperCase();
+  rar.className = "holo-rarity " + String(data.rarity).toLowerCase();
+  // Pip color (kind-aware mana indicator)
+  const pip = document.getElementById("card-pip");
+  pip.textContent = data.pip;
+  pip.style.background = data.pipColor;
+  // Sigil → art well
+  document.getElementById("card-art").innerHTML = rappidSigil(window.__seedRappid || "", 200);
+  // Abilities
+  const abilHtml = data.abilities.map(a =>
+    `<div class="holo-ability"><span class="kw">${escapeHtml(a.kw)}</span> — ${escapeHtml(a.text)}</div>`
+  ).join("");
+  document.getElementById("card-abilities").innerHTML = abilHtml;
+  // Flavor
+  document.getElementById("card-flavor").textContent = data.flavor ? `"${data.flavor}"` : "";
+  // Back: QR pointing at the front door (no ?peer, no ?card — just the URL)
+  const url = location.origin + location.pathname.replace(/\/?$/, "/");
+  document.getElementById("card-back-qr").src =
+    "https://api.qrserver.com/v1/create-qr-code/?size=440x440&margin=0&data=" + encodeURIComponent(url);
+  document.getElementById("card-back-url").textContent = url;
+  document.getElementById("card-back-sub").textContent = data.name + "'s front door";
+  // Show
+  document.getElementById("card-flipper").classList.remove("flipped");
+  document.getElementById("card-overlay").hidden = false;
+}
+
+function closeCard() {
+  document.getElementById("card-overlay").hidden = true;
+}
+
+function escapeHtml(s) {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
 async function copy(text) {
   try { await navigator.clipboard.writeText(text); } catch (_) { /* silent */ }
 }
 
+// Seed metadata — read by the card derivation logic. Set from the
+// substituted placeholders below so the card can render before any
+// async fetches land.
+window.__seedRappid      = "16ca80a7-7845-45d2-9c04-368066ffa3d1";
+window.__seedDisplayName = "Kody Wildfeuer";
+window.__seedKind        = "personal";
+
 // Wire up buttons
 document.getElementById("btn-tether").onclick = openTether;
-document.getElementById("btn-qr").onclick = showFrontDoorQR;
+document.getElementById("btn-card").onclick = openCard;
 document.getElementById("btn-install").onclick = showInstall;
+document.getElementById("card-close").onclick = closeCard;
+document.getElementById("card-flipper").addEventListener("click", (e) => {
+  // Don't flip if user clicked an inner link or the close button
+  if (e.target.closest("a, button")) return;
+  e.currentTarget.classList.toggle("flipped");
+});
+// Tap outside the card → close (but don't close on click of card itself)
+document.getElementById("card-overlay").addEventListener("click", (e) => {
+  if (e.target.id === "card-overlay") closeCard();
+});
+// Esc key closes the card
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !document.getElementById("card-overlay").hidden) closeCard();
+});
 document.getElementById("btn-connect").onclick = connectToPeer;
 document.getElementById("btn-send").onclick = sendMessage;
 document.getElementById("btn-copy-id").onclick = () => {
@@ -665,7 +1013,7 @@ function rappidSigil(rappid, size) {
 (function renderSigil() {
   const el = document.getElementById("hero-sigil");
   if (!el) return;
-  el.innerHTML = rappidSigil("6066513c-a05b-4211-b65a-193541afbe3e", 96);
+  el.innerHTML = rappidSigil("16ca80a7-7845-45d2-9c04-368066ffa3d1", 96);
 })();
 
 // ── Profile stats: memory count + age ──────────────────────────────
