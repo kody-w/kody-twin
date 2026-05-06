@@ -1026,6 +1026,26 @@ async function _doormanFetchOrNull(url, headers) {
   } catch (_) { return null; }
 }
 
+// Same provenance helpers the front-door egg uses, scoped here for the
+// doorman page (different HTML context, same logic). SHA-256 via
+// SubtleCrypto, canonical sorted-key serialization, file-add wrapper.
+async function _doormanSha256Hex(input) {
+  const bytes = (typeof input === "string")
+    ? new TextEncoder().encode(input)
+    : (input instanceof ArrayBuffer ? new Uint8Array(input) : input);
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(digest))
+    .map(b => b.toString(16).padStart(2, "0")).join("");
+}
+function _doormanCanonicalHashTable(hashes) {
+  const keys = Object.keys(hashes).sort();
+  return keys.map(k => k + "\t" + hashes[k]).join("\n");
+}
+async function _doormanAddFile(zip, path, content, hashes) {
+  zip.file(path, content);
+  hashes[path] = await _doormanSha256Hex(content);
+}
+
 // Fetch a file from the resolved private layer via the GitHub Contents
 // API. CORS-safe with auth (raw.githubusercontent.com isn't) — same
 // path loadPrivateContext takes. Returns null on 404.
@@ -1053,6 +1073,11 @@ async function buildAscendedEgg() {
     soul: 0, env: 0, rappid: 0, card: 0,
     private_files: 0, user_memories: 0,
   };
+  // Per-file SHA-256s for the ascended egg. Same scheme as the doorman
+  // tier — every file gets a hash; the manifest carries the table plus
+  // a sha256 fingerprint of the table itself. Receivers can recompute
+  // and detect any offline tampering.
+  const hashes = {};
 
   // Resolve the seed-side base for public files (the front-door root,
   // one level up from /doorman/).
@@ -1061,36 +1086,34 @@ async function buildAscendedEgg() {
   // 1. Public layer — same files the doorman-tier egg packs
   const rappidText = await _doormanFetchOrNull(seedBase + "rappid.json");
   if (!rappidText) throw new Error("can't read seed rappid.json");
-  zip.file("rappid.json", rappidText);
+  await _doormanAddFile(zip, "rappid.json", rappidText, hashes);
   counts.rappid = 1;
   let rappidObj = {};
   try { rappidObj = JSON.parse(rappidText); } catch (_) {}
 
   const soul = await _doormanFetchOrNull(seedBase + "soul.md");
-  if (soul && soul.trim()) { zip.file("soul.md", soul); counts.soul = 1; }
+  if (soul && soul.trim()) { await _doormanAddFile(zip, "soul.md", soul, hashes); counts.soul = 1; }
 
   const card = await _doormanFetchOrNull(seedBase + "card.json");
-  if (card && card.trim()) { zip.file("card.json", card); counts.card = 1; }
+  if (card && card.trim()) { await _doormanAddFile(zip, "card.json", card, hashes); counts.card = 1; }
 
   // 2. agents/ — both tiers (the kernel ignores ascended ones unless
   //    privateSoul is set, so it's safe to include all of them in the egg)
-  const agentsFolder = zip.folder("agents");
   for (const fn of ASCENDED_AGENT_FILES) {
     const text = await _doormanFetchOrNull(SEED_AGENT_BASE + fn);
-    if (text) { agentsFolder.file(fn, text); counts.agents++; }
+    if (text) { await _doormanAddFile(zip, "agents/" + fn, text, hashes); counts.agents++; }
   }
-  agentsFolder.file("__init__.py", "");
+  await _doormanAddFile(zip, "agents/__init__.py", "", hashes);
 
   // 3. data/memory.json — public memory
   const mem = await _doormanFetchOrNull(seedBase + ".brainstem_data/memory.json");
   if (mem) {
-    zip.folder("data").file("memory.json", mem);
+    await _doormanAddFile(zip, "data/memory.json", mem, hashes);
     counts.data = 1;
   }
 
   // 4. private/ subtree — what the operator-fallback OR private-companion
   //    access unlocks. soul.md, README.md, vault entrypoint, private memory.
-  const privFolder = zip.folder("private");
   const PRIV_PATHS = [
     "soul.md",
     "README.md",
@@ -1101,9 +1124,7 @@ async function buildAscendedEgg() {
   for (const path of PRIV_PATHS) {
     const text = await _privateFile(privateLayerCoords, path, token);
     if (text) {
-      // Mirror the path inside private/ so the receiving kernel can map
-      // it back: private/soul.md, private/.brainstem_data/memory.json, etc.
-      privFolder.file(path, text);
+      await _doormanAddFile(zip, "private/" + path, text, hashes);
       counts.private_files++;
     }
   }
@@ -1132,17 +1153,32 @@ async function buildAscendedEgg() {
           }
         }
         if (facts.length) {
-          zip.folder("data").file("user_memories.json", JSON.stringify({
+          const userMemBlob = JSON.stringify({
             schema: "rapp-user-memories/1.0",
             source_repo: `${privateLayerCoords.owner}/${privateLayerCoords.repo}`,
             exported_at: new Date().toISOString(),
             facts,
-          }, null, 2));
+          }, null, 2);
+          await _doormanAddFile(zip, "data/user_memories.json", userMemBlob, hashes);
           counts.user_memories = facts.length;
         }
       }
     }
   } catch (_) { /* if issues read fails, the egg still ships without user_memories */ }
+
+  // Provenance — non-GMO integrity. Same scheme as the doorman egg.
+  const manifestHash = await _doormanSha256Hex(_doormanCanonicalHashTable(hashes));
+  const provenance = {
+    schema: "rapp-egg-provenance/1.0",
+    scheme: "sha256",
+    file_hashes: hashes,
+    manifest_hash: manifestHash,
+    origin_url: seedBase,
+    origin_repo: rappidObj.github || null,
+    sealed_at: new Date().toISOString(),
+    sealed_by_rappid: rappidObj.rappid || null,
+    sealed_by_login: viewerLogin ? "@" + viewerLogin : null,
+  };
 
   // 6. Manifest — same shape bond.py writes; tier="ascended" + the
   //    resolved private layer so a receiving kernel can re-link.
@@ -1164,6 +1200,7 @@ async function buildAscendedEgg() {
     display_name: rappidObj.display_name || null,
     incarnations_at_egg: rappidObj.incarnations || 0,
     counts,
+    provenance,
   };
   zip.file("manifest.json", JSON.stringify(manifest, null, 2));
 

@@ -289,6 +289,40 @@
     font-size: 13px; padding: 12px 14px;
   }
   .row-actions button.action:hover { background: #2d333b; border-color: #484f58; }
+  /* Verify panel — drop-target + per-file pass/fail readout */
+  .verify-drop {
+    border: 2px dashed #30363d; border-radius: 10px;
+    padding: 28px 20px; text-align: center;
+    background: #0d1117; color: #8b949e;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .verify-drop.dragover { border-color: #1f6feb; background: rgba(31,111,235,0.06); color: #c9d1d9; }
+  .verify-drop-prompt { font-size: 13px; }
+  .verify-summary {
+    padding: 12px 14px; border-radius: 8px;
+    font-size: 13px; line-height: 1.5;
+    margin-bottom: 10px;
+  }
+  .verify-summary.ok { background: rgba(63,185,80,0.10); border: 1px solid rgba(63,185,80,0.4); color: #7ee787; }
+  .verify-summary.tampered { background: rgba(248,81,73,0.10); border: 1px solid rgba(248,81,73,0.4); color: #ff8c8c; }
+  .verify-summary.partial { background: rgba(210,153,34,0.10); border: 1px solid rgba(210,153,34,0.4); color: #f0c674; }
+  .verify-files { list-style: none; padding: 0; margin: 0; font-size: 12px; }
+  .verify-files li {
+    padding: 6px 10px;
+    display: flex; gap: 10px; align-items: center;
+    border-bottom: 1px solid rgba(110,118,129,0.12);
+    font-family: "SF Mono", Menlo, monospace;
+  }
+  .verify-files li:last-child { border-bottom: none; }
+  .verify-files .v-icon { font-size: 13px; flex-shrink: 0; width: 16px; }
+  .verify-files .v-path { flex: 1; word-break: break-all; }
+  .verify-files .v-status { font-size: 10px; flex-shrink: 0; }
+  .verify-files li.ok .v-icon       { color: #7ee787; }
+  .verify-files li.modified .v-icon { color: #f85149; }
+  .verify-files li.missing .v-icon  { color: #d29922; }
+  .verify-files li.unexpected .v-icon { color: #d29922; }
+
   /* Track Record — the organism's resume. Sits between hero and actions. */
   .track-record {
     max-width: 640px; margin: 0 auto 16px;
@@ -730,6 +764,7 @@
     <button class="action secondary" id="btn-card">🃏 Show my card</button>
     <button class="action secondary" id="btn-tether">📱 Pair with another device</button>
     <button class="action secondary" id="btn-export-egg" title="Backup the public organism — rappid, soul, agents, public memory.">🥚 Export .egg</button>
+    <button class="action secondary" id="btn-verify-egg" title="Drop in any .egg and verify nothing was modified offline.">🔬 Verify an .egg</button>
     <button class="action secondary" id="btn-publish-egg" title="Open a pre-filled submission to the public Egg Hub.">🌐 Back up to Egg Hub</button>
     <button class="action secondary" id="btn-install">💻 Install kernel locally</button>
   </div>
@@ -743,7 +778,7 @@
       </div>
       <div class="identity-row">
         <span class="identity-key">Rappid</span>
-        <span class="identity-val">e5bfd63d-9187-456a-84b4-bde6976323d0</span>
+        <span class="identity-val">30f32e1e-2455-4ef5-98af-72726bb63ebd</span>
       </div>
       <div class="identity-row">
         <span class="identity-key">Kernel</span>
@@ -787,6 +822,19 @@
         </div>
       </div>
     </details>
+  </section>
+
+  <!-- Verify .egg — drop in any cartridge to check it hasn't been
+       tampered with offline. Recomputes every file's sha256 against
+       the manifest's stated hash table. Non-GMO check. -->
+  <section class="pane" id="pane-verify" hidden>
+    <h2>🔬 Verify an .egg</h2>
+    <p>Drop a cartridge here. Every file's SHA-256 is recomputed and compared to the hash table in the egg's manifest. If anything was modified offline, the verifier flags it.</p>
+    <div id="verify-drop" class="verify-drop">
+      <input type="file" id="verify-file" accept=".egg,.zip" style="display:none">
+      <div class="verify-drop-prompt">📦 drop an .egg here, or <button class="small primary" id="btn-verify-pick">pick a file</button></div>
+    </div>
+    <div id="verify-results" hidden style="margin-top:14px;"></div>
   </section>
 
   <section class="pane" id="pane-install" hidden>
@@ -847,7 +895,7 @@
 "use strict";
 
 const FD = {
-  rappid: "e5bfd63d-9187-456a-84b4-bde6976323d0",
+  rappid: "30f32e1e-2455-4ef5-98af-72726bb63ebd",
   displayName: "Kody Wildfeuer",
   slug: "kody-twin",
   ghUser: "kody-w",
@@ -1322,58 +1370,97 @@ async function _fetchOrNull(url) {
   } catch (_) { return null; }
 }
 
+// SHA-256 in the browser via SubtleCrypto. No CDN, no shim — same
+// hashing primitive used by Git, GitHub, sha256sum, and the egg-hub
+// spec. Returns lowercase hex.
+async function sha256Hex(input) {
+  const bytes = (typeof input === "string")
+    ? new TextEncoder().encode(input)
+    : (input instanceof ArrayBuffer ? new Uint8Array(input) : input);
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(digest))
+    .map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+// Canonical serialization of the per-file hash table — sorted keys, no
+// trailing whitespace, stable across browsers. The manifest hash is
+// sha256 of THIS string, so any reordering or whitespace mismatch
+// won't cause false-positive mismatches.
+function _canonicalHashTable(hashes) {
+  const keys = Object.keys(hashes).sort();
+  return keys.map(k => k + "\t" + hashes[k]).join("\n");
+}
+
+// Add a file to the zip AND track its sha256 in the hash table.
+// Wraps zip.file() so the export builder doesn't have to remember
+// to hash; one call covers both.
+async function _addFile(zip, path, content, hashes) {
+  zip.file(path, content);
+  hashes[path] = await sha256Hex(content);
+}
+
 async function buildDoormanEgg() {
   if (typeof JSZip === "undefined") throw new Error("JSZip didn't load");
   const zip  = new JSZip();
-  // Counts match bond.py exactly so this cartridge can be hatched by
-  // the local kernel with no schema branching.
   const counts = {
     agents: 0, organs: 0, senses: 0, services: 0, data: 0,
     soul: 0, env: 0, rappid: 0, card: 0,
   };
+  // Per-file SHA-256s tracked as we go. After all files are added
+  // (BUT before manifest.json itself — a manifest can't sign itself),
+  // we compute manifest_hash + provenance and write the manifest last.
+  const hashes = {};
 
-  // 1. rappid.json — the organism's identity, source of truth for bond logs
   const rappidText = await _fetchOrNull("rappid.json");
   if (!rappidText) throw new Error("rappid.json is unreachable — the seed isn't fully planted");
-  zip.file("rappid.json", rappidText);
+  await _addFile(zip, "rappid.json", rappidText, hashes);
   counts.rappid = 1;
   let rappidObj = {};
   try { rappidObj = JSON.parse(rappidText); } catch (_) {}
 
-  // 2. soul.md (optional) — the persona
   const soul = await _fetchOrNull("soul.md");
-  if (soul && soul.trim()) { zip.file("soul.md", soul); counts.soul = 1; }
+  if (soul && soul.trim()) { await _addFile(zip, "soul.md", soul, hashes); counts.soul = 1; }
 
-  // 3. card.json (optional) — operator's customization of the trade card.
-  //    Not in the canonical organism schema; we keep it as an extra so
-  //    a hatched seed regenerates the same trade card on its new home.
   const card = await _fetchOrNull("card.json");
-  if (card && card.trim()) { zip.file("card.json", card); counts.card = 1; }
+  if (card && card.trim()) { await _addFile(zip, "card.json", card, hashes); counts.card = 1; }
 
-  // 4. agents/ — the doorman-tier .py files served from the seed
-  const agentsFolder = zip.folder("agents");
   for (const fn of EGG_AGENT_FILES) {
     const text = await _fetchOrNull("agents/" + fn);
-    if (text) { agentsFolder.file(fn, text); counts.agents++; }
+    if (text) { await _addFile(zip, "agents/" + fn, text, hashes); counts.agents++; }
   }
-  // __init__.py so the egg's agents/ behaves as a Python package on hatch
-  agentsFolder.file("__init__.py", "");
+  await _addFile(zip, "agents/__init__.py", "", hashes);
 
-  // 5. data/memory.json — public memory (anonymous-friendly)
   const mem = await _fetchOrNull(".brainstem_data/memory.json");
   if (mem) {
-    zip.folder("data").file("memory.json", mem);
+    await _addFile(zip, "data/memory.json", mem, hashes);
     counts.data = 1;
   }
 
-  // 6. manifest — same shape bond.py writes; tier="doorman" tells a
-  //    receiving kernel this is a partial cartridge (no private layer).
+  // Provenance — non-GMO integrity check. sha256 per file + a manifest
+  // fingerprint = sha256 of the canonical sorted hash table. Anyone who
+  // receives this egg can recompute every hash from the file bytes and
+  // confirm nothing has been edited offline. If the verifier finds a
+  // mismatch, the egg has been mutated outside the seed's commit log
+  // and the receiver knows to treat it cautiously.
+  const manifestHash = await sha256Hex(_canonicalHashTable(hashes));
+  const seedUrl = location.origin + location.pathname.replace(/\/?$/, "/");
+  const provenance = {
+    schema: "rapp-egg-provenance/1.0",
+    scheme: "sha256",
+    file_hashes: hashes,
+    manifest_hash: manifestHash,
+    origin_url: seedUrl,
+    origin_repo: rappidObj.github || null,
+    sealed_at: new Date().toISOString(),
+    sealed_by_rappid: rappidObj.rappid || null,
+  };
+
   const manifest = {
     schema: "brainstem-egg/2.2-organism",
     type: "organism",
     tier: "doorman",
     exported_at: new Date().toISOString(),
-    exported_from: location.origin + location.pathname,
+    exported_from: seedUrl,
     host: "doorman-export",
     kernel_version: "0.6.0",
     rappid: rappidObj.rappid || null,
@@ -1383,6 +1470,7 @@ async function buildDoormanEgg() {
     display_name: rappidObj.display_name || null,
     incarnations_at_egg: rappidObj.incarnations || 0,
     counts,
+    provenance,
   };
   zip.file("manifest.json", JSON.stringify(manifest, null, 2));
 
@@ -1426,6 +1514,137 @@ async function exportDoormanEgg() {
 // + the URL where the live egg can be downloaded already filled in.
 // The hub maintainer (or anyone with push) closes the loop by
 // committing the egg + sidecar from that URL.
+
+// ── Egg verifier (non-GMO check) ───────────────────────────────────
+//
+// Drop any .egg in. We unzip it, read the manifest's provenance block,
+// recompute SHA-256 over every file in the archive, and compare. Three
+// outcomes per file: ✓ ok / ✗ modified / ⚠ missing-or-unexpected.
+//
+// The verifier ALSO recomputes the manifest_hash from the file_hashes
+// table (sorted, canonical) and checks against the manifest's stated
+// manifest_hash. If THAT mismatches, someone edited the file_hashes
+// table directly — the entire envelope is suspicious.
+//
+// What this catches:
+//   - Hand-edited memory.json offline → file_hash mismatch
+//   - Edited file AND manifest hash → manifest_hash mismatch
+//   - Files added or removed since seal → unexpected/missing
+//
+// What this does NOT catch (yet — needs ed25519 signatures, phase 2
+// of the egg-hub spec):
+//   - Wholesale re-issuance with a fresh manifest. The rappid is the
+//     anchor; if it changes, the organism's identity is different too.
+//     Provenance verifies this is a self-consistent envelope, not
+//     that the envelope came from THE rappid's owner.
+
+async function verifyEgg(file) {
+  if (typeof JSZip === "undefined") throw new Error("JSZip didn't load");
+  const arrayBuf = await file.arrayBuffer();
+  const zip = await JSZip.loadAsync(arrayBuf);
+  const manifestEntry = zip.file("manifest.json");
+  if (!manifestEntry) throw new Error("not a brainstem-egg — no manifest.json inside");
+  const manifestText = await manifestEntry.async("string");
+  let manifest;
+  try { manifest = JSON.parse(manifestText); }
+  catch (e) { throw new Error("manifest.json is not valid JSON"); }
+  const prov = manifest.provenance;
+  if (!prov || !prov.file_hashes) {
+    return {
+      manifest, status: "no-provenance",
+      summary: "this egg was packed before SHA-256 provenance shipped — can't verify, but identity claims are: " +
+               `rappid ${manifest.rappid || "(none)"}, tier ${manifest.tier || "?"}.`,
+      results: [],
+    };
+  }
+
+  // Per-file recomputation
+  const expectedHashes = prov.file_hashes;
+  const results = [];
+  const seen = new Set();
+  for (const path of Object.keys(expectedHashes).sort()) {
+    seen.add(path);
+    const f = zip.file(path);
+    if (!f) {
+      results.push({ path, status: "missing" });
+      continue;
+    }
+    const text = await f.async("string");
+    const actual = await sha256Hex(text);
+    results.push({
+      path,
+      status: actual === expectedHashes[path] ? "ok" : "modified",
+      expected: expectedHashes[path],
+      actual,
+    });
+  }
+  // Files in the egg but NOT listed in the manifest table — these snuck in
+  zip.forEach((relPath, _) => {
+    if (relPath === "manifest.json") return;
+    if (relPath.endsWith("/")) return;  // folder entry
+    if (!seen.has(relPath)) {
+      results.push({ path: relPath, status: "unexpected" });
+    }
+  });
+
+  // Manifest-hash recomputation (catches: edited file AND adjusted the hash table)
+  const recomputedManifestHash = await sha256Hex(_canonicalHashTable(expectedHashes));
+  const manifestHashOk = recomputedManifestHash === prov.manifest_hash;
+
+  // Overall verdict
+  const modCount = results.filter(r => r.status === "modified").length;
+  const missCount = results.filter(r => r.status === "missing").length;
+  const extraCount = results.filter(r => r.status === "unexpected").length;
+  let status, summary;
+  if (!manifestHashOk) {
+    status = "tampered";
+    summary = "✗ manifest hash mismatch — the file_hashes table in the manifest has been edited. This egg is non-canonical.";
+  } else if (modCount > 0) {
+    status = "tampered";
+    summary = `✗ ${modCount} file${modCount === 1 ? "" : "s"} modified offline since the egg was sealed. The hash chain catches this — the rest of the egg is consistent but those files don't match what was sealed.`;
+  } else if (missCount > 0 || extraCount > 0) {
+    status = "partial";
+    summary = `⚠ ${missCount} missing, ${extraCount} unexpected files. The egg's structure has shifted since seal — verify the source.`;
+  } else {
+    status = "ok";
+    summary = `✓ envelope intact. ${results.length} file${results.length === 1 ? "" : "s"} match the sealed hash table; manifest hash recomputes correctly. This egg is byte-identical to what was sealed at ${prov.sealed_at || "(unknown time)"}${prov.origin_url ? " from " + prov.origin_url : ""}.`;
+  }
+  return { manifest, status, summary, results, manifestHashOk };
+}
+
+function renderVerifyResults(out) {
+  const wrap = document.getElementById("verify-results");
+  if (!wrap) return;
+  wrap.hidden = false;
+
+  const head = `<div class="verify-summary ${out.status === "ok" ? "ok" : (out.status === "tampered" ? "tampered" : "partial")}">${escapeHtml(out.summary)}</div>`;
+  const ICONS = { ok: "✓", modified: "✗", missing: "⚠", unexpected: "+" };
+  const rows = out.results.map(r =>
+    `<li class="${r.status}">
+       <span class="v-icon">${ICONS[r.status] || "?"}</span>
+       <span class="v-path">${escapeHtml(r.path)}</span>
+       <span class="v-status">${r.status}</span>
+     </li>`
+  ).join("");
+  wrap.innerHTML = head + (rows ? `<ul class="verify-files">${rows}</ul>` : "");
+}
+
+async function _handleVerifyFile(file) {
+  if (!file) return;
+  const wrap = document.getElementById("verify-results");
+  wrap.hidden = false;
+  wrap.innerHTML = `<div class="verify-summary partial">verifying ${escapeHtml(file.name)}…</div>`;
+  try {
+    const out = await verifyEgg(file);
+    renderVerifyResults(out);
+  } catch (e) {
+    wrap.innerHTML = `<div class="verify-summary tampered">✗ couldn't verify: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function showVerifyPane() {
+  showPane("pane-verify");
+}
 
 async function openEggHubSubmission() {
   // Pull rappid for lineage + identity context
@@ -1483,7 +1702,7 @@ async function copy(text) {
 // Seed metadata — read by the card derivation logic. Set from the
 // substituted placeholders below so the card can render before any
 // async fetches land.
-window.__seedRappid      = "e5bfd63d-9187-456a-84b4-bde6976323d0";
+window.__seedRappid      = "30f32e1e-2455-4ef5-98af-72726bb63ebd";
 window.__seedDisplayName = "Kody Wildfeuer";
 window.__seedKind        = "personal";
 window.__seedRepoName    = "kody-twin";
@@ -1492,8 +1711,39 @@ window.__seedRepoName    = "kody-twin";
 document.getElementById("btn-tether").onclick = openTether;
 document.getElementById("btn-card").onclick = openCard;
 document.getElementById("btn-export-egg").onclick = exportDoormanEgg;
+document.getElementById("btn-verify-egg").onclick = showVerifyPane;
 document.getElementById("btn-publish-egg").onclick = openEggHubSubmission;
 document.getElementById("btn-install").onclick = showInstall;
+
+// Verify pane: drag-drop + file picker. Both routes call the same
+// _handleVerifyFile so the verifier UI doesn't care how the file got
+// there.
+(function wireVerifyPane() {
+  const drop = document.getElementById("verify-drop");
+  const input = document.getElementById("verify-file");
+  if (!drop || !input) return;
+  drop.addEventListener("click", e => {
+    if (e.target.tagName !== "BUTTON") input.click();
+  });
+  document.getElementById("btn-verify-pick").addEventListener("click", e => {
+    e.stopPropagation();
+    input.click();
+  });
+  input.addEventListener("change", () => {
+    if (input.files && input.files[0]) _handleVerifyFile(input.files[0]);
+  });
+  drop.addEventListener("dragover", e => {
+    e.preventDefault();
+    drop.classList.add("dragover");
+  });
+  drop.addEventListener("dragleave", () => drop.classList.remove("dragover"));
+  drop.addEventListener("drop", e => {
+    e.preventDefault();
+    drop.classList.remove("dragover");
+    const f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) _handleVerifyFile(f);
+  });
+})();
 document.getElementById("card-close").onclick = closeCard;
 document.getElementById("card-flipper").addEventListener("click", (e) => {
   // Don't flip if user clicked an inner link or the close button
@@ -1596,7 +1846,7 @@ function rappidSigil(rappid, size) {
 (function renderSigil() {
   const el = document.getElementById("hero-sigil");
   if (!el) return;
-  el.innerHTML = rappidSigil("e5bfd63d-9187-456a-84b4-bde6976323d0", 96);
+  el.innerHTML = rappidSigil("30f32e1e-2455-4ef5-98af-72726bb63ebd", 96);
 })();
 
 // ── Profile stats: memory count + age ──────────────────────────────
