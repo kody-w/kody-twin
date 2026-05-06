@@ -231,8 +231,9 @@ const AUTH_WORKER_URL = "https://rapp-auth.kwildfeuer.workers.dev";
 const AUTH_CLIENT_ID  = "Ov23liXWPqaiWnxt9cLz";
 
 let identity = null;
+let publicSoul = null;         // soul.md at the seed root (public, served via Pages) — when present, this becomes the doorman's primary voice for everyone, replacing the kind-aware default. Operators write this to give their seed a custom persona without needing a private companion.
 let privateContext = "";       // supporting prose (README, vault entrypoint) — context, not voice
-let privateSoul = null;        // soul.md from the private companion — when loaded, the doorman ASCENDS into the full twin's voice
+let privateSoul = null;        // soul.md from the private companion — when loaded, the doorman ASCENDS into the full twin's voice (overrides publicSoul too)
 let privateFactsCount = 0;
 let publicAgents = [];         // filenames at <seed>/agents/
 let privateAgents = [];        // filenames at <private_companion>/agents/ — only loaded when authed-with-access (silent 404 otherwise)
@@ -402,6 +403,17 @@ function buildSystemPrompt() {
     lines.push("=== Context: you are speaking through your front door at " +
                (identity.url || `https://${identity.github || "this"}.github.io/${identity.name || ""}`) +
                ". The visitor has authenticated and proven access to your private brain — speak in full voice. ===");
+  } else if (publicSoul) {
+    // ── PUBLIC SOUL MODE ─────────────────────────────────────────
+    // The seed has a custom soul.md at its root. Public — every
+    // visitor gets this voice (no auth required). Replaces the
+    // kind-aware default greeter persona.
+    lines.push(publicSoul);
+    lines.push("");
+    lines.push("---");
+    lines.push("=== Context: you are speaking through your front door at " +
+               (identity.url || `https://${identity.github || "this"}.github.io/${identity.name || ""}`) +
+               ". This is the seed's public voice; visitors of every tier hear it. ===");
   } else {
     // ── DOORMAN MODE (public-facing greeter) ───────────────────────
     // Kind-aware default persona. No private soul reachable, so the
@@ -490,6 +502,21 @@ async function loadMemory() {
       memory = await r.json();
     }
   } catch (_) { /* missing file is fine, doorman still works */ }
+}
+
+async function loadPublicSoul() {
+  // Seed-root soul.md, if present. Public — Pages serves it for everyone.
+  // When present, becomes the primary system prompt (overriding the
+  // kind-aware default). Lets operators give their seed a custom persona
+  // without needing a private companion.
+  publicSoul = null;
+  try {
+    const r = await fetch("../soul.md", { cache: "no-cache" });
+    if (r.ok) {
+      const text = (await r.text()).trim();
+      if (text) publicSoul = text.slice(0, 8000);
+    }
+  } catch (_) { /* silent */ }
 }
 
 // ── Device-local memory (localStorage on this browser) ─────────────
@@ -1413,6 +1440,8 @@ async function enterChat() {
   document.getElementById("chat-actions").hidden = false;
 
   const token = getToken();
+  // Public soul (every visitor — overrides kind-aware default if present)
+  await loadPublicSoul();
   // Memory: load before private context so the prompt assembly already has it
   await loadMemory();
   // Device-local memory: every visitor gets their on-device tier
@@ -1439,6 +1468,8 @@ async function enterChat() {
   const memNote = memCount ? ` I'm carrying ${memCount} memor${memCount === 1 ? "y" : "ies"} from past visits.` : "";
   if (privateSoul) {
     renderMsg("system", `Hi — I'm ${place}. You've authenticated with access to my private brain — I'm in full voice.${memNote}`);
+  } else if (publicSoul) {
+    renderMsg("system", `Hi — I'm ${place}, here at my front door.${memNote}`);
   } else {
     renderMsg("system", `Hi — I'm ${place}, here at my front door.${memNote} Ask me anything.`);
   }
