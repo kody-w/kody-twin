@@ -289,7 +289,7 @@
     font-size: 13px; padding: 12px 14px;
   }
   .row-actions button.action:hover { background: #2d333b; border-color: #484f58; }
-  /* Propose-a-skill pane — agent submission form */
+  /* Propose-an-agent pane — agent submission form (one term: agent) */
   .propose-row { margin-bottom: 12px; }
   .propose-label {
     display: block;
@@ -509,10 +509,10 @@
     text-transform: uppercase; letter-spacing: 0.6px;
     margin-bottom: 6px;
   }
-  .tr-skills {
+  .tr-agents {
     display: flex; flex-wrap: wrap; gap: 6px;
   }
-  .skill-chip {
+  .agent-chip {
     font-size: 11px; padding: 4px 10px;
     border-radius: 999px;
     background: rgba(31,111,235,0.10);
@@ -520,17 +520,17 @@
     color: #79c0ff;
     white-space: nowrap;
   }
-  .skill-chip.achievement {
+  .agent-chip.achievement {
     background: rgba(255,215,0,0.08);
     border-color: rgba(255,215,0,0.28);
     color: #f0c674;
   }
-  .skill-chip.skel {
+  .agent-chip.skel {
     background: transparent;
     border-color: #21262d;
     color: #6e7681;
   }
-  .skill-chip.skill-new {
+  .agent-chip.agent-new {
     background: rgba(63,185,80,0.10);
     border-color: rgba(63,185,80,0.32);
     color: #7ee787;
@@ -838,10 +838,13 @@
     </div>
   </section>
 
-  <!-- Track Record — the organism's resume. Skills accumulate from agents
-       in /agents/, mutations accumulate from commit history, achievements
+  <!-- Track Record — the organism's resume. Agents accumulate in
+       /agents/, mutations accumulate from commit history, achievements
        unlock from milestones. Each visit grows the resume; the operator
-       steers mutations by accepting or rejecting visitor-proposed PRs. -->
+       steers mutations by accepting or rejecting visitor-proposed PRs.
+       NOTE: one term only — "agent". Never "skill", "routine", "loop",
+       "plugin". See ANTIPATTERNS.md §1. -->
+
   <section class="track-record">
     <h3 class="tr-heading">What I bring to the table</h3>
 
@@ -853,18 +856,18 @@
       <div class="mmr-num" id="mmr-num">—</div>
       <div class="mmr-side">
         <div class="mmr-tier" id="mmr-tier">Cradle</div>
-        <div class="mmr-breakdown" id="mmr-breakdown">based on memories, mutations, skills, and age</div>
+        <div class="mmr-breakdown" id="mmr-breakdown">based on memories, mutations, agents, and age</div>
       </div>
     </div>
 
     <div class="tr-block">
-      <div class="tr-label">Skills</div>
-      <div class="tr-skills" id="tr-skills"><span class="skill-chip skel">loading…</span></div>
+      <div class="tr-label">Agents</div>
+      <div class="tr-agents" id="tr-agents"><span class="agent-chip skel">loading…</span></div>
     </div>
 
     <div class="tr-block">
       <div class="tr-label">Achievements</div>
-      <div class="tr-skills" id="tr-achievements"><span class="skill-chip skel">…</span></div>
+      <div class="tr-agents" id="tr-achievements"><span class="agent-chip skel">…</span></div>
     </div>
 
     <div class="tr-block">
@@ -881,7 +884,7 @@
   <div class="row-actions">
     <button class="action secondary" id="btn-card">🃏 Show my card</button>
     <button class="action secondary" id="btn-tether">📱 Pair with another device</button>
-    <button class="action secondary" id="btn-propose-skill" title="Submit a new agent.py to this organism via PR — the lineage evolution path.">🌱 Propose a skill</button>
+    <button class="action secondary" id="btn-propose-agent" title="Submit a new agent.py to this organism via PR — the lineage evolution path.">🌱 Propose an agent</button>
     <button class="action secondary" id="btn-export-egg" title="Backup the public organism — rappid, soul, agents, public memory.">🥚 Export .egg</button>
     <button class="action secondary" id="btn-verify-egg" title="Drop in any .egg and verify nothing was modified offline.">🔬 Verify an .egg</button>
     <button class="action secondary" id="btn-dreamcatcher" title="Diff two eggs of the same lineage to find frames the parallel dimension has that the canonical doesn't.">🕸️ Dream Catcher</button>
@@ -898,7 +901,7 @@
       </div>
       <div class="identity-row">
         <span class="identity-key">Rappid</span>
-        <span class="identity-val">f4da892f-150d-4551-b929-78c71add4378</span>
+        <span class="identity-val">f8135aae-e9eb-4b65-b563-70caf62888a2</span>
       </div>
       <div class="identity-row">
         <span class="identity-key">Kernel</span>
@@ -944,21 +947,20 @@
     </details>
   </section>
 
-  <!-- Propose a skill — the PR-driven evolution path. The frozen kernel
-       never moves; capabilities grow via agent .py files merged into
-       the seed's /agents/. Visitor fills out the form, we open the
-       GitHub create-file URL in a new tab pre-filled with their code;
-       GitHub auto-handles fork + branch + PR for non-collaborators. -->
+  <!-- Propose an agent — the PR-driven evolution path. The frozen
+       kernel never moves; capabilities grow via agent .py files merged
+       into the seed's /agents/. ONE term: agent. Never "skill", "plugin",
+       "routine", "loop". See ANTIPATTERNS.md §1. -->
   <section class="pane" id="pane-propose" hidden>
-    <h2>🌱 Propose a new skill</h2>
-    <p>The frozen kernel never changes. Capabilities grow via <code>agent.py</code> files merged into <code>/agents/</code>. If you found a pattern useful working with this organism, package it as an agent and submit it back. Two paths, your choice:</p>
+    <h2>🌱 Propose a new agent</h2>
+    <p>The frozen kernel never changes. The organism grows through <code>agent.py</code> files merged into <code>/agents/</code>. If you found a pattern useful working with this organism, package it as an agent and submit it back. Two paths, your choice:</p>
     <ul style="font-size:13px;color:#8b949e;line-height:1.6;margin:0 0 14px 18px;">
-      <li><strong>Rejoin the lineage</strong> — open a PR; if the operator merges it, your skill becomes part of this organism on every visitor's next visit.</li>
+      <li><strong>Rejoin the lineage</strong> — open a PR; if the operator merges it, your agent becomes part of this organism on every visitor's next visit.</li>
       <li><strong>Keep it personal</strong> — leave the PR sitting on your fork, never merge it. You get the mutation as your private branch of this organism; nobody else sees it. GitHub auto-forks the repo to your account when you submit.</li>
     </ul>
 
     <div class="propose-row">
-      <label class="propose-label">Skill name <span class="propose-hint">(snake_case)</span></label>
+      <label class="propose-label">Agent name <span class="propose-hint">(snake_case)</span></label>
       <input type="text" id="propose-name" placeholder="e.g. fetch_weather, summarize_chat" />
     </div>
 
@@ -1081,7 +1083,7 @@
 "use strict";
 
 const FD = {
-  rappid: "f4da892f-150d-4551-b929-78c71add4378",
+  rappid: "f8135aae-e9eb-4b65-b563-70caf62888a2",
   displayName: "Kody Wildfeuer",
   slug: "kody-twin",
   ghUser: "kody-w",
@@ -1672,10 +1674,10 @@ async function buildDoormanEgg() {
     const forkCountSnap = (repoRes.value && repoRes.value.forks_count) || 0;
     const mutCountSnap = recentCommits.length;
     const act = activityStatus(lastCommit);
-    const customSkillsSnap = counts.agents > 2 ? counts.agents - 2 : 0;  // ManageMemory + ContextMemory are baseline
+    const customAgentsSnap = counts.agents > 2 ? counts.agents - 2 : 0;  // ManageMemory + ContextMemory are baseline
     const mmrAtSeal = computeMMR({
       memCount: memSnapshot, mutCount: mutCountSnap,
-      customSkills: customSkillsSnap, ageDays: ageDaysAtSeal,
+      customAgents: customAgentsSnap, ageDays: ageDaysAtSeal,
       forkCount: forkCountSnap, activityFactor: act.factor,
     });
     stateAtSeal = {
@@ -1683,7 +1685,7 @@ async function buildDoormanEgg() {
       mem_count: memSnapshot,
       mutation_count: mutCountSnap,
       fork_count: forkCountSnap,
-      custom_skill_count: customSkillsSnap,
+      custom_agent_count: customAgentsSnap,
       age_days: Math.round(ageDaysAtSeal * 10) / 10,
       last_commit_at: lastCommit,
       activity_kind: act.kind,
@@ -1767,14 +1769,17 @@ async function exportDoormanEgg() {
 // The hub maintainer (or anyone with push) closes the loop by
 // committing the egg + sidecar from that URL.
 
-// ── Propose a skill (the lineage-evolution path) ───────────────────
+// ── Propose an agent (the lineage-evolution path) ──────────────────
 //
-// Capabilities grow via PRs of new agent .py files into /agents/. The
+// The organism grows via PRs of new agent .py files into /agents/. The
 // frozen kernel never changes. This pane drafts a skeleton, lets the
 // visitor fill it in, then opens GitHub's create-file URL in a new
 // tab — GitHub auto-handles fork + branch + PR for visitors who
 // don't have push access. Operator reviews on GitHub, merges if good,
-// the skill becomes part of the lineage on the next page render.
+// the agent becomes part of the lineage on the next page render.
+//
+// ANTIPATTERN GUARD: this is an "agent". Never "skill", "plugin",
+// "routine", "loop", or any synonym. ONE term — see ANTIPATTERNS.md §1.
 
 function _agentTemplate(name, description, organismName) {
   const cls = (name || "new")
@@ -1784,10 +1789,10 @@ function _agentTemplate(name, description, organismName) {
     .replace(/(^|_)(\w)/g, (_, __, c) => c.toUpperCase()) || "New";
   const tool = cls + "Agent";
   return `"""
-${cls}: ${description || "<one-line description of what this skill does>"}
+${cls}: ${description || "<one-line description of what this agent does>"}
 
 Proposed back to ${organismName || "this organism"} on ${new Date().toISOString().slice(0, 10)}
-via the front-door 'Propose a skill' flow.
+via the front-door 'Propose an agent' flow.
 """
 from agents.basic_agent import BasicAgent
 
@@ -1838,11 +1843,11 @@ function showProposePane() {
   if (codeArea && !codeArea.value.trim()) _resetProposeTemplate();
 }
 
-function submitProposedSkill() {
+function submitProposedAgent() {
   const name = (document.getElementById("propose-name").value || "").trim();
   const desc = (document.getElementById("propose-desc").value || "").trim();
   const code = (document.getElementById("propose-code").value || "").trim();
-  if (!name) { alert("Give the skill a name first (snake_case, no spaces)."); return; }
+  if (!name) { alert("Give the agent a name first (snake_case, no spaces)."); return; }
   if (!code) { alert("Paste the agent source first."); return; }
 
   // Normalize the filename — must match RAPP's auto-discovery glob:
@@ -1868,8 +1873,8 @@ function submitProposedSkill() {
   u.searchParams.set("value", code);
   // GitHub web UI also accepts ?message= but it caps title length;
   // visitors can edit the commit message in the form before submitting.
-  u.searchParams.set("message", `propose new skill: ${slug}`);
-  u.searchParams.set("description", desc || `New agent proposed back to this organism via the front-door 'Propose a skill' flow.`);
+  u.searchParams.set("message", `propose new agent: ${slug}`);
+  u.searchParams.set("description", desc || `New agent proposed back to this organism via the front-door 'Propose an agent' flow.`);
 
   // GitHub URL length limit varies but is generous. If we ever blow
   // past it, fallback would be to surface the agent code in the pane
@@ -2383,7 +2388,7 @@ async function copy(text) {
 // Seed metadata — read by the card derivation logic. Set from the
 // substituted placeholders below so the card can render before any
 // async fetches land.
-window.__seedRappid      = "f4da892f-150d-4551-b929-78c71add4378";
+window.__seedRappid      = "f8135aae-e9eb-4b65-b563-70caf62888a2";
 window.__seedDisplayName = "Kody Wildfeuer";
 window.__seedKind        = "personal";
 window.__seedRepoName    = "kody-twin";
@@ -2395,8 +2400,8 @@ document.getElementById("btn-export-egg").onclick = exportDoormanEgg;
 document.getElementById("btn-verify-egg").onclick = showVerifyPane;
 document.getElementById("btn-publish-egg").onclick = openEggHubSubmission;
 document.getElementById("btn-install").onclick = showInstall;
-document.getElementById("btn-propose-skill").onclick = showProposePane;
-document.getElementById("btn-propose-submit").onclick = submitProposedSkill;
+document.getElementById("btn-propose-agent").onclick = showProposePane;
+document.getElementById("btn-propose-submit").onclick = submitProposedAgent;
 document.getElementById("btn-propose-template").onclick = (e) => {
   e.preventDefault();
   document.getElementById("propose-code").value = "";
@@ -2558,7 +2563,7 @@ function rappidSigil(rappid, size) {
 (function renderSigil() {
   const el = document.getElementById("hero-sigil");
   if (!el) return;
-  el.innerHTML = rappidSigil("f4da892f-150d-4551-b929-78c71add4378", 96);
+  el.innerHTML = rappidSigil("f8135aae-e9eb-4b65-b563-70caf62888a2", 96);
 })();
 
 // ── Profile stats: memory count + age ──────────────────────────────
@@ -2584,9 +2589,9 @@ function relativeAge(iso) {
 // Three live data feeds drive the resume — every fetch is anonymous-
 // friendly (60 req/hour from any IP, plenty for a profile page):
 //
-//   Skills       — GET /repos/<owner>/<seed>/contents/agents
+//   Agents       — GET /repos/<owner>/<seed>/contents/agents
 //                  Each agent .py is a capability the organism brings
-//                  to the table when summoned/hatched.
+//                  to the table when summoned/hatched. ONE term: agent.
 //
 //   Mutations    — GET /repos/<owner>/<seed>/commits
 //                  Every commit IS a mutation event — new memory, new
@@ -2673,7 +2678,8 @@ async function cachedGhText(url, headers) {
   return { value: null, source: "none", stale: true };
 }
 
-const SKILL_FRIENDLY = {
+// Friendly display map for known agents. ONE term: agent. Never "skill".
+const AGENT_FRIENDLY = {
   manage_memory_agent:   { name: "Manage Memory",   icon: "🧠" },
   context_memory_agent:  { name: "Context Memory",  icon: "📌" },
   learn_new_agent:       { name: "Learn New",       icon: "🎓" },
@@ -2681,41 +2687,41 @@ const SKILL_FRIENDLY = {
   basic_agent:           null, // base class — not a capability
 };
 
-async function fillSkills() {
-  const el = document.getElementById("tr-skills");
+async function fillAgents() {
+  const el = document.getElementById("tr-agents");
   if (!el) return;
   const { owner, repo } = _ghOwnerRepo();
   if (!owner || !repo) { el.innerHTML = ""; return; }
   // Local-first: cachedGhJson tries network, then localStorage cache.
-  // An organism running offline still renders its skills from the last
+  // An organism running offline still renders its agents from the last
   // successful sync — never goes blank.
   const res = await cachedGhJson(`https://api.github.com/repos/${owner}/${repo}/contents/agents`);
   const list = res.value;
   if (!Array.isArray(list)) {
     el.innerHTML = res.source === "none"
-      ? '<span class="skill-chip skel">offline — skills will load when network returns</span>'
+      ? '<span class="agent-chip skel">offline — agents will load when network returns</span>'
       : "";
     return;
   }
-  const skills = [];
+  const agents = [];
   for (const f of list) {
     if (f.type !== "file" || !f.name.endsWith(".py")) continue;
     const stem = f.name.replace(/\.py$/, "");
-    const fr = SKILL_FRIENDLY[stem];
+    const fr = AGENT_FRIENDLY[stem];
     if (fr === null) continue;
     if (fr) {
-      skills.push({ icon: fr.icon, label: fr.name, custom: false });
+      agents.push({ icon: fr.icon, label: fr.name, custom: false });
     } else {
       const friendly = stem.replace(/_agent$/, "").replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
-      skills.push({ icon: "✨", label: friendly, custom: true });
+      agents.push({ icon: "✨", label: friendly, custom: true });
     }
   }
-  if (!skills.length) { el.innerHTML = '<span class="skill-chip skel">no skills loaded yet</span>'; return; }
+  if (!agents.length) { el.innerHTML = '<span class="agent-chip skel">no agents loaded yet</span>'; return; }
   const stalePill = (res.source === "cache" && res.stale)
-    ? `<span class="skill-chip skel" title="last synced ${res.fetchedAt ? res.fetchedAt.toLocaleString() : 'a while ago'} — offline reading from cache">📡 stale</span>`
+    ? `<span class="agent-chip skel" title="last synced ${res.fetchedAt ? res.fetchedAt.toLocaleString() : 'a while ago'} — offline reading from cache">📡 stale</span>`
     : "";
-  el.innerHTML = skills.map(s =>
-    `<span class="skill-chip ${s.custom ? "skill-new" : ""}">${s.icon} ${escapeHtml(s.label)}</span>`
+  el.innerHTML = agents.map(a =>
+    `<span class="agent-chip ${a.custom ? "agent-new" : ""}">${a.icon} ${escapeHtml(a.label)}</span>`
   ).join("") + stalePill;
 }
 
@@ -2735,10 +2741,10 @@ function fillAchievements(memCount, plantedAt, mutationCount) {
   if (mutationCount >= 5)  ach.push({ icon: "🔧", label: "5+ mutations" });
   if (mutationCount >= 25) ach.push({ icon: "⚙️", label: "25+ mutations" });
   if (!ach.length) {
-    el.innerHTML = '<span class="skill-chip skel">earn your first achievement by talking with me</span>';
+    el.innerHTML = '<span class="agent-chip skel">earn your first achievement by talking with me</span>';
     return;
   }
-  el.innerHTML = ach.map(a => `<span class="skill-chip achievement">${a.icon} ${escapeHtml(a.label)}</span>`).join("");
+  el.innerHTML = ach.map(a => `<span class="agent-chip achievement">${a.icon} ${escapeHtml(a.label)}</span>`).join("");
 }
 
 function _relativeDate(iso) {
@@ -2817,7 +2823,7 @@ async function fillLineage() {
 // 3500-MMR Heimdall is directly comparable to a 3500-MMR Cloud Gate
 // or any other organism on the species. The score reflects: lived
 // time, accumulated memory (depth of relationship), mutation count
-// (operator steering), custom skills (capabilities earned beyond
+// (operator steering), custom agents (capabilities earned beyond
 // the doorman defaults), AND offspring (organisms forked from this
 // one — pedigree counts).
 //
@@ -2856,10 +2862,10 @@ function activityStatus(lastCommitIso) {
   return                          { kind: "stasis",  label: "❄ Stasis",   factor: 0.45 };
 }
 
-function computeMMR({ memCount, mutCount, customSkills, ageDays, forkCount, activityFactor, lineageGift }) {
+function computeMMR({ memCount, mutCount, customAgents, ageDays, forkCount, activityFactor, lineageGift }) {
   const m = Math.max(0, memCount || 0);
   const x = Math.max(0, mutCount || 0);
-  const c = Math.max(0, customSkills || 0);
+  const c = Math.max(0, customAgents || 0);
   const d = Math.max(0, ageDays || 0);
   const f = Math.max(0, forkCount || 0);
   const af = (typeof activityFactor === "number" && activityFactor > 0) ? activityFactor : 1.0;
@@ -2916,16 +2922,16 @@ async function _parentLineageGift(rappidObj) {
   if (memRes.value) {
     try { const j = JSON.parse(memRes.value); memCount = Array.isArray(j.facts) ? j.facts.length : 0; } catch (_) {}
   }
-  let customSkills = 0;
+  let customAgents = 0;
   if (Array.isArray(agentsRes.value)) {
-    customSkills = agentsRes.value.filter(f =>
+    customAgents = agentsRes.value.filter(f =>
       f.type === "file" && f.name.endsWith(".py") &&
-      !(f.name.replace(/\.py$/, "") in SKILL_FRIENDLY)
+      !(f.name.replace(/\.py$/, "") in AGENT_FRIENDLY)
     ).length;
   }
   const act = activityStatus(lastCommit);
   const parentMMR = computeMMR({
-    memCount, mutCount, customSkills, ageDays, forkCount,
+    memCount, mutCount, customAgents, ageDays, forkCount,
     activityFactor: act.factor,
   });
   // Child inherits 30% of parent's above-baseline as the lineage gift.
@@ -2990,7 +2996,7 @@ function fillMMR(inputs) {
   const parts = [];
   if (inputs.memCount)     parts.push(inputs.memCount + " mem");
   if (inputs.mutCount)     parts.push(inputs.mutCount + (inputs.mutCount >= 6 ? "+" : "") + " mut");
-  if (inputs.customSkills) parts.push(inputs.customSkills + " custom skill" + (inputs.customSkills === 1 ? "" : "s"));
+  if (inputs.customAgents) parts.push(inputs.customAgents + " custom agent" + (inputs.customAgents === 1 ? "" : "s"));
   if (inputs.forkCount)    parts.push(inputs.forkCount + " fork" + (inputs.forkCount === 1 ? "" : "s") + " 🌳");
   if (inputs.ageDays)      parts.push(Math.floor(inputs.ageDays) + "d alive");
   // Activity status as a colored chip baked into the breakdown
@@ -3007,8 +3013,8 @@ function fillMMR(inputs) {
   bd.innerHTML = (parts.length ? "earned from " + escapeHtml(parts.join(" · ")) : "fresh plant") + activityNote + lineageNote;
 }
 
-// Skills count — how many beyond the doorman defaults?
-async function _customSkillCount() {
+// Custom-agent count — how many agents beyond the doorman defaults?
+async function _customAgentCount() {
   const { owner, repo } = _ghOwnerRepo();
   if (!owner || !repo) return 0;
   try {
@@ -3022,7 +3028,7 @@ async function _customSkillCount() {
     for (const f of list) {
       if (f.type !== "file" || !f.name.endsWith(".py")) continue;
       const stem = f.name.replace(/\.py$/, "");
-      if (!(stem in SKILL_FRIENDLY)) custom++;  // not a known doorman/ascended agent
+      if (!(stem in AGENT_FRIENDLY)) custom++;  // not a known doorman/ascended agent
     }
     return custom;
   } catch (_) { return 0; }
@@ -3041,14 +3047,14 @@ async function _customSkillCount() {
   } catch (_) {}
 
   // Fetch all signal sources in parallel — each independent.
-  const [skillsRes, mutationsRes, customSkills, forkCount, lineage] = await Promise.all([
-    fillSkills(),
+  const [agentsRes, mutationsRes, customAgents, forkCount, lineage] = await Promise.all([
+    fillAgents(),
     fillMutations(),
-    fillLineage().then(() => _customSkillCount()),
+    fillLineage().then(() => _customAgentCount()),
     _forkCount(),
     _parentLineageGift(rappidObj),
   ]);
-  void skillsRes;
+  void agentsRes;
 
   const ageDays   = plantedAt ? (Date.now() - new Date(plantedAt).getTime()) / 86400000 : 0;
   const mutCount  = mutationsRes && mutationsRes.count || 0;
@@ -3056,7 +3062,7 @@ async function _customSkillCount() {
   const lineageGift = lineage ? lineage.gift : 0;
 
   fillMMR({
-    memCount, mutCount, customSkills, ageDays,
+    memCount, mutCount, customAgents, ageDays,
     forkCount, lastCommit, lineageGift, lineage,
   });
   fillAchievements(memCount, plantedAt, mutCount);
