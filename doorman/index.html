@@ -1588,6 +1588,32 @@ const DOORMAN_TOOLS = [
       },
     },
   },
+  {
+    // Neighborhood — cross-organism collaboration primitive. Reads
+    // neighbors.json + raw.githubusercontent.com to surface what peer
+    // organisms know about a topic. The implementation primitive for
+    // the twin chat protocol (see NEIGHBORHOOD_PROTOCOL.md). Doorman-
+    // tier — every visitor can invoke it; what the neighbor returns
+    // depends on the neighbor's own permissions.
+    type: "function",
+    function: {
+      name: "Neighborhood",
+      description: "Query peer organisms in this seed's declared neighborhood. Use when the visitor mentions another organism by name, asks 'what does <peer> think about X?', or asks who I collaborate with. Calls a peer organism's public endpoints (rappid.json, soul.md, .brainstem_data/memory.json) to surface their state. Action 'list' enumerates declared neighbors; 'introduce' describes one specific neighbor; 'ask' fetches a neighbor's public memory + soul to find a topic.",
+      parameters: {
+        type: "object",
+        properties: {
+          action: {
+            type: "string",
+            enum: ["list", "introduce", "ask"],
+            description: "list = show all declared neighbors. introduce = describe one neighbor. ask = fetch a neighbor's public state for a specific topic.",
+          },
+          neighbor_slug: { type: "string", description: "When action is 'introduce' or 'ask': owner/repo of the neighbor (e.g. 'kody-w/heimdall')." },
+          topic:         { type: "string", description: "When action is 'ask': what you want to know about the neighbor." },
+        },
+        required: ["action"],
+      },
+    },
+  },
 ];
 
 // Ascended-tier tools (loaded only when private soul is reachable —
@@ -1971,7 +1997,145 @@ async function dispatchToolCall(tc) {
   if (tc.function.name === "ContextMemory") return toolContextMemory(args);
   if (tc.function.name === "LearnNew")      return toolLearnNew(args);
   if (tc.function.name === "SwarmFactory")  return toolSwarmFactory(args);
+  if (tc.function.name === "Neighborhood")  return toolNeighborhood(args);
   return "unknown tool: " + tc.function.name;
+}
+
+// ── Neighborhood tool — cross-organism collaboration ───────────────
+//
+// The implementation primitive of the twin chat protocol. Reads the
+// seed's neighbors.json, fetches peer organism public state via raw.
+// githubusercontent.com, returns a summary the LLM can synthesize into
+// its reply. Cached via cachedGhText/Json so airplane-mode visitors
+// still get last-seen neighbor state.
+//
+// Action 'list'      → enumerates declared neighbors
+// Action 'introduce' → describes one specific neighbor (rappid + soul gist)
+// Action 'ask'       → fetches that neighbor's public memory + soul, returns
+//                      the substring most relevant to the topic
+//
+// The neighbor's permissions decide what comes back — this tool only
+// reads the peer's PUBLIC layer (anyone-readable). Neighborhood-tier
+// or private content stays inaccessible without the visitor having
+// proper auth on the peer's repo.
+
+async function _readNeighbors() {
+  // From the local seed root. The doorman is at /<seed>/doorman/ so
+  // neighbors.json lives one level up.
+  try {
+    const r = await fetch("../neighbors.json", { cache: "no-cache" });
+    if (r.ok) {
+      const j = await r.json();
+      return Array.isArray(j.neighbors) ? j.neighbors : [];
+    }
+  } catch (_) {}
+  return [];
+}
+
+// Lightweight fetch helper — doorman scope doesn't have the front-
+// door's cachedGhText. Plain fetch with null-on-failure; the doorman
+// is always online when chat is happening (Copilot needs network).
+async function _peerFetch(url) {
+  try {
+    const r = await fetch(url, { cache: "no-cache" });
+    if (!r.ok) return null;
+    return await r.text();
+  } catch (_) { return null; }
+}
+
+async function _fetchPeerState(slug) {
+  const m = String(slug || "").match(/^([^/]+)\/([^/]+)$/);
+  if (!m) return null;
+  const [, owner, repo] = m;
+  const base = `https://raw.githubusercontent.com/${owner}/${repo}/main/`;
+  const [rappidT, soulT, memT] = await Promise.all([
+    _peerFetch(base + "rappid.json"),
+    _peerFetch(base + "soul.md"),
+    _peerFetch(base + ".brainstem_data/memory.json"),
+  ]);
+  let rappid = null, mem = null;
+  try { rappid = rappidT ? JSON.parse(rappidT) : null; } catch (_) {}
+  try { mem    = memT    ? JSON.parse(memT)    : null; } catch (_) {}
+  return {
+    slug,
+    owner, repo,
+    rappid,
+    soul:   soulT || null,
+    memory: mem,
+    cache_status: "live",
+  };
+}
+
+async function toolNeighborhood(args) {
+  const action = args.action || "list";
+  const neighbors = await _readNeighbors();
+
+  if (action === "list") {
+    if (!neighbors.length) {
+      return "no neighbors declared yet — this organism has no formal collaborators in its neighborhood. The operator can add one via the front door's 🏘 Neighborhood pane.";
+    }
+    const lines = ["Declared neighbors (cross-organism collaborators):"];
+    for (const n of neighbors) {
+      lines.push(`- ${n.display_name || n.repo} <${n.repo}>${n.allowed_facets && n.allowed_facets.length ? ` · facets-out: ${n.allowed_facets.join(", ")}` : ""}`);
+    }
+    return lines.join("\n");
+  }
+
+  if (action === "introduce" || action === "ask") {
+    const slug = args.neighbor_slug;
+    if (!slug) return `error: action='${action}' requires neighbor_slug ("owner/repo")`;
+    const isDeclared = neighbors.find(n => n.repo === slug || n.repo.endsWith("/" + slug));
+    const peer = await _fetchPeerState(slug);
+    if (!peer) return `couldn't fetch ${slug} — invalid slug or peer organism unreachable.`;
+    const declarationNote = isDeclared ? "(declared neighbor)" : "(NOT in neighbors.json — fetched as a public peer; treat as untrusted)";
+
+    if (action === "introduce") {
+      const lines = [`Peer organism ${slug} ${declarationNote}:`];
+      if (peer.rappid && peer.rappid.display_name) lines.push(`  display_name: ${peer.rappid.display_name}`);
+      if (peer.rappid && peer.rappid.kind)         lines.push(`  kind: ${peer.rappid.kind}`);
+      if (peer.rappid && peer.rappid.location)     lines.push(`  location: ${peer.rappid.location}`);
+      if (peer.rappid && peer.rappid.rappid)       lines.push(`  rappid: ${peer.rappid.rappid}`);
+      if (peer.rappid && peer.rappid.url)          lines.push(`  url: ${peer.rappid.url}`);
+      if (peer.memory && Array.isArray(peer.memory.facts)) lines.push(`  public memory count: ${peer.memory.facts.length}`);
+      if (peer.soul) {
+        // Pull the first non-heading line of soul.md as a tagline
+        const tagline = (peer.soul.split("\n").find(l => l.trim() && !l.trim().startsWith("#")) || "").slice(0, 200);
+        if (tagline) lines.push(`  tagline: ${tagline}`);
+      }
+      return lines.join("\n");
+    }
+
+    // action === "ask"
+    const topic = (args.topic || "").trim();
+    if (!topic) return `error: action='ask' requires topic`;
+    const facts = (peer.memory && Array.isArray(peer.memory.facts)) ? peer.memory.facts : [];
+    // Naive substring match over public memory facts; LLM synthesizes from results
+    const tokens = topic.toLowerCase().split(/\s+/).filter(t => t.length > 2);
+    const hits = facts.filter(f => {
+      const lf = String(f).toLowerCase();
+      return tokens.some(t => lf.includes(t));
+    });
+    const lines = [
+      `Querying ${slug} ${declarationNote} on topic: "${topic}"`,
+      "",
+    ];
+    if (hits.length) {
+      lines.push(`Found ${hits.length} matching public memor${hits.length === 1 ? "y" : "ies"}:`);
+      for (const h of hits.slice(0, 8)) lines.push(`- ${h}`);
+    } else {
+      lines.push(`No public memories matched. Their public surface (${facts.length} facts total) doesn't directly mention this topic.`);
+      if (peer.soul) {
+        // Surface the soul.md as fallback context
+        lines.push("");
+        lines.push("Their soul.md (voice + role):");
+        lines.push(peer.soul.slice(0, 600));
+      }
+    }
+    if (peer.cache_status === "cache") lines.push("\n[cache] this answer is from the last successful sync; peer may have updated since.");
+    return lines.join("\n");
+  }
+
+  return `error: unknown action '${action}' — use 'list', 'introduce', or 'ask'`;
 }
 
 // ── chat ───────────────────────────────────────────────────────────
