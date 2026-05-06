@@ -1,0 +1,26 @@
+{
+  "schema": "rapp-rappid/1.1",
+  "rappid": "fe211ed6-c82d-4a3c-acd1-d74986d1019a",
+  "kind": "personal",
+  "name": "kody-twin",
+  "display_name": "Kody Wildfeuer",
+  "github": "https://github.com/kody-w/kody-twin",
+  "url": "https://kody-w.github.io/kody-twin",
+  "parent_rappid": "0b635450-c042-49fb-b4b1-bdb571044dec",
+  "parent_repo": "https://github.com/kody-w/rapp-installer",
+  "planted_by": "kody-w",
+  "planted_at": "2026-05-06T01:50:07Z",
+  "planted_from": null,
+  "kernel_version": "0.6.0",
+  "private_companion": {
+    "repo": "https://github.com/kody-w/twin.git",
+    "purpose": "The brain repo \u2014 vault notes, soul.md, agents. Visitors with GitHub read access to kody-w/twin chat with the doorman backed by the full corpus; anonymous visitors see only the public seed-level identity.",
+    "access_required": "Read access to kody-w/twin.",
+    "raw_url_template": "https://raw.githubusercontent.com/kody-w/twin/main/{path}",
+    "tree_url_template": "https://api.github.com/repos/kody-w/twin/contents/{path}",
+    "auth": {
+      "scheme": "github_token",
+      "scope_required": "repo (or fine-grained Contents: Read on the private_companion repo)"
+    }
+  }
+}

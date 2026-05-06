@@ -1,0 +1,11 @@
+.brainstem_data/
+.copilot_token
+.copilot_session
+.env
+.env.local
+__pycache__/
+*.pyc
+.DS_Store
+node_modules/
+venv/
+.pytest_cache/

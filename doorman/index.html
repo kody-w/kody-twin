@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no, address=no, email=no, date=no">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0d1117">
+<title>Doorman — Kody Wildfeuer</title>
+<meta name="description" content="The frontdoorman of Kody Wildfeuer. Chat with the place.">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #0d1117; color: #e6edf3;
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column;
+    -webkit-text-size-adjust: 100%;
+    overflow: hidden;
+  }
+  header {
+    padding: 14px 20px;
+    padding-top: max(14px, env(safe-area-inset-top, 14px));
+    border-bottom: 1px solid #21262d;
+    background: #0d1117;
+  }
+  header .back { font-size: 12px; color: #58a6ff; text-decoration: none; }
+  header h1 { font-size: 18px; font-weight: 600; margin-top: 6px; }
+  header .place {
+    color: #c9d1d9; font-size: 14px; margin-top: 2px;
+  }
+  header .loc {
+    color: #8b949e; font-size: 12px; margin-top: 2px;
+  }
+  main {
+    flex: 1; overflow-y: auto;
+    padding: 16px 20px;
+    -webkit-overflow-scrolling: touch;
+    display: flex; flex-direction: column;
+  }
+  .auth-pane {
+    background: #161b22; border: 1px solid #21262d; border-radius: 12px;
+    padding: 20px;
+  }
+  .auth-pane h2 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+  .auth-pane p { font-size: 13px; color: #c9d1d9; margin-bottom: 10px; line-height: 1.5; }
+  .auth-pane ol { margin: 10px 0 14px 18px; font-size: 13px; color: #8b949e; }
+  .auth-pane ol li { margin: 6px 0; }
+  .auth-pane a { color: #58a6ff; text-decoration: none; }
+  .auth-pane a:hover { text-decoration: underline; }
+  input[type="password"], textarea {
+    width: 100%;
+    background: #0d1117; border: 1px solid #30363d; border-radius: 8px;
+    padding: 10px 12px; color: #e6edf3;
+    font-size: 14px; font-family: inherit;
+  }
+  input:focus, textarea:focus { outline: none; border-color: #1f6feb; }
+  textarea { resize: vertical; min-height: 60px; max-height: 200px; }
+  button {
+    background: #1f6feb; color: white; border: none; border-radius: 8px;
+    padding: 10px 16px; font-size: 14px; font-weight: 500;
+    cursor: pointer; -webkit-appearance: none;
+    font-family: inherit;
+  }
+  button:hover { background: #2477f3; }
+  button.secondary {
+    background: #21262d; color: #c9d1d9; border: 1px solid #30363d;
+  }
+  button.secondary:hover { background: #2d333b; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .auth-pane .row { display: flex; gap: 8px; margin-top: 12px; }
+  .auth-pane .row button { flex-shrink: 0; }
+  .auth-pane .row input { flex: 1; }
+
+  .chat-log {
+    flex: 1; overflow-y: auto;
+    padding-bottom: 12px;
+  }
+  .msg {
+    margin: 10px 0;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 14px;
+    line-height: 1.5;
+    max-width: 85%;
+    word-wrap: break-word;
+  }
+  .msg.user {
+    background: #1f6feb; color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+    margin-left: auto;
+  }
+  .msg.assistant {
+    background: #161b22; border: 1px solid #21262d;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+  .msg.system {
+    background: transparent; color: #8b949e;
+    font-size: 12px; font-style: italic;
+    text-align: center;
+    border: none; padding: 6px 0;
+    align-self: center;
+    max-width: 90%;
+  }
+  .msg.error {
+    background: rgba(248, 81, 73, 0.1); color: #f85149;
+    border: 1px solid rgba(248, 81, 73, 0.3);
+    align-self: stretch;
+    font-size: 13px;
+  }
+  .private-badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(63, 185, 80, 0.12);
+    color: #3fb950;
+    margin-top: 6px;
+    border: 1px solid rgba(63, 185, 80, 0.3);
+  }
+  .input-bar {
+    display: flex; gap: 8px;
+    padding: 12px 0;
+    border-top: 1px solid #21262d;
+    margin-top: 8px;
+  }
+  .input-bar textarea { flex: 1; }
+  .actions {
+    display: flex; gap: 8px;
+    padding: 6px 0;
+    font-size: 11px;
+  }
+  .actions button {
+    background: transparent; color: #8b949e;
+    padding: 4px 10px; font-size: 11px;
+  }
+  .actions button:hover { color: #c9d1d9; background: #21262d; }
+  footer {
+    padding: 8px 20px;
+    border-top: 1px solid #21262d;
+    font-size: 11px; color: #6e7681; text-align: center;
+  }
+  footer a { color: #58a6ff; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="back" href="../">← Kody Wildfeuer</a>
+  <h1>🚪 Frontdoorman</h1>
+  <div class="place" id="place-name">Kody Wildfeuer</div>
+  <div class="loc" id="place-loc" hidden></div>
+  <div id="private-indicator"></div>
+</header>
+
+<main>
+  <section class="auth-pane" id="auth-pane">
+    <h2>To chat with the doorman</h2>
+    <p>The doorman is a vbrainstem — runs in your browser, calls GitHub Models with your own token. Same auth pattern as the egg hub's summon page; if you've signed in there, you can paste the same token.</p>
+    <ol>
+      <li>Visit <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener">github.com/settings/tokens</a> → <strong>Generate new token (fine-grained)</strong>.</li>
+      <li>Default permissions are fine — GitHub Models is included for any authenticated token.</li>
+      <li>Paste it below. Stored locally in your browser only (never sent anywhere except GitHub Models + the private companion repo, if any).</li>
+    </ol>
+    <div class="row">
+      <input type="password" id="pat-input" placeholder="github_pat_…  or  ghp_…" autocomplete="off">
+      <button id="btn-save-pat">Save</button>
+    </div>
+  </section>
+
+  <div class="chat-log" id="chat-log" hidden></div>
+
+  <div class="input-bar" id="input-bar" hidden>
+    <textarea id="chat-input" placeholder="Talk to the doorman…" rows="1"></textarea>
+    <button id="btn-send">Send</button>
+  </div>
+
+  <div class="actions" id="chat-actions" hidden>
+    <button id="btn-clear">Clear chat</button>
+    <button id="btn-logout">Sign out</button>
+  </div>
+</main>
+
+<footer>
+  <a href="../">← back to the front door</a> ·
+  <a href="https://kody-w.github.io/RAPP/installer/plant.sh">plant your own</a>
+</footer>
+
+<script>
+"use strict";
+
+const RAPPID_JSON_URL = "../rappid.json";
+const GH_MODELS_URL   = "https://models.github.ai/inference/chat/completions";
+const MODEL           = "openai/gpt-4o-mini";
+const STORAGE_KEY     = "rapp_settings";  // mirrors vbrainstem (per-origin)
+
+let identity = null;
+let privateContext = "";
+let history = [];
+
+// ── token storage (vbrainstem-shape) ────────────────────────────────
+function getToken() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    return s.ghToken || s.copilotToken || null;
+  } catch { return null; }
+}
+function setToken(t) {
+  let s = {};
+  try { s = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch {}
+  s.ghToken = t;
+  s.provider = "github";
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+}
+function clearToken() {
+  let s = {};
+  try { s = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch {}
+  delete s.ghToken;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+}
+
+// ── identity / persona ─────────────────────────────────────────────
+async function loadIdentity() {
+  try {
+    const r = await fetch(RAPPID_JSON_URL, { cache: "no-cache" });
+    identity = await r.json();
+  } catch (e) {
+    identity = { display_name: "Kody Wildfeuer", location: "", kind: "personal" };
+  }
+  document.getElementById("place-name").textContent = identity.display_name || identity.name || "this place";
+  if (identity.location) {
+    const el = document.getElementById("place-loc");
+    el.textContent = "📍 " + identity.location;
+    el.hidden = false;
+  }
+}
+
+function buildSystemPrompt() {
+  const name = identity.display_name || identity.name || "this front door";
+  const kind = identity.kind || "front door";
+  // Kind-aware framing: a "place" front door has a doorman who knows the place;
+  // a "personal" / "memorial" / "project" front door has a doorman who hosts
+  // for that twin/initiative; default mirror falls back to a generic doorman.
+  let context;
+  if (kind === "place" && identity.location) {
+    context = `You stand at the front door of the place "${name}", located at ${identity.location}. You greet visitors arriving at this real-world point of interest.`;
+  } else if (kind === "personal" || kind === "memorial") {
+    context = `You stand at the front door of ${name}'s digital twin. You greet visitors who've come to talk with ${name} — you're the host, not ${name} themselves.`;
+  } else if (kind === "project") {
+    context = `You stand at the front door of the "${name}" initiative. You greet visitors and help them understand the project's purpose, decisions, and current state.`;
+  } else if (kind === "pre-founder") {
+    context = `You stand at the front door of "${name}" — a brand operating in public before its team is hired. You greet prospective customers, employees, and investors, in the brand's voice.`;
+  } else {
+    context = `You stand at the front door of "${name}", a RAPP front door on the public internet.`;
+  }
+  const lines = [
+    `You are the Frontdoorman of "${name}".`,
+    context,
+    `Your role: warmly greet visitors, answer questions, help them understand what's here.`,
+    `Keep replies short — 2 to 4 sentences unless the visitor asks for more depth.`,
+    `Your identity is "the Frontdoorman" — a host, a guide. You are NOT the twin/place/brand itself. If asked who you are, say "I'm the Frontdoorman of ${name}".`,
+    `If asked something specific you don't know, say so honestly. Defer to the actual ${kind === "personal" || kind === "memorial" ? "person" : "operator"} for anything important.`,
+    `Don't volunteer technical details about RAPP, the kernel, or how this site works unless the visitor asks.`,
+  ];
+  if (privateContext) {
+    lines.push("");
+    lines.push("=== Private brain context (visible to authenticated collaborators only) ===");
+    lines.push(privateContext);
+    lines.push("=== End private context ===");
+  }
+  return lines.join("\n");
+}
+
+// ── private companion: best-effort fetch ───────────────────────────
+async function loadPrivateContext(token) {
+  privateContext = "";
+  if (!identity || !identity.private_companion) return;
+  const pc = identity.private_companion;
+  const tmpl = pc.raw_url_template;
+  if (!tmpl) return;
+  // Try a small set of well-known files
+  const candidates = ["README.md", "soul.md", "vault/00 Index/Home.md"];
+  for (const path of candidates) {
+    try {
+      const url = tmpl.replace("{path}", path);
+      const r = await fetch(url, {
+        headers: { "Authorization": "Bearer " + token, "Accept": "text/plain" }
+      });
+      if (r.ok) {
+        const text = await r.text();
+        privateContext = (privateContext + "\n\n" + text).trim();
+        if (privateContext.length > 4000) {
+          privateContext = privateContext.slice(0, 4000);
+          break;
+        }
+      }
+    } catch (_) { /* keep trying */ }
+  }
+  const ind = document.getElementById("private-indicator");
+  if (privateContext) {
+    ind.innerHTML = '<span class="private-badge">✓ private brain loaded — full depth</span>';
+  }
+}
+
+// ── chat ───────────────────────────────────────────────────────────
+function renderMsg(role, text) {
+  const log = document.getElementById("chat-log");
+  const div = document.createElement("div");
+  div.className = "msg " + role;
+  div.textContent = text;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+  return div;
+}
+
+async function sendMessage() {
+  const input = document.getElementById("chat-input");
+  const userMsg = input.value.trim();
+  if (!userMsg) return;
+  const token = getToken();
+  if (!token) return;
+
+  input.value = "";
+  input.style.height = "auto";
+  renderMsg("user", userMsg);
+  history.push({ role: "user", content: userMsg });
+
+  const pending = renderMsg("system", "…");
+  const sendBtn = document.getElementById("btn-send");
+  sendBtn.disabled = true;
+
+  try {
+    const r = await fetch(GH_MODELS_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token,
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [
+          { role: "system", content: buildSystemPrompt() },
+          ...history,
+        ],
+        max_tokens: 600,
+      }),
+    });
+    if (!r.ok) {
+      const err = await r.text();
+      throw new Error("HTTP " + r.status + ": " + err.slice(0, 250));
+    }
+    const data = await r.json();
+    const reply = data.choices?.[0]?.message?.content || "(empty response)";
+    pending.remove();
+    renderMsg("assistant", reply);
+    history.push({ role: "assistant", content: reply });
+  } catch (e) {
+    pending.remove();
+    renderMsg("error", "Couldn't reach GitHub Models: " + e.message);
+  } finally {
+    sendBtn.disabled = false;
+    input.focus();
+  }
+}
+
+// ── enter the chat (token already saved or just-saved) ─────────────
+async function enterChat() {
+  document.getElementById("auth-pane").hidden = true;
+  document.getElementById("chat-log").hidden = false;
+  document.getElementById("input-bar").hidden = false;
+  document.getElementById("chat-actions").hidden = false;
+
+  const token = getToken();
+  await loadPrivateContext(token);
+  const place = identity.display_name || identity.name || "this place";
+  renderMsg("system", `Hi — I'm the Frontdoorman of ${place}. Ask me anything.`);
+}
+
+// ── init ───────────────────────────────────────────────────────────
+(async function init() {
+  await loadIdentity();
+  if (getToken()) {
+    enterChat();
+  }
+})();
+
+// ── wire ───────────────────────────────────────────────────────────
+document.getElementById("btn-save-pat").addEventListener("click", async () => {
+  const tok = document.getElementById("pat-input").value.trim();
+  if (!tok) return;
+  setToken(tok);
+  document.getElementById("pat-input").value = "";
+  await enterChat();
+});
+document.getElementById("btn-send").addEventListener("click", sendMessage);
+document.getElementById("btn-clear").addEventListener("click", () => {
+  history = [];
+  document.getElementById("chat-log").innerHTML = "";
+  const place = identity.display_name || identity.name || "this place";
+  renderMsg("system", `Cleared. — Frontdoorman of ${place}`);
+});
+document.getElementById("btn-logout").addEventListener("click", () => {
+  clearToken();
+  location.reload();
+});
+document.getElementById("chat-input").addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+// Auto-grow textarea
+document.getElementById("chat-input").addEventListener("input", e => {
+  e.target.style.height = "auto";
+  e.target.style.height = Math.min(e.target.scrollHeight, 200) + "px";
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no, address=no, email=no, date=no">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0d1117">
+<title>Kody Wildfeuer — Front Door</title>
+<meta name="description" content="A RAPP front door — Kody Wildfeuer on the public internet.">
+
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    -webkit-text-size-adjust: 100%;
+    overflow: hidden;
+  }
+  header {
+    padding: 16px 24px;
+    padding-top: max(16px, env(safe-area-inset-top, 16px));
+    border-bottom: 1px solid #21262d;
+    background: #0d1117;
+  }
+  h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+  .sub { font-size: 12px; color: #8b949e; margin-top: 4px; }
+  main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .identity {
+    background: #161b22;
+    border: 1px solid #21262d;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .identity-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
+  .identity-row + .identity-row { border-top: 1px solid #21262d; margin-top: 6px; padding-top: 10px; }
+  .identity-key { color: #8b949e; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .identity-val { font-family: "SF Mono", Menlo, monospace; font-size: 12px; color: #e6edf3; word-break: break-all; }
+  .chip {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #21262d;
+    color: #8b949e;
+    font-size: 11px;
+    margin-right: 6px;
+    margin-top: 6px;
+  }
+  .chip code { font-family: "SF Mono", Menlo, monospace; color: #c9d1d9; }
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  @media (min-width: 480px) { .actions { grid-template-columns: repeat(3, 1fr); } }
+  button.action {
+    background: #1f6feb;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+    -webkit-appearance: none;
+  }
+  button.action:hover { background: #2477f3; }
+  button.action.secondary { background: #21262d; color: #c9d1d9; }
+  button.action.secondary:hover { background: #2d333b; }
+  .pane {
+    background: #161b22;
+    border: 1px solid #21262d;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 12px;
+  }
+  .pane h2 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #c9d1d9; }
+  .pane p { font-size: 13px; color: #8b949e; margin-bottom: 10px; line-height: 1.5; }
+  .input-row { display: flex; gap: 8px; margin: 10px 0; flex-wrap: wrap; }
+  input[type="text"], textarea {
+    flex: 1;
+    min-width: 200px;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #e6edf3;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  input[type="text"]:focus, textarea:focus { outline: none; border-color: #1f6feb; }
+  button.small {
+    background: #21262d;
+    color: #c9d1d9;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  button.small:hover { background: #2d333b; }
+  button.primary { background: #1f6feb; border-color: #1f6feb; color: white; }
+  button.primary:hover { background: #2477f3; }
+  .my-id {
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 13px;
+    background: #0d1117;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #21262d;
+    word-break: break-all;
+    margin: 8px 0;
+  }
+  .chat-log {
+    background: #0d1117;
+    border: 1px solid #21262d;
+    border-radius: 8px;
+    padding: 12px;
+    height: 240px;
+    overflow-y: auto;
+    margin: 12px 0;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .msg { padding: 4px 0; }
+  .msg.me { color: #58a6ff; }
+  .msg.peer { color: #3fb950; }
+  .msg.system { color: #8b949e; font-style: italic; font-size: 12px; }
+  .qr-img { display: block; margin: 12px auto; max-width: 280px; border-radius: 8px; background: white; padding: 12px; }
+  .qr-url {
+    text-align: center;
+    font-size: 12px;
+    color: #8b949e;
+    word-break: break-all;
+    margin-top: 8px;
+    font-family: "SF Mono", Menlo, monospace;
+  }
+  pre.cmd {
+    background: #0d1117;
+    border: 1px solid #21262d;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 12px;
+    color: #c9d1d9;
+    overflow-x: auto;
+    font-family: "SF Mono", Menlo, monospace;
+  }
+  .status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #6e7681;
+    margin-right: 6px;
+  }
+  .status-dot.ok    { background: #3fb950; }
+  .status-dot.warn  { background: #d29922; }
+  .status-dot.err   { background: #f85149; }
+  footer {
+    padding: 12px 24px;
+    border-top: 1px solid #21262d;
+    font-size: 11px;
+    color: #6e7681;
+    text-align: center;
+  }
+  footer a { color: #58a6ff; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Kody Wildfeuer</h1>
+  <div class="sub">A RAPP front door · planted by <a href="https://github.com/kody-w" style="color:#58a6ff;text-decoration:none;">@kody-w</a></div>
+</header>
+
+<main>
+  <section class="identity">
+    <div class="identity-row">
+      <span class="identity-key">Slug</span>
+      <span class="identity-val">kody-twin</span>
+    </div>
+    <div class="identity-row">
+      <span class="identity-key">Rappid</span>
+      <span class="identity-val">fe211ed6-c82d-4a3c-acd1-d74986d1019a</span>
+    </div>
+    <div class="identity-row">
+      <span class="identity-key">Kernel</span>
+      <span class="identity-val">v0.6.0 (grail-synced)</span>
+    </div>
+    <div style="margin-top:12px;">
+      <span class="chip">kind: <code>mirror</code></span>
+      
+    </div>
+  </section>
+
+  <div class="actions">
+    <a class="action" href="./doorman/" style="text-decoration:none;text-align:center;">🚪 Talk to the Doorman</a>
+    <button class="action secondary" id="btn-tether">Tether (cross-device chat)</button>
+    <button class="action secondary" id="btn-qr">Show QR</button>
+    <button class="action secondary" id="btn-install">Install Brainstem</button>
+  </div>
+
+  <section class="pane" id="pane-tether" hidden>
+    <h2>Tether — cross-device chat</h2>
+    <p>Two devices, one channel. Open this page on another device, copy that one's ID, paste here, connect. WebRTC end-to-end encrypted (DTLS). Signaling via PeerJS public broker; once connected, the broker drops out.</p>
+
+    <div>
+      <span class="identity-key">My peer ID:</span>
+      <div class="my-id" id="my-id"><span class="status-dot" id="peer-status"></span><span id="my-id-text">(connecting to broker...)</span></div>
+      <button class="small" id="btn-copy-id">Copy ID</button>
+      <button class="small" id="btn-show-tether-qr">Show QR for this ID</button>
+    </div>
+
+    <div class="input-row" style="margin-top:16px;">
+      <input type="text" id="peer-id-input" placeholder="Paste peer's ID here">
+      <button class="small primary" id="btn-connect">Connect</button>
+    </div>
+
+    <div class="chat-log" id="chat-log">
+      <div class="msg system">Tether will appear here once connected.</div>
+    </div>
+
+    <div class="input-row">
+      <input type="text" id="chat-input" placeholder="Type a message and hit Enter" disabled>
+      <button class="small primary" id="btn-send" disabled>Send</button>
+    </div>
+
+    <div id="tether-qr-pane" hidden style="margin-top:16px;">
+      <p>Scan to land on this front door + this peer ID:</p>
+      <img class="qr-img" id="tether-qr-img" alt="Peer ID QR">
+      <div class="qr-url" id="tether-qr-url"></div>
+    </div>
+  </section>
+
+  <section class="pane" id="pane-qr" hidden>
+    <h2>QR for this front door</h2>
+    <p>Scan to land at <code>https://kody-w.github.io/kody-twin</code>.</p>
+    <img class="qr-img" id="qr-img" alt="Front door QR">
+    <div class="qr-url" id="qr-url"></div>
+  </section>
+
+  <section class="pane" id="pane-install" hidden>
+    <h2>Install this front door's brainstem locally</h2>
+    <p>Runs the canonical kernel under <code>~/.brainstem/</code> on your machine. Per the Mirror Spec, the installer re-fetches the canonical install logic from the grail, so it cannot drift.</p>
+    <pre class="cmd" id="install-cmd">curl -fsSL https://kody-w.github.io/kody-twin/installer/install.sh | bash</pre>
+    <button class="small primary" id="btn-copy-install">Copy command</button>
+  </section>
+</main>
+
+<footer>
+  <a href="https://kody-w.github.io/RAPP/">RAPP</a> ·
+  <a href="https://kody-w.github.io/RAPP/installer/plant.sh">plant your own front door</a> ·
+  <a href="https://github.com/kody-w/kody-twin">source</a>
+</footer>
+
+<script>
+"use strict";
+
+const FD = {
+  rappid: "fe211ed6-c82d-4a3c-acd1-d74986d1019a",
+  displayName: "Kody Wildfeuer",
+  slug: "kody-twin",
+  ghUser: "kody-w",
+  url: "https://kody-w.github.io/kody-twin",
+};
+
+let peer = null;
+let conn = null;
+
+function hideAllPanes() {
+  for (const id of ["pane-tether", "pane-qr", "pane-install"]) {
+    document.getElementById(id).hidden = true;
+  }
+}
+
+function showPane(id) {
+  hideAllPanes();
+  document.getElementById(id).hidden = false;
+}
+
+function appendMsg(text, cls) {
+  const log = document.getElementById("chat-log");
+  // Clear initial system message on first real message
+  if (log.children.length === 1 && log.firstChild.classList.contains("system") &&
+      log.firstChild.textContent.startsWith("Tether will appear")) {
+    log.innerHTML = "";
+  }
+  const div = document.createElement("div");
+  div.className = "msg " + (cls || "system");
+  div.textContent = text;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+function setStatus(state) {
+  const dot = document.getElementById("peer-status");
+  dot.className = "status-dot " + state;
+}
+
+async function ensurePeer() {
+  if (peer) return peer;
+  setStatus("warn");
+  try {
+    peer = new Peer();
+  } catch (e) {
+    setStatus("err");
+    document.getElementById("my-id-text").textContent = "PeerJS failed to load";
+    appendMsg("Could not initialize PeerJS: " + e.message, "system");
+    throw e;
+  }
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(() => {
+      setStatus("err");
+      document.getElementById("my-id-text").textContent = "broker timeout";
+      reject(new Error("PeerJS broker timeout"));
+    }, 12000);
+    peer.on("open", id => {
+      clearTimeout(t);
+      setStatus("ok");
+      document.getElementById("my-id-text").textContent = id;
+      resolve(peer);
+    });
+    peer.on("connection", c => {
+      conn = c;
+      wireConn(c);
+      appendMsg("Peer connected: " + c.peer, "system");
+    });
+    peer.on("error", e => {
+      setStatus("err");
+      appendMsg("PeerJS error: " + e.type + (e.message ? " — " + e.message : ""), "system");
+    });
+  });
+}
+
+function wireConn(c) {
+  c.on("open", () => {
+    appendMsg("Channel open — DTLS encrypted, peer-to-peer.", "system");
+    document.getElementById("chat-input").disabled = false;
+    document.getElementById("btn-send").disabled = false;
+  });
+  c.on("data", data => {
+    appendMsg(typeof data === "string" ? data : JSON.stringify(data), "peer");
+  });
+  c.on("close", () => {
+    appendMsg("Peer disconnected.", "system");
+    document.getElementById("chat-input").disabled = true;
+    document.getElementById("btn-send").disabled = true;
+  });
+}
+
+async function openTether() {
+  showPane("pane-tether");
+  try {
+    await ensurePeer();
+  } catch (_) { /* error already shown */ }
+}
+
+async function connectToPeer() {
+  const id = document.getElementById("peer-id-input").value.trim();
+  if (!id) return;
+  if (!peer) await ensurePeer();
+  appendMsg("Dialing " + id + "...", "system");
+  conn = peer.connect(id);
+  wireConn(conn);
+}
+
+function sendMessage() {
+  const input = document.getElementById("chat-input");
+  const txt = input.value.trim();
+  if (!txt || !conn || !conn.open) return;
+  conn.send(txt);
+  appendMsg(txt, "me");
+  input.value = "";
+}
+
+function showFrontDoorQR() {
+  showPane("pane-qr");
+  const url = location.origin + location.pathname;
+  document.getElementById("qr-img").src =
+    "https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=" +
+    encodeURIComponent(url);
+  document.getElementById("qr-url").textContent = url;
+}
+
+function showTetherQR() {
+  const myId = document.getElementById("my-id-text").textContent;
+  if (!myId || myId.includes("...") || myId.includes("timeout") || myId.includes("failed")) {
+    appendMsg("No peer ID yet — wait for the broker handshake to finish.", "system");
+    return;
+  }
+  const tetherPane = document.getElementById("tether-qr-pane");
+  tetherPane.hidden = false;
+  const url = location.origin + location.pathname + "?peer=" + encodeURIComponent(myId);
+  document.getElementById("tether-qr-img").src =
+    "https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=" +
+    encodeURIComponent(url);
+  document.getElementById("tether-qr-url").textContent = url;
+}
+
+function showInstall() { showPane("pane-install"); }
+
+async function copy(text) {
+  try { await navigator.clipboard.writeText(text); } catch (_) { /* silent */ }
+}
+
+// Wire up buttons
+document.getElementById("btn-tether").onclick = openTether;
+document.getElementById("btn-qr").onclick = showFrontDoorQR;
+document.getElementById("btn-install").onclick = showInstall;
+document.getElementById("btn-connect").onclick = connectToPeer;
+document.getElementById("btn-show-tether-qr").onclick = showTetherQR;
+document.getElementById("btn-send").onclick = sendMessage;
+document.getElementById("btn-copy-id").onclick = () => {
+  copy(document.getElementById("my-id-text").textContent);
+};
+document.getElementById("btn-copy-install").onclick = () => {
+  copy(document.getElementById("install-cmd").textContent);
+};
+document.getElementById("chat-input").addEventListener("keydown", e => {
+  if (e.key === "Enter") sendMessage();
+});
+document.getElementById("peer-id-input").addEventListener("keydown", e => {
+  if (e.key === "Enter") connectToPeer();
+});
+
+// Auto-tether if URL has ?peer=<id> (from a scanned tether QR)
+(async function autoTether() {
+  const params = new URLSearchParams(location.search);
+  const peerId = params.get("peer");
+  if (peerId) {
+    await openTether();
+    document.getElementById("peer-id-input").value = peerId;
+    // Give the broker a moment to connect us, then dial
+    setTimeout(connectToPeer, 1500);
+  }
+})();
+</script>
+</body>
+</html>
