@@ -793,60 +793,62 @@ async function loadPrivateContext(token) {
   privateSoul = null;
   privateFactsCount = 0;
   if (!identity || !identity.private_companion) return;
-  const pc = identity.private_companion;
-  const tmpl = pc.raw_url_template;
-  if (!tmpl) return;
+
+  // CORS-aware private file reads: raw.githubusercontent.com blocks
+  // browsers from sending Authorization headers (preflight 404). Use the
+  // GitHub Contents API instead — it supports CORS for authenticated
+  // requests and returns raw file content with the right Accept header.
+  const c = privateCompanionCoords();
+  if (!c) return;
+
+  async function fetchPrivateFile(path) {
+    try {
+      const url = `https://api.github.com/repos/${c.owner}/${c.repo}/contents/` +
+                  path.split("/").map(encodeURIComponent).join("/");
+      const r = await fetch(url, {
+        headers: {
+          "Authorization": "Bearer " + token,
+          "Accept": "application/vnd.github.raw+json",
+        },
+      });
+      if (!r.ok) return null;
+      return await r.text();
+    } catch (_) {
+      return null;
+    }
+  }
 
   const PROSE_CANDIDATES = ["README.md", "vault/00 Index/Home.md"];
   const MEMORY_CANDIDATES = ["memory.json", ".brainstem_data/memory.json"];
 
   // 1. soul.md FIRST — if reachable, it becomes the primary voice.
-  try {
-    const url = tmpl.replace("{path}", "soul.md");
-    const r = await fetch(url, {
-      headers: { "Authorization": "Bearer " + token, "Accept": "text/plain" }
-    });
-    if (r.ok) {
-      const text = (await r.text()).trim();
-      if (text) privateSoul = text.slice(0, 8000);  // cap to keep prompt sane
-    }
-  } catch (_) { /* silent */ }
+  const soulText = await fetchPrivateFile("soul.md");
+  if (soulText && soulText.trim()) privateSoul = soulText.trim().slice(0, 8000);
 
-  // 2. Supporting prose — README, vault entrypoint — for additional context
+  // 2. Supporting prose — README, vault entrypoint
   for (const path of PROSE_CANDIDATES) {
     if (privateContext.length >= 4000) break;
-    try {
-      const url = tmpl.replace("{path}", path);
-      const r = await fetch(url, {
-        headers: { "Authorization": "Bearer " + token, "Accept": "text/plain" }
-      });
-      if (r.ok) {
-        const text = await r.text();
-        privateContext = (privateContext + "\n\n" + text).trim().slice(0, 4000);
-      }
-    } catch (_) { /* silent */ }
+    const text = await fetchPrivateFile(path);
+    if (text) {
+      privateContext = (privateContext + "\n\n" + text).trim().slice(0, 4000);
+    }
   }
 
-  // 3. Private memory: parse .facts arrays and merge into running memory
-  // with a [private] prefix so the LLM understands the access boundary.
+  // 3. Private memory: parse .facts arrays from JSON memory files
   for (const path of MEMORY_CANDIDATES) {
+    const text = await fetchPrivateFile(path);
+    if (!text) continue;
     try {
-      const url = tmpl.replace("{path}", path);
-      const r = await fetch(url, {
-        headers: { "Authorization": "Bearer " + token, "Accept": "application/json" }
-      });
-      if (r.ok) {
-        const j = await r.json();
-        if (Array.isArray(j.facts)) {
-          for (const f of j.facts) {
-            if (typeof f === "string" && f.trim()) {
-              memory.facts.push("[private] " + f.trim());
-              privateFactsCount++;
-            }
+      const j = JSON.parse(text);
+      if (Array.isArray(j.facts)) {
+        for (const f of j.facts) {
+          if (typeof f === "string" && f.trim()) {
+            memory.facts.push("[private] " + f.trim());
+            privateFactsCount++;
           }
         }
       }
-    } catch (_) { /* silent */ }
+    } catch (_) { /* not JSON, skip */ }
   }
 
   // Badge defer — we'll render it in refreshIndicator() after loadAgents
@@ -1043,7 +1045,83 @@ function pyAgentsToolDefs() {
   return defs;
 }
 
+// Embedded Python sources — mirrors the egg hub vbrainstem (summon.html)
+// pattern: write canonical `utils/local_storage.py` with all the methods
+// agents expect, plus thin re-export shims for the other storage names.
+// All localStorage-backed; `from js import localStorage` direct, no JS
+// callback hops.
+const VB_LOCAL_STORAGE_PY = `"""utils/local_storage.py — Pyodide variant.
+Drop-in for AzureFileStorageManager. Same API as the local brainstem's
+rapp_brainstem/utils/local_storage.py — agents can't tell."""
+import json
+from js import localStorage
+
+_PREFIX = "vbrainstem_storage:"
+
+class AzureFileStorageManager:
+    DEFAULT_MARKER_GUID = "c0p110t0-aaaa-bbbb-cccc-123456789abc"
+    def __init__(self, share_name=None, **kwargs):
+        self.current_guid = None
+        self.shared_memory_path = "shared_memories"
+        self.default_file_name = "memory.json"
+        self.current_memory_path = self.shared_memory_path
+    def set_memory_context(self, user_guid=None):
+        if not user_guid or user_guid == self.DEFAULT_MARKER_GUID:
+            self.current_guid = None
+            self.current_memory_path = self.shared_memory_path
+            return True
+        self.current_guid = user_guid
+        self.current_memory_path = "memory/" + user_guid
+        return True
+    def _file_path(self):
+        if self.current_guid:
+            return "memory/" + self.current_guid + "/user_memory.json"
+        return "shared_memories/memory.json"
+    def read_json(self, file_path=None):
+        path = file_path or self._file_path()
+        raw = localStorage.getItem(_PREFIX + path)
+        if raw is None:
+            return {}
+        try:
+            return json.loads(raw)
+        except Exception:
+            return {}
+    def write_json(self, data, file_path=None):
+        path = file_path or self._file_path()
+        localStorage.setItem(_PREFIX + path, json.dumps(data, default=str))
+        return True
+    def read_file(self, file_path):
+        return localStorage.getItem(_PREFIX + file_path)
+    def write_file(self, file_path, content):
+        localStorage.setItem(_PREFIX + file_path, content)
+        return True
+    def list_files(self, directory=""):
+        prefix = _PREFIX + directory
+        out = []
+        n = localStorage.length
+        for i in range(n):
+            k = localStorage.key(i)
+            if k and k.startswith(prefix):
+                out.append(k[len(_PREFIX):])
+        return out
+    def delete_file(self, file_path):
+        if localStorage.getItem(_PREFIX + file_path) is not None:
+            localStorage.removeItem(_PREFIX + file_path)
+            return True
+        return False
+    def file_exists(self, file_path):
+        return localStorage.getItem(_PREFIX + file_path) is not None
+`;
+
+const VB_AZURE_REEXPORT_PY    = "from utils.local_storage import AzureFileStorageManager\n";
+const VB_DYNAMICS_REEXPORT_PY = "from utils.local_storage import AzureFileStorageManager\nDynamicsStorageManager = AzureFileStorageManager\n";
+const VB_FACTORY_PY           = "from utils.local_storage import AzureFileStorageManager\ndef get_storage_manager():\n    return AzureFileStorageManager()\n";
+
 // Lazy-load Pyodide and the agents. Idempotent — call multiple times.
+// Pattern mirrors the egg hub vbrainstem (summon.html): use Pyodide's
+// virtual filesystem (FS.writeFile) with sys.path.insert(0, '/'), so
+// agents `import from utils.azure_file_storage` cleanly without sys.modules
+// tricks.
 async function initPyodide() {
   if (pyodide && Object.keys(pyAgents).length) return pyodide;
   if (pyodideLoadingPromise) return pyodideLoadingPromise;
@@ -1064,125 +1142,26 @@ async function initPyodide() {
         indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/",
       });
 
-      // Storage shim: JS callbacks the Python AzureFileStorageManager
-      // proxies into. Reads check localStorage first, then in-session
-      // memory. Writes go to localStorage (per-front-door, per-device).
-      const storagePrefix = () => "rapp_doorman_storage:" + location.pathname + ":";
+      // Pull the canonical BasicAgent source from grail — same as summon.html
+      // does (absolute URL, since the relative path may not resolve when this
+      // page is hosted under different seeds).
+      const basicAgentResp = await fetch("https://raw.githubusercontent.com/kody-w/rapp-installer/main/rapp_brainstem/agents/basic_agent.py", { cache: "force-cache" });
+      const basicAgentPy = basicAgentResp.ok ? await basicAgentResp.text() : "class BasicAgent:\n    def __init__(self, name=None, metadata=None):\n        if name is not None: self.name = name\n        if metadata is not None: self.metadata = metadata\n    def system_context(self):\n        return None\n";
 
-      globalThis.__vb_storage_read = (path) => {
-        try {
-          const v = localStorage.getItem(storagePrefix() + path);
-          if (v !== null) return v;
-        } catch (_) {}
-        // Bootstrap fallback for the well-known seed memory path:
-        // the JS layer already loaded memory.json from raw URLs into
-        // memory.facts; surface that as a JSON blob the agent can parse.
-        if (path === "memory.json" || path.endsWith("/memory.json")) {
-          try {
-            return JSON.stringify({
-              schema: memory.schema || "rapp-memory/1.0",
-              facts: memory.facts || [],
-              memories: (memory.facts || []).map((f, i) => ({ id: i, content: f })),
-            });
-          } catch (_) {}
-        }
-        return null;
-      };
-      globalThis.__vb_storage_write = (path, content) => {
-        try {
-          localStorage.setItem(storagePrefix() + path, content);
-          return true;
-        } catch (_) { return false; }
-      };
-      globalThis.__vb_storage_list = (dir) => {
-        const prefix = storagePrefix() + (dir || "").replace(/^\/+|\/+$/g, "");
-        const out = [];
-        try {
-          for (let i = 0; i < localStorage.length; i++) {
-            const k = localStorage.key(i);
-            if (k && k.startsWith(prefix)) {
-              out.push(k.substring(prefix.length).replace(/^\//, ""));
-            }
-          }
-        } catch (_) {}
-        return out;
-      };
-      globalThis.__vb_storage_exists = (path) => {
-        try { return localStorage.getItem(storagePrefix() + path) !== null; }
-        catch (_) { return false; }
-      };
+      // Stand up the virtual FS. Same layout as summon.html.
+      pyodide.FS.mkdirTree("/agents");
+      pyodide.FS.writeFile("/agents/basic_agent.py", basicAgentPy);
+      pyodide.FS.writeFile("/agents/__init__.py", "");
+      pyodide.FS.mkdirTree("/utils");
+      pyodide.FS.writeFile("/utils/__init__.py", "");
+      pyodide.FS.writeFile("/utils/local_storage.py", VB_LOCAL_STORAGE_PY);
+      pyodide.FS.writeFile("/utils/azure_file_storage.py", VB_AZURE_REEXPORT_PY);
+      pyodide.FS.writeFile("/utils/dynamics_storage.py", VB_DYNAMICS_REEXPORT_PY);
+      pyodide.FS.writeFile("/utils/storage_factory.py", VB_FACTORY_PY);
+      await pyodide.runPythonAsync(`import sys; sys.path.insert(0, '/')`);
 
-      // Set up the Python sandbox: mock `agents.basic_agent.BasicAgent`
-      // and `utils.azure_file_storage.AzureFileStorageManager` so the
-      // unmodified agent.py files import cleanly.
-      await pyodide.runPythonAsync(`
-import sys, types, json as _json
-
-class BasicAgent:
-    """Minimal stand-in for the real BasicAgent — agents subclass this."""
-    def __init__(self, name=None, metadata=None):
-        if name is not None:    self.name = name
-        if metadata is not None: self.metadata = metadata
-    def system_context(self):
-        return None
-
-_agents_mod = types.ModuleType("agents")
-_basic_mod  = types.ModuleType("agents.basic_agent")
-_basic_mod.BasicAgent = BasicAgent
-_agents_mod.basic_agent = _basic_mod
-sys.modules["agents"] = _agents_mod
-sys.modules["agents.basic_agent"] = _basic_mod
-
-class AzureFileStorageManager:
-    """Storage shim — proxies file IO to the JS layer (localStorage-backed)."""
-    def __init__(self, *args, **kwargs):
-        from js import __vb_storage_read, __vb_storage_write, __vb_storage_list, __vb_storage_exists
-        self._read   = __vb_storage_read
-        self._write  = __vb_storage_write
-        self._list   = __vb_storage_list
-        self._exists = __vb_storage_exists
-    def read_json(self, path):
-        v = self._read(path)
-        if v is None or v == "":
-            return None
-        try:
-            return _json.loads(v)
-        except Exception:
-            return None
-    def write_json(self, path, data):
-        try:
-            self._write(path, _json.dumps(data))
-            return True
-        except Exception:
-            return False
-    def read_text(self, path):
-        v = self._read(path)
-        return "" if v is None else v
-    def write_text(self, path, content):
-        return bool(self._write(path, content))
-    def list_files(self, directory):
-        try:
-            res = self._list(directory)
-            return list(res) if res else []
-        except Exception:
-            return []
-    def file_exists(self, path):
-        try: return bool(self._exists(path))
-        except Exception: return False
-    # Some agents use these legacy names — alias to the same backend
-    def read_blob(self, path):       return self.read_text(path)
-    def write_blob(self, path, c):   return self.write_text(path, c)
-    def list_blobs(self, directory): return self.list_files(directory)
-
-_utils_mod   = types.ModuleType("utils")
-_storage_mod = types.ModuleType("utils.azure_file_storage")
-_storage_mod.AzureFileStorageManager = AzureFileStorageManager
-_utils_mod.azure_file_storage = _storage_mod
-sys.modules["utils"] = _utils_mod
-sys.modules["utils.azure_file_storage"] = _storage_mod
-      `);
-
-      // Load each agent .py — same source as a local brainstem
+      // Load each agent .py — same source as a local brainstem.
+      // Write to /agents/<file>.py and import its class via runPython.
       const token = getToken();
       for (const cfg of PYODIDE_AGENTS) {
         if (cfg.tier === "ascended" && !privateSoul) continue;
@@ -1193,34 +1172,42 @@ sys.modules["utils.azure_file_storage"] = _storage_mod
             continue;
           }
           const source = await r.text();
-          await pyodide.runPythonAsync(source);
-          // Instantiate and capture metadata
-          const cls = pyodide.globals.get(cfg.className);
-          if (!cls) {
-            console.info("[doorman] class", cfg.className, "not found in", cfg.file);
+          // Drop into the FS so `import agents.<name>` works
+          pyodide.FS.writeFile("/agents/" + cfg.file, source);
+          const moduleName = cfg.file.replace(/\.py$/, "");
+          // Import the module + grab the class + instantiate, all in one runPython
+          await pyodide.runPythonAsync(
+            `from agents.${moduleName} import ${cfg.className} as _Cls\n` +
+            `_inst = _Cls()\n` +
+            `_agent_${cfg.className.replace(/Agent$/, "")} = _inst\n`
+          );
+          const instance = pyodide.globals.get("_agent_" + cfg.className.replace(/Agent$/, ""));
+          if (!instance) {
+            console.info("[doorman] couldn't capture instance for", cfg.className);
             continue;
           }
-          const instance = cls();
           const metadataPy = instance.metadata;
-          const metadata = metadataPy.toJs ? metadataPy.toJs({ dict_converter: Object.fromEntries }) : metadataPy;
-          const agentName = instance.name || cfg.className.replace(/Agent$/, "");
+          const metadata = metadataPy && metadataPy.toJs
+            ? metadataPy.toJs({ dict_converter: Object.fromEntries })
+            : metadataPy;
+          const agentName = (instance.name && String(instance.name)) || cfg.className.replace(/Agent$/, "");
           pyAgents[agentName] = { instance, metadata, source };
-          // Stash on Pyodide globals for tool dispatch
-          pyodide.globals.set("_agent_" + agentName, instance);
           console.info("[doorman] loaded agent", agentName, "from", cfg.file);
         } catch (e) {
-          console.info("[doorman] agent load failed for", cfg.file, ":", e && e.message);
+          console.info("[doorman] agent load failed for", cfg.file, ":", e && (e.message || e));
         }
       }
 
       const loaded = Object.keys(pyAgents);
       if (loaded.length) {
         renderMsg("system", "loaded " + loaded.length + " agent" + (loaded.length === 1 ? "" : "s") + " (Pyodide): " + loaded.join(", "));
+      } else {
+        renderMsg("system", "Pyodide ready (no agents loaded — using JS tool impls)");
       }
       refreshIndicator();
       return pyodide;
     } catch (e) {
-      console.info("[doorman] Pyodide init failed:", e && e.message);
+      console.info("[doorman] Pyodide init failed:", e && (e.message || e));
       pyodide = null;
       return null;
     }

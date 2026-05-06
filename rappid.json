@@ -14,7 +14,7 @@
   "kernel_version": "0.6.0",
   "private_companion": {
     "repo": "https://github.com/kody-w/twin-private.git",
-    "purpose": "Private brain repo. Authenticated visitors with read access get full ascended-twin voice + Pyodide-loaded private agents (learn_new, swarm_factory). Anonymous visitors see only public seed-level identity + their browser's localStorage memory.",
+    "purpose": "Richer brain content available to authenticated collaborators with read access.",
     "access_required": "Read access to kody-w/twin-private.",
     "raw_url_template": "https://raw.githubusercontent.com/kody-w/twin-private/main/{path}",
     "tree_url_template": "https://api.github.com/repos/kody-w/twin-private/contents/{path}",
