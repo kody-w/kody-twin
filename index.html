@@ -425,9 +425,17 @@
   }
   .holo-art svg { width: 92%; height: 92%; display: block; }
   .holo-type {
-    font-size: 11px; color: #c8b89a; padding: 5px 16px;
-    border-top: 1px solid #4d4332; border-bottom: 1px solid #4d4332;
+    font-size: 11px; color: #c8b89a; padding: 5px 16px 2px;
+    border-top: 1px solid #4d4332;
     background: rgba(50,40,25,0.6);
+    flex-shrink: 0;
+  }
+  /* Set line — temporal dimension. Era + live memory count. */
+  .holo-set {
+    font-size: 9px; color: #8b7332; padding: 0 16px 5px;
+    border-bottom: 1px solid #4d4332;
+    background: rgba(50,40,25,0.6);
+    letter-spacing: 0.4px; text-transform: uppercase;
     flex-shrink: 0;
   }
   .holo-text {
@@ -539,7 +547,7 @@
       </div>
       <div class="identity-row">
         <span class="identity-key">Rappid</span>
-        <span class="identity-val">67c84e51-3dfb-4608-bf8a-8e1859c79403</span>
+        <span class="identity-val">d111455a-bc20-4d34-ba37-3001b320c2ea</span>
       </div>
       <div class="identity-row">
         <span class="identity-key">Kernel</span>
@@ -610,6 +618,7 @@
           </div>
           <div class="holo-art" id="card-art"></div>
           <div class="holo-type" id="card-type">…</div>
+          <div class="holo-set" id="card-set">…</div>
           <div class="holo-text" id="card-abilities"></div>
           <div class="holo-flavor" id="card-flavor"></div>
           <div class="holo-footer">
@@ -642,7 +651,7 @@
 "use strict";
 
 const FD = {
-  rappid: "67c84e51-3dfb-4608-bf8a-8e1859c79403",
+  rappid: "d111455a-bc20-4d34-ba37-3001b320c2ea",
   displayName: "Kody Wildfeuer",
   slug: "kody-twin",
   ghUser: "kody-w",
@@ -881,27 +890,72 @@ function rappidVisualTraits(rappid) {
 // rappid so a module-level state is fine.
 let _cardData = null;
 
+// Lifecycle eras — the temporal dimension of the card. Same organism's
+// card carries a different set/era stamp depending on when it's drawn,
+// which mirrors how trading-card games print sets across years. Cradle
+// is the very first weeks; Grown is past the first month; Veteran is
+// past the first year.
+function _eraFromAge(plantedAt) {
+  if (!plantedAt) return "Cradle Set";
+  const ms = Date.now() - new Date(plantedAt).getTime();
+  if (Number.isNaN(ms) || ms < 0) return "Cradle Set";
+  const days = ms / 86400000;
+  if (days < 30)  return "Cradle Set";
+  if (days < 365) return "Grown Set";
+  if (days < 365*3) return "Veteran Set";
+  return "Ancient Set";
+}
+
 async function deriveCardData() {
   if (_cardData) return _cardData;
   const kind = (window.__seedKind || "mirror").toLowerCase();
   const defaults = CARD_KIND_DEFAULTS[kind] || CARD_KIND_DEFAULTS.mirror;
   // Visual traits flow straight from the rappid hash so the card's
   // identity is one-to-one with the organism's identity. Same UUID →
-  // same pip color, same power/toughness, same rarity, every render,
+  // same pip color, same toughness, same rarity, every render,
   // every medium.
   const traits = rappidVisualTraits(window.__seedRappid || "");
+
+  // Pull live state — public memory count + planted_at — so the card
+  // reflects WHERE the organism is in its lifecycle (the 4D dimension).
+  // Power scales with memories accumulated; toughness stays rappid-
+  // locked (constitutional hardiness). The card is a snapshot in time
+  // of an identity that doesn't change.
+  let memCount = 0;
+  let plantedAt = null;
+  try {
+    const r = await fetch(".brainstem_data/memory.json", { cache: "no-cache" });
+    if (r.ok) {
+      const j = await r.json();
+      if (Array.isArray(j.facts)) memCount = j.facts.length;
+    }
+  } catch (_) {}
+  try {
+    const r = await fetch("rappid.json", { cache: "no-cache" });
+    if (r.ok) {
+      const j = await r.json();
+      plantedAt = j.planted_at || null;
+    }
+  } catch (_) {}
+
+  // Power = base from rappid + (1 per 3 accumulated memories), capped at 9.
+  // The organism gets stronger as it learns; hard ceiling so a
+  // 1000-memory archive doesn't read as 1000/n.
+  const liveStrength = Math.min(9, traits.power + Math.floor(memCount / 3));
   const data = {
     name:       window.__seedDisplayName || "Front Door",
     title:      defaults.title,
     type_line:  defaults.type_line,
+    set_line:   "RAPP · " + _eraFromAge(plantedAt),
     pip:        traits.pip.letter,
     pipColor:   traits.pip.color,
     pipText:    traits.pip.text,
-    power:      traits.power,
+    power:      liveStrength,
     toughness:  traits.toughness,
     rarity:     traits.rarity,
     abilities:  defaults.abilities.slice(),
     flavor:     defaults.flavor,
+    mem_count:  memCount,
   };
   // Operator override — optional card.json at seed root
   try {
@@ -928,6 +982,7 @@ async function openCard() {
   document.getElementById("card-name").textContent     = data.name;
   document.getElementById("card-title").textContent    = data.title;
   document.getElementById("card-type").textContent     = data.type_line;
+  document.getElementById("card-set").textContent      = data.set_line + (data.mem_count ? " · " + data.mem_count + " mem" : "");
   // Rarity (rappid-derived — most seeds are core, mythic is rare)
   const rar = document.getElementById("card-rarity");
   rar.textContent = String(data.rarity).toUpperCase();
@@ -1161,7 +1216,7 @@ async function copy(text) {
 // Seed metadata — read by the card derivation logic. Set from the
 // substituted placeholders below so the card can render before any
 // async fetches land.
-window.__seedRappid      = "67c84e51-3dfb-4608-bf8a-8e1859c79403";
+window.__seedRappid      = "d111455a-bc20-4d34-ba37-3001b320c2ea";
 window.__seedDisplayName = "Kody Wildfeuer";
 window.__seedKind        = "personal";
 window.__seedRepoName    = "kody-twin";
@@ -1274,7 +1329,7 @@ function rappidSigil(rappid, size) {
 (function renderSigil() {
   const el = document.getElementById("hero-sigil");
   if (!el) return;
-  el.innerHTML = rappidSigil("67c84e51-3dfb-4608-bf8a-8e1859c79403", 96);
+  el.innerHTML = rappidSigil("d111455a-bc20-4d34-ba37-3001b320c2ea", 96);
 })();
 
 // ── Profile stats: memory count + age ──────────────────────────────
