@@ -182,9 +182,21 @@
   </div>
 
   <div class="actions" id="chat-actions" hidden>
+    <button id="btn-add-memory">+ Save a memory</button>
     <button id="btn-clear">Clear chat</button>
     <button id="btn-logout">Sign out</button>
   </div>
+
+  <section class="auth-pane" id="memory-pane" hidden style="margin-top:12px;">
+    <h2>Save a memory to this front door</h2>
+    <p>Adds a fact to <code>.brainstem_data/memory.json</code> in this seed's repo via GitHub API. The fact is then context for every future doorman conversation. Requires write access to the repo.</p>
+    <textarea id="memory-input" placeholder="One thing future visitors should know about this place…" rows="3"></textarea>
+    <div class="row">
+      <button id="btn-save-memory">Commit memory</button>
+      <button class="secondary" id="btn-cancel-memory">Cancel</button>
+    </div>
+    <div id="memory-status" style="margin-top:10px;font-size:12px;color:#8b949e;"></div>
+  </section>
 </main>
 
 <footer>
@@ -202,6 +214,8 @@ const STORAGE_KEY     = "rapp_settings";  // mirrors vbrainstem (per-origin)
 
 let identity = null;
 let privateContext = "";
+let memory = { schema: "rapp-memory/1.0", facts: [], preserved_by: "", preserved_at: "" };
+let memorySha = null;  // GitHub blob sha for the current memory.json (needed for PUT)
 let history = [];
 
 // ── token storage (vbrainstem-shape) ────────────────────────────────
@@ -243,6 +257,16 @@ async function loadIdentity() {
   }
 }
 
+function memoryFactsForPrompt() {
+  if (!memory || !Array.isArray(memory.facts) || memory.facts.length === 0) return "";
+  return [
+    "",
+    "=== Known facts about this place (from .brainstem_data/memory.json) ===",
+    ...memory.facts.map((f, i) => `${i+1}. ${f}`),
+    "=== End facts ===",
+  ].join("\n");
+}
+
 function buildSystemPrompt() {
   const name = identity.display_name || identity.name || "this front door";
   const kind = identity.kind || "front door";
@@ -270,6 +294,9 @@ function buildSystemPrompt() {
     `If asked something specific you don't know, say so honestly. Defer to the actual ${kind === "personal" || kind === "memorial" ? "person" : "operator"} for anything important.`,
     `Don't volunteer technical details about RAPP, the kernel, or how this site works unless the visitor asks.`,
   ];
+  // Inject persistent memory (facts saved by past visitors with write access)
+  const memBlock = memoryFactsForPrompt();
+  if (memBlock) lines.push(memBlock);
   if (privateContext) {
     lines.push("");
     lines.push("=== Private brain context (visible to authenticated collaborators only) ===");
@@ -277,6 +304,116 @@ function buildSystemPrompt() {
     lines.push("=== End private context ===");
   }
   return lines.join("\n");
+}
+
+// ── memory: read public memory.json (anyone), write via GH API (auth) ──
+function repoCoords() {
+  // Parse owner/repo from the seed's rappid.json `github` field if present.
+  // Fallback: derive from location.host + location.pathname.
+  if (identity && identity.github) {
+    const m = identity.github.match(/github\.com\/([^/]+)\/([^/]+?)(?:\.git)?\/?$/);
+    if (m) return { owner: m[1], repo: m[2] };
+  }
+  const host = location.host; // <owner>.github.io
+  const owner = host.split(".")[0];
+  const parts = location.pathname.split("/").filter(Boolean);
+  // /<repo>/doorman/  → parts[0] is repo. (User Pages without repo prefix is rare here.)
+  const repo = parts[0] || "";
+  return { owner, repo };
+}
+
+async function loadMemory() {
+  // Public read: just fetch the static file via Pages.
+  try {
+    const r = await fetch("../.brainstem_data/memory.json", { cache: "no-cache" });
+    if (r.ok) {
+      memory = await r.json();
+      // Also fetch via GH API once we have a token, so we know the blob sha.
+    }
+  } catch (_) { /* missing file is fine, doorman still works */ }
+}
+
+async function refreshMemorySha(token) {
+  // Get the current blob sha (required for PUT). Best effort.
+  try {
+    const { owner, repo } = repoCoords();
+    if (!owner || !repo) return;
+    const r = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/contents/.brainstem_data/memory.json`,
+      { headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json" } }
+    );
+    if (r.ok) {
+      const meta = await r.json();
+      memorySha = meta.sha || null;
+      // Refresh local memory from the GH API content (more authoritative than Pages' cache)
+      if (meta.content) {
+        try {
+          const decoded = atob(meta.content.replace(/\n/g, ""));
+          memory = JSON.parse(decoded);
+        } catch (_) { /* keep what we had */ }
+      }
+    }
+  } catch (_) { /* silent */ }
+}
+
+async function commitMemory(newFact) {
+  const token = getToken();
+  if (!token) return { ok: false, error: "no token" };
+
+  const { owner, repo } = repoCoords();
+  if (!owner || !repo) return { ok: false, error: "could not derive owner/repo" };
+
+  // Build new memory state
+  const newMemory = {
+    schema: memory.schema || "rapp-memory/1.0",
+    facts: [...(memory.facts || []), newFact.trim()],
+    preserved_by: memory.preserved_by || "@unknown",
+    preserved_at: new Date().toISOString().replace(/\.\d+Z$/, "Z"),
+    last_writer: await getViewerHandle(token).catch(() => null),
+  };
+
+  // Refresh sha right before write to minimize stale-sha races
+  await refreshMemorySha(token);
+
+  const body = {
+    message: `memory: ${newFact.trim().slice(0, 60)}…`,
+    content: btoa(unescape(encodeURIComponent(JSON.stringify(newMemory, null, 2) + "\n"))),
+    branch:  "main",
+  };
+  if (memorySha) body.sha = memorySha;
+
+  const r = await fetch(
+    `https://api.github.com/repos/${owner}/${repo}/contents/.brainstem_data/memory.json`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token,
+        "Accept": "application/vnd.github+json",
+      },
+      body: JSON.stringify(body),
+    }
+  );
+
+  if (!r.ok) {
+    let msg = "HTTP " + r.status;
+    try { const j = await r.json(); msg = j.message || msg; } catch {}
+    return { ok: false, error: msg };
+  }
+
+  const out = await r.json();
+  memorySha = out.content?.sha || null;
+  memory = newMemory;
+  return { ok: true };
+}
+
+async function getViewerHandle(token) {
+  const r = await fetch("https://api.github.com/user", {
+    headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json" }
+  });
+  if (!r.ok) return null;
+  const u = await r.json();
+  return u.login ? "@" + u.login : null;
 }
 
 // ── private companion: best-effort fetch ───────────────────────────
@@ -379,9 +516,15 @@ async function enterChat() {
   document.getElementById("chat-actions").hidden = false;
 
   const token = getToken();
+  // Memory: load before private context so the prompt assembly already has it
+  await loadMemory();
+  // Best effort: refresh from GH API (gives us the sha for write + freshest content)
+  refreshMemorySha(token);  // fire-and-forget — doorman can chat without it
   await loadPrivateContext(token);
   const place = identity.display_name || identity.name || "this place";
-  renderMsg("system", `Hi — I'm the Frontdoorman of ${place}. Ask me anything.`);
+  const memCount = (memory.facts || []).length;
+  const memNote = memCount ? ` I'm carrying ${memCount} memor${memCount === 1 ? "y" : "ies"} from past visits.` : "";
+  renderMsg("system", `Hi — I'm the Frontdoorman of ${place}.${memNote} Ask me anything.`);
 }
 
 // ── init ───────────────────────────────────────────────────────────
@@ -410,6 +553,37 @@ document.getElementById("btn-clear").addEventListener("click", () => {
 document.getElementById("btn-logout").addEventListener("click", () => {
   clearToken();
   location.reload();
+});
+// Memory UI: open / cancel / commit
+document.getElementById("btn-add-memory").addEventListener("click", () => {
+  document.getElementById("memory-pane").hidden = false;
+  document.getElementById("memory-input").focus();
+});
+document.getElementById("btn-cancel-memory").addEventListener("click", () => {
+  document.getElementById("memory-pane").hidden = true;
+  document.getElementById("memory-input").value = "";
+  document.getElementById("memory-status").textContent = "";
+});
+document.getElementById("btn-save-memory").addEventListener("click", async () => {
+  const input = document.getElementById("memory-input");
+  const status = document.getElementById("memory-status");
+  const fact = input.value.trim();
+  if (!fact) { status.textContent = "Empty memory."; return; }
+  status.textContent = "Committing to GitHub…";
+  document.getElementById("btn-save-memory").disabled = true;
+  const result = await commitMemory(fact);
+  document.getElementById("btn-save-memory").disabled = false;
+  if (result.ok) {
+    status.textContent = "✓ Saved. " + (memory.facts.length) + " facts now live in this front door's memory.";
+    input.value = "";
+    renderMsg("system", "Saved memory: \"" + fact + "\"");
+    setTimeout(() => {
+      document.getElementById("memory-pane").hidden = true;
+      status.textContent = "";
+    }, 2000);
+  } else {
+    status.textContent = "✗ Failed: " + result.error + ". You probably don't have write access to this seed's repo (that's normal — only the operator/maintainers can write to public memory).";
+  }
 });
 document.getElementById("chat-input").addEventListener("keydown", e => {
   if (e.key === "Enter" && !e.shiftKey) {

@@ -1,4 +1,5 @@
-.brainstem_data/
+.brainstem_data/private/
+.brainstem_data/conversations/
 .copilot_token
 .copilot_session
 .env

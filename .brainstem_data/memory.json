@@ -1,0 +1,9 @@
+{
+  "schema": "rapp-memory/1.0",
+  "facts": [
+    "This is the planted seed for \"Kody Wildfeuer\". Kind: personal. Public front door for Kody's digital twin.",
+    "private_companion is kody-w/twin — visitors with read access there get full vault depth via the doorman."
+  ],
+  "preserved_by": "@kody-w",
+  "preserved_at": "2026-05-06T01:50:07Z"
+}
