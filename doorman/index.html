@@ -366,6 +366,65 @@ let viewerLogin = null;        // authenticated visitor's GitHub @login — natu
 let privateLayerCoords = null; // resolved {owner,repo} for the "private" layer — explicit private_companion if set, else the seed repo itself when the authed visitor has push access (operator fallback)
 let isOperator = false;        // authed visitor has push access to the seed repo (= seed owner). Operator fallback grants ascended-tier tools without needing a separate private companion.
 let memory = { schema: "rapp-memory/1.0", facts: [], preserved_by: "", preserved_at: "" };
+
+// ── Local frame log (offline mutation tracking) ────────────────────
+//
+// Every meaningful event in this doorman session writes a content-
+// addressed frame to localStorage. The Dream Catcher reads these
+// when an ascended egg is exported, so a parallel hatched dimension's
+// offline mutations can be reassimilated back into the canonical
+// lineage via PR. ANTIPATTERN GUARD: each entry references an
+// "agent" — never "skill"/"plugin"/etc.
+//
+// Stream id is per-(rappid, device) — same device hatching the same
+// organism keeps appending to one stream. Different device = different
+// stream = parallel dimension by definition.
+
+const _FRAME_KEY = "rapp_frames_v1";
+
+function _instanceId() {
+  // Stable per-device random id. localStorage scopes per-origin so
+  // each planted seed gets its own stream id naturally.
+  let id = localStorage.getItem("rapp_instance_id");
+  if (!id) {
+    id = (crypto.randomUUID && crypto.randomUUID().slice(0, 8))
+       || (Math.random().toString(36).slice(2, 10));
+    localStorage.setItem("rapp_instance_id", id);
+  }
+  return id;
+}
+
+function _loadFrames() {
+  try {
+    const raw = localStorage.getItem(_FRAME_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (_) {}
+  return { schema: "rapp-frame/1.0", stream_id: null, frames: [] };
+}
+
+function _saveFrames(log) {
+  try { localStorage.setItem(_FRAME_KEY, JSON.stringify(log)); } catch (_) {}
+}
+
+async function appendFrame(kind, payload) {
+  // Loads, appends, saves. Each frame's hash chains to the previous.
+  // If we don't have an identity yet (loadIdentity hasn't run) the
+  // call is buffered into the log with a placeholder stream_id which
+  // gets back-filled on the next call.
+  const log = _loadFrames();
+  if (!log.stream_id && identity && identity.rappid) {
+    log.stream_id = identity.rappid.slice(0, 8) + ":" + _instanceId();
+  }
+  const prev = log.frames.length ? log.frames[log.frames.length - 1].hash : "";
+  const utc = new Date().toISOString();
+  const frame_n = log.frames.length;
+  const body = (prev || "") + "|" + utc + "|" + frame_n + "|" + kind + "|" + JSON.stringify(payload || {});
+  // SHA-256 via SubtleCrypto — same primitive the egg verifier uses.
+  const hashBytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(body));
+  const hash = Array.from(new Uint8Array(hashBytes)).map(b => b.toString(16).padStart(2, "0")).join("");
+  log.frames.push({ stream_id: log.stream_id, frame_n, utc, kind, payload: payload || {}, prev_hash: prev, hash });
+  _saveFrames(log);
+}
 let memorySha = null;  // GitHub blob sha for the current memory.json (needed for PUT)
 let history = [];
 
@@ -997,6 +1056,16 @@ async function saveUserPrivateMemory(fact) {
   const issue = await r.json();
   memory.facts.push(`[@${viewerLogin}] ` + trimmed);
   userPrivateFactsCount++;
+  // Frame log: per-user memory write is a high-signal mutation —
+  // it persists to GitHub so it's already canonical, but we log it
+  // locally too so the Dream Catcher can correlate with conversation
+  // turns from the same session.
+  appendFrame("memory_added", {
+    scope: "private",
+    by: "@" + viewerLogin,
+    issue_number: issue.number,
+    body_len: trimmed.length,
+  }).catch(() => {});
   return { ok: true, url: issue.html_url, number: issue.number };
 }
 
@@ -1165,6 +1234,17 @@ async function buildAscendedEgg() {
       }
     }
   } catch (_) { /* if issues read fails, the egg still ships without user_memories */ }
+
+  // 6. data/frames.json — the local frame log accumulated by THIS
+  //    hatched dimension. Each meaningful event (chat turn, tool call,
+  //    memory write) is a content-addressed frame with sha256 chain.
+  //    The Dream Catcher reads this when reassimilating parallel
+  //    dimensions back into the canonical lineage.
+  const frameLog = _loadFrames();
+  if (frameLog && Array.isArray(frameLog.frames) && frameLog.frames.length) {
+    const blob = JSON.stringify(frameLog, null, 2);
+    await _doormanAddFile(zip, "data/frames.json", blob, hashes);
+  }
 
   // Provenance — non-GMO integrity. Same scheme as the doorman egg.
   const manifestHash = await _doormanSha256Hex(_doormanCanonicalHashTable(hashes));
@@ -1914,6 +1994,9 @@ async function sendMessage() {
   input.style.height = "auto";
   renderMsg("user", userMsg);
   history.push({ role: "user", content: userMsg });
+  // Frame log: record the conversation turn so the Dream Catcher can
+  // see this dimension's chat history when this egg is reassimilated.
+  appendFrame("conversation", { role: "user", content_len: userMsg.length }).catch(() => {});
 
   const pending = renderPending();
   const sendBtn = document.getElementById("btn-send");
@@ -2005,6 +2088,13 @@ async function sendMessage() {
           if (tc.function.name === "ManageMemory" && result.startsWith("saved")) {
             renderMsg("system", "memory saved");
           }
+          // Frame log: each tool call is a mutation event. payload is
+          // small (just the tool name + args summary) — full conversation
+          // history isn't logged for privacy.
+          appendFrame("tool_call", {
+            tool: tc.function.name,
+            args_keys: Object.keys((function(){ try { return JSON.parse(tc.function.arguments || "{}"); } catch(_) { return {}; } })()),
+          }).catch(() => {});
         }
         // Tools done → back to thinking while the LLM composes the reply.
         setPendingLabel(pending, "");

@@ -366,6 +366,11 @@
   .dc-frame-list li.shared {
     color: #6e7681;
   }
+  .dc-frame-list li.contradiction {
+    background: rgba(247,176,32,0.06);
+    border-left: 3px solid #d29922;
+  }
+  .dc-frame-list li.contradiction .dc-frame-msg { color: #f0c674; }
   .dc-frame-icon { width: 18px; flex-shrink: 0; }
   .dc-frame-body { flex: 1; min-width: 0; }
   .dc-frame-pk {
@@ -901,7 +906,7 @@
       </div>
       <div class="identity-row">
         <span class="identity-key">Rappid</span>
-        <span class="identity-val">f8135aae-e9eb-4b65-b563-70caf62888a2</span>
+        <span class="identity-val">e84c1b0e-0520-4fb9-a484-b52b3637a5b1</span>
       </div>
       <div class="identity-row">
         <span class="identity-key">Kernel</span>
@@ -931,6 +936,15 @@
     <div class="input-row">
       <input type="text" id="chat-input" placeholder="Type a message and hit Enter" disabled>
       <button class="small primary" id="btn-send" disabled>Send</button>
+    </div>
+
+    <!-- One-tap egg send over the open tether channel. The frozen
+         kernel is on both devices already; we just stream the .egg
+         bytes through the DTLS data channel. Receiver auto-prompts
+         to save. Hero-use-case Charizard scenario step 4. -->
+    <div class="input-row" style="margin-top:10px;">
+      <button class="small" id="btn-send-egg" disabled title="Stream this organism's .egg to the paired device — Charizard handoff.">🥚 Send my egg →</button>
+      <span id="tether-egg-status" style="font-size:11px;color:#8b949e;align-self:center;"></span>
     </div>
 
     <details class="tether-fallback">
@@ -1083,7 +1097,7 @@
 "use strict";
 
 const FD = {
-  rappid: "f8135aae-e9eb-4b65-b563-70caf62888a2",
+  rappid: "e84c1b0e-0520-4fb9-a484-b52b3637a5b1",
   displayName: "Kody Wildfeuer",
   slug: "kody-twin",
   ghUser: "kody-w",
@@ -1094,8 +1108,9 @@ let peer = null;
 let conn = null;
 
 function hideAllPanes() {
-  for (const id of ["pane-tether", "pane-qr", "pane-install"]) {
-    document.getElementById(id).hidden = true;
+  for (const id of ["pane-tether", "pane-install", "pane-verify", "pane-dreamcatcher", "pane-propose"]) {
+    const el = document.getElementById(id);
+    if (el) el.hidden = true;
   }
 }
 
@@ -1106,10 +1121,17 @@ function showPane(id) {
 
 function appendMsg(text, cls) {
   const log = document.getElementById("chat-log");
-  // Clear initial system message on first real message
-  if (log.children.length === 1 && log.firstChild.classList.contains("system") &&
-      log.firstChild.textContent.startsWith("Tether will appear")) {
-    log.innerHTML = "";
+  if (!log) return;
+  // Clear initial placeholder system message on first real message.
+  // Use firstElementChild to skip whitespace text nodes between tags.
+  const first = log.firstElementChild;
+  if (log.children.length === 1 && first && first.classList && first.classList.contains("system")) {
+    const txt = first.textContent || "";
+    if (txt.startsWith("Tether will appear") ||
+        txt.startsWith("Once a device scans") ||
+        txt.startsWith("Once paired")) {
+      log.innerHTML = "";
+    }
   }
   const div = document.createElement("div");
   div.className = "msg " + (cls || "system");
@@ -1162,20 +1184,126 @@ async function ensurePeer() {
   });
 }
 
+// Egg transfer protocol over the DTLS data channel. Wire format:
+//   { type: "egg-begin",  size, sha256, name }
+//   { type: "egg-chunk",  seq, b64 }     ← repeat for each ~16KB chunk
+//   { type: "egg-end" }
+// Receiver verifies sha256 on completion and prompts to save.
+const EGG_CHUNK_BYTES = 16 * 1024;
+let _eggRecv = null;  // assembly buffer on the receive side
+
 function wireConn(c) {
   c.on("open", () => {
     appendMsg("Channel open — DTLS encrypted, peer-to-peer.", "system");
     document.getElementById("chat-input").disabled = false;
     document.getElementById("btn-send").disabled = false;
+    const eggBtn = document.getElementById("btn-send-egg");
+    if (eggBtn) eggBtn.disabled = false;
   });
-  c.on("data", data => {
+  c.on("data", async data => {
+    // Try to detect egg-protocol messages first; fall through to chat.
+    let parsed = null;
+    if (typeof data === "string") {
+      try { parsed = JSON.parse(data); } catch (_) {}
+    }
+    if (parsed && parsed.type && parsed.type.startsWith("egg-")) {
+      await _handleEggMessage(parsed);
+      return;
+    }
     appendMsg(typeof data === "string" ? data : JSON.stringify(data), "peer");
   });
   c.on("close", () => {
     appendMsg("Peer disconnected.", "system");
     document.getElementById("chat-input").disabled = true;
     document.getElementById("btn-send").disabled = true;
+    const eggBtn = document.getElementById("btn-send-egg");
+    if (eggBtn) eggBtn.disabled = true;
   });
+}
+
+async function _handleEggMessage(msg) {
+  if (msg.type === "egg-begin") {
+    _eggRecv = { size: msg.size, sha256: msg.sha256, name: msg.name || "received.egg", chunks: [], received: 0 };
+    appendMsg(`📦 receiving ${msg.name || "egg"} (${Math.round(msg.size / 1024)} KB)…`, "system");
+    return;
+  }
+  if (msg.type === "egg-chunk" && _eggRecv) {
+    // Decode base64 chunk
+    const bin = atob(msg.b64);
+    const buf = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+    _eggRecv.chunks.push(buf);
+    _eggRecv.received += buf.length;
+    return;
+  }
+  if (msg.type === "egg-end" && _eggRecv) {
+    // Concatenate chunks → verify sha256 → trigger download
+    const total = new Uint8Array(_eggRecv.size);
+    let off = 0;
+    for (const c of _eggRecv.chunks) { total.set(c, off); off += c.length; }
+    const hash = await crypto.subtle.digest("SHA-256", total);
+    const hex = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("");
+    if (hex !== _eggRecv.sha256) {
+      appendMsg(`✗ received egg failed integrity check (sha256 mismatch).`, "system");
+      _eggRecv = null;
+      return;
+    }
+    const blob = new Blob([total], { type: "application/zip" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = _eggRecv.name;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 0);
+    appendMsg(`✓ received ${_eggRecv.name} — sha256 verified, file saved.`, "system");
+    _eggRecv = null;
+    return;
+  }
+}
+
+// Stream THIS organism's doorman-tier egg through the given channel.
+// Chunks are base64 over the existing JSON-string send path so we
+// reuse the chat-message wire (PeerJS DataChannel handles binary too,
+// but b64-over-JSON keeps the wire format simple + portable).
+//
+// Takes an explicit channel object so tests can drive it without going
+// through the live PeerJS broker. The button-bound entrypoint
+// `sendEggToPeer()` reads the module's `conn` and forwards.
+async function _streamEggThroughChannel(chan) {
+  const status = document.getElementById("tether-egg-status");
+  if (status) status.textContent = "packing egg…";
+  try {
+    const blob = await buildDoormanEgg();
+    const buf  = new Uint8Array(await blob.arrayBuffer());
+    const sha256 = await sha256Hex(buf);
+    const name = ((window.__seedDisplayName || "rapp").toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-doorman.egg");
+    chan.send(JSON.stringify({ type: "egg-begin", size: buf.length, sha256, name }));
+    let sent = 0;
+    for (let off = 0; off < buf.length; off += EGG_CHUNK_BYTES) {
+      const slice = buf.subarray(off, off + EGG_CHUNK_BYTES);
+      let bin = "";
+      for (let i = 0; i < slice.length; i++) bin += String.fromCharCode(slice[i]);
+      const b64 = btoa(bin);
+      chan.send(JSON.stringify({ type: "egg-chunk", seq: Math.floor(off / EGG_CHUNK_BYTES), b64 }));
+      sent += slice.length;
+      if (status) status.textContent = `sending ${Math.round(sent / 1024)} / ${Math.round(buf.length / 1024)} KB…`;
+      await new Promise(r => setTimeout(r, 0));
+    }
+    chan.send(JSON.stringify({ type: "egg-end" }));
+    if (status) status.textContent = `✓ sent ${Math.round(buf.length / 1024)} KB`;
+    appendMsg(`✓ sent ${name} (${Math.round(buf.length / 1024)} KB) — receiver should be saving now.`, "system");
+    setTimeout(() => { if (status) status.textContent = ""; }, 4000);
+  } catch (e) {
+    if (status) status.textContent = "✗ " + (e.message || "send failed").slice(0, 50);
+    appendMsg("✗ egg send failed: " + e.message, "system");
+    throw e;
+  }
+}
+async function sendEggToPeer() {
+  if (!conn || !conn.open) {
+    appendMsg("✗ no peer channel open — pair first.", "system");
+    return;
+  }
+  return _streamEggThroughChannel(conn);
 }
 
 async function openTether() {
@@ -1993,6 +2121,7 @@ async function _dcHandleSlot(file, slot) {
 
 function _dcRenderDiff() {
   const wrap = document.getElementById("dc-results");
+  if (!wrap) return;  // pane not in DOM yet
   wrap.hidden = false;
   if (!_dcCanonical || !_dcParallel) return;
 
@@ -2006,33 +2135,72 @@ function _dcRenderDiff() {
     lineageWarn = `<div class="verify-summary tampered">⚠ different rappids: <code>${escapeHtml(cRap.slice(0,8))}</code> vs <code>${escapeHtml(pRap.slice(0,8))}</code>. These are different organisms — reassimilation crossing species lines isn't supported.</div>`;
   }
 
-  // Frame-set diff. Hash is the identity — if a frame's hash exists
-  // in canonical, it's already-known to the lineage. Otherwise it's
-  // a parallel-only frame and a candidate for reassimilation.
-  const canonHashes = new Set(c.frames.map(f => f.hash).filter(Boolean));
-  const sharedFrames = p.frames.filter(f => canonHashes.has(f.hash));
-  const newFrames    = p.frames.filter(f => !canonHashes.has(f.hash));
+  // ── Dream Catcher merge doctrine ─────────────────────────────────
+  //
+  // From the Gareth conversation:
+  //   "Whatever frame hit the UTC one first, that's canon, and then
+  //    anything that doesn't contradict that, I'm going to layer on
+  //    that... There are contradictions, so that doesn't get synced.
+  //    It gets put into a different dimension of that aspect of that
+  //    life, so you don't lose that data."
+  //
+  // Three categories per frame:
+  //   ✓ shared      — same hash exists in canonical; already canon
+  //   🌱 new        — hash absent from canonical AND no PK collision;
+  //                   safe to reassimilate (layer on)
+  //   ⚡ contradiction — hash absent from canonical BUT same PK
+  //                   (utc + frame_n) collides with a canon frame.
+  //                   Saved as alternate-dimension data — visible in
+  //                   the diff so the operator can decide.
 
-  // Sort all parallel frames by UTC for the timeline view
+  const canonHashes = new Set(c.frames.map(f => f.hash).filter(Boolean));
+  // PK index: same-stream frames keyed by frame_n; cross-stream by utc
+  const canonByPK = new Map();
+  for (const f of c.frames) {
+    canonByPK.set(`${f.stream_id || ""}|${f.frame_n}`, f);
+    canonByPK.set(`utc:${f.utc}`, f);
+  }
+  const shared = [], newFrames = [], contradictions = [];
+  for (const f of p.frames) {
+    if (canonHashes.has(f.hash)) { shared.push(f); continue; }
+    const sameStream = canonByPK.get(`${f.stream_id || ""}|${f.frame_n}`);
+    const sameUtc    = canonByPK.get(`utc:${f.utc}`);
+    if ((sameStream && sameStream.hash !== f.hash) ||
+        (sameUtc && sameUtc.hash !== f.hash)) {
+      contradictions.push({ frame: f, conflicts_with: sameStream || sameUtc });
+    } else {
+      newFrames.push(f);
+    }
+  }
+
+  // Sort all parallel frames by UTC for the timeline view (UTC-first
+  // ordering is the canon resolution rule — earlier UTC wins).
   const ordered = p.frames.slice().sort((a, b) => (a.utc || "").localeCompare(b.utc || ""));
+  const contradictionHashes = new Set(contradictions.map(x => x.frame.hash));
 
   let summaryClass, summaryText;
-  if (newFrames.length === 0) {
+  if (newFrames.length === 0 && contradictions.length === 0) {
     summaryClass = "ok";
-    summaryText = `✓ parallel dimension is fully reflected in canonical — ${sharedFrames.length} frame${sharedFrames.length === 1 ? "" : "s"} match. Nothing to reassimilate.`;
+    summaryText = `✓ parallel dimension is fully reflected in canonical — ${shared.length} frame${shared.length === 1 ? "" : "s"} match. Nothing to reassimilate.`;
+  } else if (contradictions.length > 0) {
+    summaryClass = "partial";
+    summaryText = `🕸️ ${newFrames.length} layer-on frame${newFrames.length === 1 ? "" : "s"} + ${contradictions.length} contradiction${contradictions.length === 1 ? "" : "s"}. Layer-on frames are safe to reassimilate (UTC-first canon already holds). Contradictions occupy the same PK as a canonical frame — they're saved as alternate-dimension data; the operator decides whether to fold them in.`;
   } else {
     summaryClass = "partial";
-    summaryText = `🕸️ ${newFrames.length} parallel-only frame${newFrames.length === 1 ? "" : "s"} found, not yet in canonical. Review each below; reassimilation happens by replaying the frame as a commit on the seed repo (a PR per frame, or batch a single PR with all of them).`;
+    summaryText = `🕸️ ${newFrames.length} parallel-only frame${newFrames.length === 1 ? "" : "s"} ready to layer on (UTC-first canon resolved). No contradictions — reassimilation is clean.`;
   }
 
   const rows = ordered.map(f => {
-    const isNew = !canonHashes.has(f.hash);
+    let cls, icon;
+    if (canonHashes.has(f.hash))               { cls = "shared";        icon = "·";  }
+    else if (contradictionHashes.has(f.hash))  { cls = "contradiction"; icon = "⚡"; }
+    else                                        { cls = "new";           icon = "🌱"; }
     const utcShort = (f.utc || "").slice(0, 19).replace("T", " ");
     const msg = f.kind === "commit"
       ? (f.payload && f.payload.message || "(no message)")
       : `${f.kind}: ${JSON.stringify(f.payload).slice(0, 80)}`;
-    return `<li class="${isNew ? "new" : "shared"}">
-      <span class="dc-frame-icon">${isNew ? "🌱" : "·"}</span>
+    return `<li class="${cls}">
+      <span class="dc-frame-icon">${icon}</span>
       <div class="dc-frame-body">
         <div class="dc-frame-pk">${escapeHtml(utcShort)} · frame_n=${f.frame_n} · <code>${escapeHtml((f.hash || "").slice(0,10))}…</code></div>
         <div class="dc-frame-msg">${escapeHtml(msg)}</div>
@@ -2318,6 +2486,7 @@ async function deepVerifyAgainstOrigin(out) {
 async function _handleVerifyFile(file) {
   if (!file) return;
   const wrap = document.getElementById("verify-results");
+  if (!wrap) return;  // pane not in DOM
   wrap.hidden = false;
   wrap.innerHTML = `<div class="verify-summary partial">verifying ${escapeHtml(file.name)}…</div>`;
   try {
@@ -2388,7 +2557,7 @@ async function copy(text) {
 // Seed metadata — read by the card derivation logic. Set from the
 // substituted placeholders below so the card can render before any
 // async fetches land.
-window.__seedRappid      = "f8135aae-e9eb-4b65-b563-70caf62888a2";
+window.__seedRappid      = "e84c1b0e-0520-4fb9-a484-b52b3637a5b1";
 window.__seedDisplayName = "Kody Wildfeuer";
 window.__seedKind        = "personal";
 window.__seedRepoName    = "kody-twin";
@@ -2477,6 +2646,7 @@ document.addEventListener("keydown", (e) => {
 });
 document.getElementById("btn-connect").onclick = connectToPeer;
 document.getElementById("btn-send").onclick = sendMessage;
+document.getElementById("btn-send-egg").onclick = sendEggToPeer;
 document.getElementById("btn-copy-id").onclick = () => {
   copy(document.getElementById("my-id-text").textContent);
 };
@@ -2563,7 +2733,7 @@ function rappidSigil(rappid, size) {
 (function renderSigil() {
   const el = document.getElementById("hero-sigil");
   if (!el) return;
-  el.innerHTML = rappidSigil("f8135aae-e9eb-4b65-b563-70caf62888a2", 96);
+  el.innerHTML = rappidSigil("e84c1b0e-0520-4fb9-a484-b52b3637a5b1", 96);
 })();
 
 // ── Profile stats: memory count + age ──────────────────────────────
@@ -2895,6 +3065,24 @@ function computeMMR({ memCount, mutCount, customAgents, ageDays, forkCount, acti
 // set or isn't a github.com URL.
 async function _parentLineageGift(rappidObj) {
   if (!rappidObj || !rappidObj.parent_repo) return null;
+  // Plant-time snapshot wins if it was baked into rappid.json at plant.
+  // This is the genes/epigenetics layer: the parent's MMR-at-our-birth
+  // is fixed; later regression on the parent doesn't affect children
+  // already planted from it. Same shape the live fetcher returns so
+  // the rest of the pipeline doesn't branch.
+  if (rappidObj.lineage_snapshot && typeof rappidObj.lineage_snapshot.parent_mmr_at_birth === "number") {
+    const snap = rappidObj.lineage_snapshot;
+    const gift = Math.round(Math.max(0, (snap.parent_mmr_at_birth - 1000) * 0.30));
+    return {
+      parentMMR:        snap.parent_mmr_at_birth,
+      gift:             gift,
+      parentRepoLabel:  snap.parent_repo_label || (snap.parent_repo || "").replace(/^https?:\/\/github\.com\//, "").replace(/\.git$/, ""),
+      source:           "snapshot",
+      snapshotted_at:   snap.snapshotted_at,
+    };
+  }
+  // No snapshot → live fetch (the path we used before; kept for older
+  // seeds planted before this commit).
   const m = rappidObj.parent_repo.match(/github\.com\/([^/]+)\/([^/]+?)(?:\.git)?\/?$/);
   if (!m) return null;
   const [, owner, repo] = m;
@@ -2936,7 +3124,7 @@ async function _parentLineageGift(rappidObj) {
   });
   // Child inherits 30% of parent's above-baseline as the lineage gift.
   const gift = Math.round(Math.max(0, (parentMMR - 1000) * 0.30));
-  return { parentMMR, gift, parentRepoLabel: owner + "/" + repo };
+  return { parentMMR, gift, parentRepoLabel: owner + "/" + repo, source: "live" };
 }
 
 // Calibration check — has the organism graduated from placement?
