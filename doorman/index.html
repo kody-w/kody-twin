@@ -335,6 +335,8 @@ let publicAgents = [];         // filenames at <seed>/agents/
 let privateAgents = [];        // filenames at <private_companion>/agents/ — only loaded when authed-with-access (silent 404 otherwise)
 let userPrivateFactsCount = 0; // memories specifically created by the authed visitor (per-user via Issues API)
 let viewerLogin = null;        // authenticated visitor's GitHub @login — natural identifier for per-user private memory
+let privateLayerCoords = null; // resolved {owner,repo} for the "private" layer — explicit private_companion if set, else the seed repo itself when the authed visitor has push access (operator fallback)
+let isOperator = false;        // authed visitor has push access to the seed repo (= seed owner). Operator fallback grants ascended-tier tools without needing a separate private companion.
 let memory = { schema: "rapp-memory/1.0", facts: [], preserved_by: "", preserved_at: "" };
 let memorySha = null;  // GitHub blob sha for the current memory.json (needed for PUT)
 let history = [];
@@ -823,10 +825,28 @@ function privateCompanionCoords() {
   return m ? { owner: m[1], repo: m[2] } : null;
 }
 
+// True iff the authed visitor has push access to <owner>/<repo>.
+// GitHub returns a `permissions` object on the repo when authenticated;
+// `push` covers maintainers and admins too. Anonymous / no-access returns
+// 404 from this endpoint, which is also a no.
+async function checkPushAccess(owner, repo, token) {
+  if (!owner || !repo || !token) return false;
+  try {
+    const r = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+      headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json" },
+    });
+    if (!r.ok) return false;
+    const data = await r.json();
+    return !!(data.permissions && data.permissions.push);
+  } catch (_) { return false; }
+}
+
 async function loadUserPrivateIssues(token) {
   userPrivateFactsCount = 0;
   if (!token || !viewerLogin) return;
-  const c = privateCompanionCoords();
+  // Reads from the resolved private layer — explicit companion if configured,
+  // else the seed repo itself for operators (who have push access).
+  const c = privateLayerCoords;
   if (!c) return;
   try {
     const r = await fetch(
@@ -853,8 +873,8 @@ async function saveUserPrivateMemory(fact) {
     if (!u || !u.login) return { ok: false, error: "couldn't identify your GitHub account" };
     viewerLogin = u.login;
   }
-  const c = privateCompanionCoords();
-  if (!c) return { ok: false, error: "this front door has no private_companion configured" };
+  const c = privateLayerCoords;
+  if (!c) return { ok: false, error: "no private layer available — sign in with an account that has push access to this seed, or plant a seed with a private_companion" };
 
   const trimmed = fact.trim();
   const title = "memory: " + trimmed.slice(0, 60).replace(/\s+/g, " ") + (trimmed.length > 60 ? "…" : "");
@@ -916,14 +936,39 @@ async function loadPrivateContext(token) {
   privateContext = "";
   privateSoul = null;
   privateFactsCount = 0;
-  if (!identity || !identity.private_companion) return;
+  privateLayerCoords = null;
+  isOperator = false;
+  if (!identity) return;
+
+  // Resolve the private-layer coords. Two paths produce ascension:
+  //   1. Explicit `private_companion` configured at plant time (e.g. a
+  //      personal twin seed paired to a private repo holding the full
+  //      brain). Anyone the operator has granted read access to that
+  //      private repo silently ascends.
+  //   2. **Operator fallback** — the seed has no private companion, but
+  //      the authed visitor has push access to the seed repo itself
+  //      (i.e. they ARE the operator/owner). The seed becomes its own
+  //      private layer: ascended tools unlock, per-user issue memory
+  //      writes against the seed repo. This is what makes `plant`-and-
+  //      go seeds (like Heimdall) ascend for their owners without
+  //      forcing a separate companion repo.
+  let c = privateCompanionCoords();
+  let isOperatorFallback = false;
+  if (!c && token) {
+    const seed = repoCoords();
+    if (await checkPushAccess(seed.owner, seed.repo, token)) {
+      c = seed;
+      isOperatorFallback = true;
+    }
+  }
+  if (!c) return;
+  privateLayerCoords = c;
+  isOperator = isOperatorFallback;
 
   // CORS-aware private file reads: raw.githubusercontent.com blocks
   // browsers from sending Authorization headers (preflight 404). Use the
   // GitHub Contents API instead — it supports CORS for authenticated
   // requests and returns raw file content with the right Accept header.
-  const c = privateCompanionCoords();
-  if (!c) return;
 
   async function fetchPrivateFile(path) {
     try {
@@ -973,6 +1018,15 @@ async function loadPrivateContext(token) {
         }
       }
     } catch (_) { /* not JSON, skip */ }
+  }
+
+  // Operator fallback: if we got here via push-access and didn't pick up
+  // a soul.md from the auth path (perhaps the file isn't there, or only
+  // exists at the seed root and was already loaded as publicSoul), copy
+  // publicSoul into privateSoul so the ascension gate fires. The operator
+  // doesn't need a separate private brain — they ARE the brain.
+  if (isOperator && !privateSoul && publicSoul) {
+    privateSoul = publicSoul;
   }
 
   // Badge defer — we'll render it in refreshIndicator() after loadAgents
@@ -1622,7 +1676,10 @@ async function enterChat() {
   const place = identity.display_name || identity.name || "this place";
   const memCount = (memory.facts || []).length;
   const memNote = memCount ? ` I'm carrying ${memCount} memor${memCount === 1 ? "y" : "ies"} from past visits.` : "";
-  if (privateSoul) {
+  if (isOperator) {
+    const me = viewerLogin ? `@${viewerLogin}` : "the operator";
+    renderMsg("system", `Hi — I'm ${place}. You're signed in as ${me}, my operator. Ascended tools loaded.${memNote}`);
+  } else if (privateSoul) {
     renderMsg("system", `Hi — I'm ${place}. You've authenticated with access to my private brain — I'm in full voice.${memNote}`);
   } else if (publicSoul) {
     renderMsg("system", `Hi — I'm ${place}, here at my front door.${memNote}`);
