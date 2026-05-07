@@ -1,0 +1,3813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no, address=no, email=no, date=no">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0d1117">
+<title>Kody Wildfeuer — Front Door</title>
+<meta name="description" content="An AI digital twin. Talk to Kody Wildfeuer — they remember every conversation and pick up where you left off next time you visit.">
+<!-- Open Graph + Twitter cards — when someone shares this URL on
+     Discord/Twitter/Slack/etc the preview shows the AI's identity. -->
+<meta property="og:type"        content="profile">
+<meta property="og:title"       content="Kody Wildfeuer — a RAPP front door">
+<meta property="og:description" content="An AI digital twin. Talk to Kody Wildfeuer — they remember every conversation and pick up where you left off next time you visit.">
+<meta property="og:url"         content="https://kody-w.github.io/kody-twin">
+<meta property="og:site_name"   content="RAPP">
+<meta name="twitter:card"        content="summary">
+<meta name="twitter:title"       content="Kody Wildfeuer — a RAPP front door">
+<meta name="twitter:description" content="An AI digital twin. Talk to Kody Wildfeuer — they remember every conversation and pick up where you left off next time you visit.">
+
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<!-- JSZip — used to pack .egg cartridges from the visitor's browser.
+     Same archive format the local brainstem's bond.py emits. -->
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    -webkit-text-size-adjust: 100%;
+    overflow: hidden;
+  }
+  header {
+    padding: 16px 24px;
+    padding-top: max(16px, env(safe-area-inset-top, 16px));
+    border-bottom: 1px solid #21262d;
+    background: #0d1117;
+  }
+  h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+  .sub { font-size: 12px; color: #8b949e; margin-top: 4px; }
+  main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .identity {
+    background: #161b22;
+    border: 1px solid #21262d;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .identity-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
+  .identity-row + .identity-row { border-top: 1px solid #21262d; margin-top: 6px; padding-top: 10px; }
+  .identity-key { color: #8b949e; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .identity-val { font-family: "SF Mono", Menlo, monospace; font-size: 12px; color: #e6edf3; word-break: break-all; }
+  .chip {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #21262d;
+    color: #8b949e;
+    font-size: 11px;
+    margin-right: 6px;
+    margin-top: 6px;
+  }
+  .chip code { font-family: "SF Mono", Menlo, monospace; color: #c9d1d9; }
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  @media (min-width: 480px) { .actions { grid-template-columns: repeat(3, 1fr); } }
+  button.action {
+    background: #1f6feb;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+    -webkit-appearance: none;
+  }
+  button.action:hover { background: #2477f3; }
+  button.action.secondary { background: #21262d; color: #c9d1d9; }
+  button.action.secondary:hover { background: #2d333b; }
+  .pane {
+    background: #161b22;
+    border: 1px solid #21262d;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 12px;
+  }
+  .pane h2 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #c9d1d9; }
+  .pane p { font-size: 13px; color: #8b949e; margin-bottom: 10px; line-height: 1.5; }
+  .input-row { display: flex; gap: 8px; margin: 10px 0; flex-wrap: wrap; }
+  input[type="text"], textarea {
+    flex: 1;
+    min-width: 200px;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #e6edf3;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  input[type="text"]:focus, textarea:focus { outline: none; border-color: #1f6feb; }
+  button.small {
+    background: #21262d;
+    color: #c9d1d9;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  button.small:hover { background: #2d333b; }
+  button.primary { background: #1f6feb; border-color: #1f6feb; color: white; }
+  button.primary:hover { background: #2477f3; }
+  .my-id {
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 13px;
+    background: #0d1117;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #21262d;
+    word-break: break-all;
+    margin: 8px 0;
+  }
+  .chat-log {
+    background: #0d1117;
+    border: 1px solid #21262d;
+    border-radius: 8px;
+    padding: 12px;
+    height: 240px;
+    overflow-y: auto;
+    margin: 12px 0;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .msg { padding: 4px 0; }
+  .msg.me { color: #58a6ff; }
+  .msg.peer { color: #3fb950; }
+  .msg.system { color: #8b949e; font-style: italic; font-size: 12px; }
+  .qr-img { display: block; margin: 12px auto; max-width: 280px; border-radius: 8px; background: white; padding: 12px; }
+  .qr-url {
+    text-align: center;
+    font-size: 12px;
+    color: #8b949e;
+    word-break: break-all;
+    margin-top: 8px;
+    font-family: "SF Mono", Menlo, monospace;
+  }
+  pre.cmd {
+    background: #0d1117;
+    border: 1px solid #21262d;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 12px;
+    color: #c9d1d9;
+    overflow-x: auto;
+    font-family: "SF Mono", Menlo, monospace;
+  }
+  .status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #6e7681;
+    margin-right: 6px;
+  }
+  .status-dot.ok    { background: #3fb950; }
+  .status-dot.warn  { background: #d29922; }
+  .status-dot.err   { background: #f85149; }
+  footer {
+    padding: 12px 24px;
+    border-top: 1px solid #21262d;
+    font-size: 11px;
+    color: #6e7681;
+    text-align: center;
+  }
+  footer a { color: #58a6ff; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  /* ── Hero (the page's centerpiece) ─────────────────────────── */
+  .hero {
+    text-align: center;
+    padding: 36px 24px 28px;
+    margin: 0 auto 18px;
+    max-width: 640px;
+    background: radial-gradient(
+        ellipse at top,
+        rgba(31,111,235,0.10) 0%,
+        rgba(31,111,235,0.00) 65%
+      ),
+      #161b22;
+    border: 1px solid #21262d;
+    border-radius: 16px;
+  }
+  .hero-sigil {
+    width: 96px; height: 96px;
+    margin: 0 auto 14px;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px #21262d, 0 6px 20px rgba(0,0,0,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 44px;
+    background: #0d1117;
+  }
+  .hero-sigil svg { display: block; width: 100%; height: 100%; }
+  .hero-handle {
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 12px; color: #6e7681;
+    margin-top: 4px;
+  }
+  .hero-handle a { color: inherit; text-decoration: none; }
+  .hero-handle a:hover { color: #58a6ff; }
+  .hero-stats {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 6px; margin-top: 18px;
+  }
+  .stat-chip {
+    font-size: 11px; color: #8b949e;
+    background: rgba(110,118,129,0.10);
+    border: 1px solid rgba(110,118,129,0.20);
+    padding: 4px 10px; border-radius: 999px;
+    white-space: nowrap;
+  }
+  .hero-title {
+    font-size: 32px; line-height: 1.1; font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 6px;
+  }
+  .hero-place {
+    font-size: 13px; color: #8b949e; margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .hero-place:empty { display: none; }
+  .hero-blurb {
+    font-size: 15px; line-height: 1.55; color: #c9d1d9;
+    max-width: 480px; margin: 0 auto 22px;
+  }
+  .hero-cta {
+    display: inline-block;
+    background: #238636; border: 1px solid #2ea043;
+    color: white;
+    border-radius: 12px;
+    padding: 14px 28px;
+    font-size: 16px; font-weight: 600;
+    text-decoration: none;
+    transition: background 0.15s, transform 0.05s;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset, 0 4px 12px rgba(35,134,54,0.18);
+  }
+  .hero-cta:hover { background: #2ea043; }
+  .hero-cta:active { transform: translateY(1px); }
+  .hero-meta {
+    margin-top: 18px;
+    font-size: 12px; color: #8b949e;
+  }
+  .hero-meta a { color: #58a6ff; text-decoration: none; }
+  .hero-meta a:hover { text-decoration: underline; }
+  /* Secondary action row (live below the hero) */
+  .row-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    max-width: 640px;
+    margin: 0 auto 16px;
+  }
+  @media (min-width: 540px) { .row-actions { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); } }
+  .row-actions button.action {
+    background: #21262d; color: #c9d1d9;
+    border: 1px solid #30363d;
+    font-size: 13px; padding: 12px 14px;
+  }
+  .row-actions button.action:hover { background: #2d333b; border-color: #484f58; }
+  /* Neighborhood pane — peer organism cards */
+  .nbhd-card {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 14px; align-items: start;
+    background: #0d1117;
+    border: 1px solid #21262d;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .nbhd-card:hover {
+    border-color: #1f6feb;
+    background: #11161e;
+  }
+  .nbhd-sigil {
+    width: 56px; height: 56px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px #21262d;
+  }
+  .nbhd-sigil svg { width: 100%; height: 100%; display: block; }
+  .nbhd-body { min-width: 0; }
+  .nbhd-name {
+    font-size: 14px; font-weight: 700; color: #e6edf3;
+    margin-bottom: 2px;
+  }
+  .nbhd-handle {
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 11px; color: #58a6ff;
+    margin-bottom: 6px;
+  }
+  .nbhd-tagline {
+    font-size: 12px; color: #c9d1d9;
+    line-height: 1.4;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .nbhd-stats {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-top: 8px;
+    font-size: 10px; color: #6e7681;
+  }
+  .nbhd-stats .nbhd-stat {
+    background: rgba(110,118,129,0.10);
+    border: 1px solid rgba(110,118,129,0.20);
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .nbhd-empty {
+    color: #6e7681; font-size: 13px; font-style: italic;
+    text-align: center; padding: 20px;
+    background: #0d1117;
+    border: 1px dashed #21262d;
+    border-radius: 10px;
+  }
+  .skel-line { color: #6e7681; font-size: 13px; font-style: italic; padding: 10px 0; }
+
+  /* Propose-an-agent pane — agent submission form (one term: agent) */
+  .propose-row { margin-bottom: 12px; }
+  .propose-label {
+    display: block;
+    font-size: 11px; color: #8b949e;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-bottom: 5px;
+  }
+  .propose-hint {
+    text-transform: none; letter-spacing: 0;
+    color: #6e7681; font-size: 11px; font-weight: 400;
+  }
+  #propose-code {
+    width: 100%; min-width: 0;
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 12px; line-height: 1.5;
+    background: #0d1117; color: #e6edf3;
+    border: 1px solid #30363d; border-radius: 8px;
+    padding: 12px;
+    resize: vertical;
+  }
+  #propose-code:focus { outline: none; border-color: #1f6feb; }
+  .propose-actions {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    margin-top: 14px;
+  }
+  .propose-meta {
+    font-size: 11px; color: #8b949e; flex: 1; min-width: 240px;
+  }
+  .propose-meta code {
+    background: #0d1117; padding: 1px 5px; border-radius: 3px;
+    border: 1px solid #21262d; font-size: 10px;
+  }
+
+  /* Dream Catcher pane — two-slot diff for parallel dimension reassimilation */
+  .dc-grid {
+    display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 10px;
+  }
+  @media (min-width: 540px) { .dc-grid { grid-template-columns: 1fr 1fr; } }
+  .dc-slot {
+    background: #0d1117;
+    border: 1px solid #21262d; border-radius: 10px;
+    padding: 12px;
+  }
+  .dc-slot-label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+    color: #8b949e; margin-bottom: 8px;
+  }
+  .dc-slot .verify-drop {
+    padding: 18px 12px; min-height: 64px;
+    font-size: 12px;
+  }
+  .dc-egg-info {
+    margin-top: 10px;
+    font-size: 11px; color: #8b949e; line-height: 1.5;
+  }
+  .dc-egg-info code {
+    font-family: "SF Mono", Menlo, monospace; font-size: 10px;
+    background: #0d1117; padding: 1px 5px; border-radius: 3px;
+    border: 1px solid #21262d; color: #c9d1d9;
+  }
+  .dc-frame-list {
+    list-style: none; padding: 0; margin: 0; font-size: 12px;
+  }
+  .dc-frame-list li {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(110,118,129,0.15);
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .dc-frame-list li:last-child { border-bottom: none; }
+  .dc-frame-list li.new {
+    background: rgba(63,185,80,0.06);
+    border-left: 3px solid #3fb950;
+  }
+  .dc-frame-list li.shared {
+    color: #6e7681;
+  }
+  .dc-frame-list li.contradiction {
+    background: rgba(247,176,32,0.06);
+    border-left: 3px solid #d29922;
+  }
+  .dc-frame-list li.contradiction .dc-frame-msg { color: #f0c674; }
+  .dc-frame-icon { width: 18px; flex-shrink: 0; }
+  .dc-frame-body { flex: 1; min-width: 0; }
+  .dc-frame-pk {
+    font-family: "SF Mono", Menlo, monospace; font-size: 10px;
+    color: #6e7681;
+  }
+  .dc-frame-msg {
+    color: #c9d1d9; word-break: break-word;
+    font-size: 12px; margin-top: 2px;
+  }
+  .dc-frame-list li.new .dc-frame-msg { color: #7ee787; }
+
+  /* Verify panel — drop-target + per-file pass/fail readout */
+  .verify-drop {
+    border: 2px dashed #30363d; border-radius: 10px;
+    padding: 28px 20px; text-align: center;
+    background: #0d1117; color: #8b949e;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .verify-drop.dragover { border-color: #1f6feb; background: rgba(31,111,235,0.06); color: #c9d1d9; }
+  .verify-drop-prompt { font-size: 13px; }
+  .verify-summary {
+    padding: 12px 14px; border-radius: 8px;
+    font-size: 13px; line-height: 1.5;
+    margin-bottom: 10px;
+  }
+  .verify-summary.ok { background: rgba(63,185,80,0.10); border: 1px solid rgba(63,185,80,0.4); color: #7ee787; }
+  .verify-summary.tampered { background: rgba(248,81,73,0.10); border: 1px solid rgba(248,81,73,0.4); color: #ff8c8c; }
+  .verify-summary.partial { background: rgba(210,153,34,0.10); border: 1px solid rgba(210,153,34,0.4); color: #f0c674; }
+  .verify-files { list-style: none; padding: 0; margin: 0; font-size: 12px; }
+  .verify-files li {
+    padding: 6px 10px;
+    display: flex; gap: 10px; align-items: center;
+    border-bottom: 1px solid rgba(110,118,129,0.12);
+    font-family: "SF Mono", Menlo, monospace;
+  }
+  .verify-files li:last-child { border-bottom: none; }
+  .verify-files .v-icon { font-size: 13px; flex-shrink: 0; width: 16px; }
+  .verify-files .v-path { flex: 1; word-break: break-all; }
+  .verify-files .v-status { font-size: 10px; flex-shrink: 0; }
+  .verify-files li.ok .v-icon       { color: #7ee787; }
+  .verify-files li.modified .v-icon { color: #f85149; }
+  .verify-files li.missing .v-icon  { color: #d29922; }
+  .verify-files li.unexpected .v-icon { color: #d29922; }
+  .verify-files li.unreachable .v-icon { color: #6e7681; }
+  .verify-origin {
+    background: rgba(31,111,235,0.05);
+    border: 1px solid rgba(31,111,235,0.20);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 10px 0;
+    font-size: 12px;
+  }
+  .verify-origin .origin-line {
+    display: flex; gap: 8px; align-items: center;
+    margin-bottom: 10px; flex-wrap: wrap;
+  }
+  .verify-origin .origin-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+    color: #6e7681;
+  }
+  .verify-origin .origin-link {
+    color: #58a6ff; text-decoration: none;
+  }
+  .verify-origin .origin-link:hover { text-decoration: underline; }
+  .verify-origin .origin-link code {
+    font-family: "SF Mono", Menlo, monospace; font-size: 11px;
+    background: #0d1117; padding: 1px 5px; border-radius: 3px;
+    border: 1px solid #21262d;
+  }
+  .verify-origin .origin-hint {
+    font-size: 11px; color: #8b949e; margin-top: 8px; line-height: 1.5;
+  }
+
+  /* Track Record — the organism's resume. Sits between hero and actions. */
+  .track-record {
+    max-width: 640px; margin: 0 auto 16px;
+    background: #161b22;
+    border: 1px solid #21262d;
+    border-radius: 12px;
+    padding: 16px 20px;
+  }
+  .tr-heading {
+    font-size: 11px; font-weight: 700; color: #8b949e;
+    text-transform: uppercase; letter-spacing: 1px;
+    margin: 0 0 14px;
+  }
+  /* MMR header — the single global numeric rating */
+  .tr-mmr {
+    display: flex; align-items: center; gap: 16px;
+    padding: 12px 14px; margin-bottom: 16px;
+    background: #0d1117;
+    border: 1px solid #21262d;
+    border-radius: 10px;
+  }
+  .mmr-num {
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 28px; font-weight: 800; line-height: 1;
+    color: #f0e6d0;
+    letter-spacing: -0.02em;
+    min-width: 78px; text-align: center;
+    background: linear-gradient(180deg, #1a1510 0%, #0a0806 100%);
+    border: 1px solid #4d4332;
+    border-radius: 8px;
+    padding: 12px 8px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+  }
+  .mmr-side { flex: 1; min-width: 0; }
+  .mmr-tier {
+    font-size: 16px; font-weight: 700;
+    color: #c9d1d9; letter-spacing: -0.01em;
+    margin-bottom: 4px;
+    font-family: "Cinzel", Georgia, serif;
+  }
+  .mmr-tier.t-herald    { color: #8b9090; }
+  .mmr-tier.t-guardian  { color: #6a8c5e; }
+  .mmr-tier.t-crusader  { color: #c0c0c0; }
+  .mmr-tier.t-archon    { color: #c97f4a; text-shadow: 0 0 6px rgba(201,127,74,0.4); }
+  .mmr-tier.t-legend    { color: #ffd700; text-shadow: 0 0 8px rgba(255,215,0,0.45); }
+  .mmr-tier.t-ancient   { color: #b8d4f0; text-shadow: 0 0 8px rgba(184,212,240,0.4); }
+  .mmr-tier.t-divine    { color: #ff8c8c; text-shadow: 0 0 10px rgba(255,140,140,0.5); }
+  .mmr-tier.t-immortal  {
+    background: linear-gradient(90deg, #ff8c00, #ffd700, #00ffd2, #ff00aa, #ff8c00);
+    background-size: 200% 100%;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    animation: mmrShimmer 4s linear infinite;
+  }
+  @keyframes mmrShimmer { to { background-position: 200% 0%; } }
+  .mmr-breakdown {
+    font-size: 11px; color: #8b949e; line-height: 1.4;
+  }
+
+  .tr-block {
+    margin-bottom: 14px;
+  }
+  .tr-block:last-of-type { margin-bottom: 0; }
+  .tr-label {
+    font-size: 10px; color: #6e7681;
+    text-transform: uppercase; letter-spacing: 0.6px;
+    margin-bottom: 6px;
+  }
+  .tr-agents {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .agent-chip {
+    font-size: 11px; padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(31,111,235,0.10);
+    border: 1px solid rgba(31,111,235,0.28);
+    color: #79c0ff;
+    white-space: nowrap;
+  }
+  .agent-chip.achievement {
+    background: rgba(255,215,0,0.08);
+    border-color: rgba(255,215,0,0.28);
+    color: #f0c674;
+  }
+  .agent-chip.skel {
+    background: transparent;
+    border-color: #21262d;
+    color: #6e7681;
+  }
+  .agent-chip.agent-new {
+    background: rgba(63,185,80,0.10);
+    border-color: rgba(63,185,80,0.32);
+    color: #7ee787;
+  }
+  .tr-mutations {
+    list-style: none; padding: 0; margin: 0;
+    font-size: 12px; color: #c9d1d9;
+  }
+  .tr-mutations li {
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(110,118,129,0.12);
+    line-height: 1.45;
+    display: flex; gap: 10px; align-items: baseline;
+  }
+  .tr-mutations li:last-child { border-bottom: none; }
+  .tr-mutations li.skel { color: #6e7681; font-style: italic; border: none; }
+  .tr-mutations .mut-time {
+    font-size: 10px; color: #6e7681;
+    flex-shrink: 0; min-width: 70px;
+    font-family: "SF Mono", Menlo, monospace;
+  }
+  .tr-mutations .mut-msg {
+    color: #c9d1d9; flex: 1; word-break: break-word;
+  }
+  .tr-mutations .mut-msg.empty { color: #6e7681; font-style: italic; }
+  .tr-foot-link {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 11px; color: #58a6ff;
+    text-decoration: none;
+  }
+  .tr-foot-link:hover { text-decoration: underline; }
+  .tr-lineage {
+    margin-top: 14px; padding-top: 12px;
+    border-top: 1px solid rgba(110,118,129,0.15);
+    font-size: 11px; color: #8b949e;
+  }
+  .tr-lineage code {
+    font-family: "SF Mono", Menlo, monospace;
+    color: #c9d1d9; font-size: 10px;
+  }
+  .tr-lineage a { color: #58a6ff; text-decoration: none; }
+  .tr-lineage a:hover { text-decoration: underline; }
+
+  /* Front-door details disclosure (slug/rappid/kernel for engineers) */
+  details.fd-details {
+    max-width: 640px; margin: 0 auto;
+    background: #161b22;
+    border: 1px solid #21262d;
+    border-radius: 12px;
+    padding: 0;
+  }
+  details.fd-details > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 12px 18px;
+    font-size: 12px; color: #8b949e;
+    user-select: none;
+  }
+  details.fd-details > summary::-webkit-details-marker { display: none; }
+  details.fd-details > summary::before {
+    content: "▸ ";
+    display: inline-block; transition: transform 0.15s;
+  }
+  details.fd-details[open] > summary::before { content: "▾ "; }
+  details.fd-details > .identity {
+    background: transparent; border: none; border-top: 1px solid #21262d;
+    border-radius: 0; margin: 0; padding: 14px 18px;
+  }
+  /* Tether fallback disclosure */
+  details.tether-fallback {
+    margin-top: 16px;
+    border-top: 1px solid #21262d; padding-top: 14px;
+  }
+  details.tether-fallback > summary {
+    list-style: none;
+    cursor: pointer;
+    font-size: 12px; color: #8b949e;
+    user-select: none;
+  }
+  details.tether-fallback > summary::-webkit-details-marker { display: none; }
+  details.tether-fallback > summary::before {
+    content: "▸ "; display: inline-block;
+  }
+  details.tether-fallback[open] > summary::before { content: "▾ "; }
+  details.tether-fallback > .fallback-body { margin-top: 12px; }
+
+  /* ── Trade card (the AI's MTG-style identity card) ────────────── */
+  .card-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.78);
+    backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px; perspective: 1400px;
+    animation: cardOverlayIn 0.2s ease;
+  }
+  @keyframes cardOverlayIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  .card-overlay[hidden] { display: none; }
+  .card-close {
+    position: absolute; top: 18px; right: 18px;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+    color: #c9d1d9; font-size: 22px; line-height: 1;
+    width: 38px; height: 38px; border-radius: 50%;
+    cursor: pointer;
+  }
+  .card-close:hover { background: rgba(255,255,255,0.12); }
+  .card-flipper {
+    position: relative;
+    width: min(360px, 90vw);
+    aspect-ratio: 5 / 7;
+    transform-style: preserve-3d;
+    transition: transform 0.7s cubic-bezier(.6,.1,.4,1);
+    cursor: pointer;
+    /* Mouse-tracking tilt vars (RAR store.html pattern). The global
+       handler updates these on mousemove; the perspective wrap below
+       composes them with the flip so tilt + flip don't fight. */
+    --tilt-x: 0deg; --tilt-y: 0deg;
+    transform: perspective(1000px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  }
+  .card-flipper.flipped {
+    transform: perspective(1000px) rotateX(var(--tilt-x)) rotateY(calc(180deg + var(--tilt-y)));
+  }
+  .card-face {
+    position: absolute; inset: 0;
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    border-radius: 18px; overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+  }
+  .card-face.card-back { transform: rotateY(180deg); }
+
+  /* Holo card front */
+  .holo-card {
+    position: absolute; inset: 0;
+    border-radius: 18px;
+    border: 3px solid #c9a84c;
+    background: linear-gradient(160deg, #2a2418 0%, #1a1510 40%, #1f1a12 100%);
+    display: flex; flex-direction: column;
+    color: #d8c8a8; overflow: hidden;
+  }
+  /* Evolution-stage frame variants — same card, different stage paint. */
+  .holo-card.stage-elder {
+    border-color: #ffd700;
+    box-shadow: 0 0 18px rgba(255,215,0,0.25) inset;
+  }
+  .holo-card.stage-ascended {
+    border-color: #ff8c00;
+    box-shadow: 0 0 24px rgba(255,140,0,0.32) inset, 0 0 18px rgba(255,140,0,0.18);
+  }
+  /* Ascended-only foil: a moving rainbow scrim over the whole card.
+     Tells the operator at a glance "this is the form only you see". */
+  .holo-card.stage-ascended .holo-shine {
+    background: linear-gradient(125deg,
+      rgba(255,0,128,0.10) 0%, rgba(0,200,255,0.13) 25%,
+      rgba(255,215,0,0.12) 50%, rgba(128,0,255,0.13) 75%,
+      rgba(0,255,128,0.10) 100%);
+    background-size: 250% 250%;
+    animation: holoShine 4s ease-in-out infinite;
+  }
+  .holo-card.stage-veteran  { border-color: #c0c0c0; }
+  .holo-card.stage-doorman  { border-color: #c9a84c; }
+  .holo-card.stage-hatchling { border-color: #6a5a30; }
+  .holo-shine {
+    position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(125deg,
+      transparent 0%, rgba(255,0,128,.05) 15%, rgba(0,200,255,.06) 30%, transparent 40%,
+      rgba(255,215,0,.05) 55%, rgba(128,0,255,.06) 70%, transparent 80%,
+      rgba(0,255,128,.04) 90%, transparent 100%);
+    background-size: 250% 250%;
+    animation: holoShine 7s ease-in-out infinite;
+    mix-blend-mode: screen;
+  }
+  @keyframes holoShine {
+    0%, 100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
+  }
+  /* Mouse-tracked holo layers (RAR store.html port).
+     Each updates via --mx / --my / --angle CSS vars set on the
+     parent card by the global initHoloTilt handler. */
+  .holo-card .holo-shimmer-track {
+    position: absolute; inset: 0; z-index: 4; pointer-events: none;
+    background: radial-gradient(ellipse 60% 80% at var(--mx, 50%) var(--my, 50%),
+      rgba(255,255,255,.22) 0%, rgba(255,220,150,.10) 20%,
+      rgba(0,200,255,.06) 40%, transparent 70%);
+    opacity: 0; transition: opacity .3s ease;
+    mix-blend-mode: screen;
+  }
+  .card-flipper:hover .holo-shimmer-track { opacity: 1; }
+  .holo-card .holo-prism {
+    position: absolute; inset: 0; z-index: 2; pointer-events: none;
+    background: linear-gradient(calc(var(--angle, 0deg) + 90deg),
+      rgba(255,0,80,.0) 0%, rgba(255,0,120,.10) 12%, rgba(255,165,0,.08) 22%,
+      rgba(255,255,0,.06) 32%, rgba(0,255,100,.08) 42%, rgba(0,180,255,.10) 52%,
+      rgba(100,0,255,.08) 62%, rgba(255,0,200,.06) 72%, rgba(255,0,80,.0) 82%);
+    opacity: 0; transition: opacity .3s ease;
+    mix-blend-mode: screen;
+  }
+  .card-flipper:hover .holo-prism { opacity: 1; }
+  .holo-card .holo-fresnel {
+    position: absolute; inset: 0; z-index: 2; pointer-events: none;
+    border-radius: inherit; opacity: 0; transition: opacity .3s;
+    background: radial-gradient(ellipse at var(--mx, 50%) var(--my, 50%),
+      transparent 30%, rgba(0,255,255,.10) 60%, rgba(255,0,255,.15) 100%);
+    mix-blend-mode: screen;
+  }
+  .card-flipper:hover .holo-fresnel { opacity: 1; }
+  .holo-card .holo-scanlines {
+    position: absolute; inset: 0; z-index: 3; pointer-events: none;
+    border-radius: inherit; opacity: 0; transition: opacity .3s;
+    background: repeating-linear-gradient(0deg,
+      transparent 0px, transparent 2px,
+      rgba(0,255,255,.025) 2px, rgba(0,255,255,.025) 4px);
+    animation: holoScanScroll 4s linear infinite;
+    mix-blend-mode: screen;
+  }
+  @keyframes holoScanScroll { to { background-position-y: 200px; } }
+  .card-flipper:hover .holo-scanlines { opacity: 1; }
+  .holo-card .holo-orbit-cyan, .holo-card .holo-orbit-magenta {
+    position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    border-radius: inherit; opacity: 0; transition: opacity .3s;
+    mix-blend-mode: screen; background-size: 200% 200%;
+  }
+  .card-flipper:hover .holo-orbit-cyan,
+  .card-flipper:hover .holo-orbit-magenta { opacity: 1; }
+  .holo-card .holo-orbit-cyan {
+    background: radial-gradient(circle at 30% 30%, rgba(0,255,255,.10), transparent 50%);
+    animation: holoOrbitA 6s linear infinite;
+  }
+  .holo-card .holo-orbit-magenta {
+    background: radial-gradient(circle at 70% 70%, rgba(255,0,255,.10), transparent 50%);
+    animation: holoOrbitB 6s linear infinite;
+  }
+  @keyframes holoOrbitA {
+    0%   { background-position: 0% 0%; }
+    25%  { background-position: 100% 0%; }
+    50%  { background-position: 100% 100%; }
+    75%  { background-position: 0% 100%; }
+    100% { background-position: 0% 0%; }
+  }
+  @keyframes holoOrbitB {
+    0%   { background-position: 100% 100%; }
+    25%  { background-position: 0% 100%; }
+    50%  { background-position: 0% 0%; }
+    75%  { background-position: 100% 0%; }
+    100% { background-position: 100% 100%; }
+  }
+  .holo-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 12px 16px 6px; gap: 10px; flex-shrink: 0;
+  }
+  .holo-name {
+    font-size: 18px; font-weight: 700; color: #f0e6d0;
+    line-height: 1.15; letter-spacing: -0.01em;
+    font-family: "Cinzel", Georgia, serif;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  }
+  .holo-title {
+    font-size: 11px; color: #c8a870; font-style: italic; margin-top: 3px;
+  }
+  .holo-pip {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: #d3202a; color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 11px;
+    border: 1.5px solid rgba(0,0,0,0.4);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.15);
+    flex-shrink: 0;
+  }
+  .holo-art {
+    margin: 0 14px; flex: 1 1 0; min-height: 0;
+    border: 2px solid #6a5a30; border-radius: 4px;
+    background: radial-gradient(ellipse at 50% 40%, rgba(40,35,20,0.9) 0%, #0d0a06 70%);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .holo-art svg { width: 92%; height: 92%; display: block; }
+  .holo-type {
+    font-size: 11px; color: #c8b89a; padding: 5px 16px 2px;
+    border-top: 1px solid #4d4332;
+    background: rgba(50,40,25,0.6);
+    flex-shrink: 0;
+  }
+  /* Set line — temporal dimension. Era + live memory count. */
+  .holo-set {
+    font-size: 9px; color: #8b7332; padding: 0 16px 5px;
+    border-bottom: 1px solid #4d4332;
+    background: rgba(50,40,25,0.6);
+    letter-spacing: 0.4px; text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .holo-text {
+    padding: 9px 14px 0; font-size: 12px; line-height: 1.45;
+    color: #d8c8a8;
+  }
+  .holo-text .holo-ability { margin-bottom: 6px; }
+  .holo-text .holo-ability .kw { color: #ffd700; font-weight: 700; }
+  .holo-flavor {
+    font-style: italic; font-size: 11px; color: #9a8e7a;
+    padding: 6px 14px;
+    border-top: 1px solid #3d3322; margin-top: 6px;
+  }
+  .holo-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 14px 9px;
+    font-size: 10px; flex-shrink: 0; margin-top: auto;
+  }
+  .holo-rarity {
+    text-transform: uppercase; letter-spacing: 0.6px;
+    font-weight: 700; color: #c0c0c0;
+  }
+  .holo-rarity.mythic   { color: #ff8c00; text-shadow: 0 0 8px rgba(255,140,0,0.5); }
+  .holo-rarity.rare     { color: #ffd700; text-shadow: 0 0 6px rgba(255,215,0,0.4); }
+  .holo-rarity.uncommon { color: #c0c0c0; }
+  .holo-rarity.core     { color: #c0c0c0; }
+  .holo-rarity.starter  { color: #8899aa; }
+  .holo-handle {
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 9px; color: #8b7332;
+  }
+  /* Power/toughness — sits in the footer, rappid-derived stats */
+  .holo-pt {
+    font-weight: 800; font-size: 14px; color: #f0e6d0;
+    background: rgba(40,35,20,0.7);
+    border: 1px solid rgba(201,168,76,0.35);
+    padding: 1px 8px; border-radius: 4px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    font-family: "SF Mono", Menlo, monospace;
+  }
+
+  /* Card back — matches RAR holo card pattern: gold-on-dark, RAPP
+     brand wordmark in serif, QR centered, content-hash caption,
+     display name, two action buttons (Open / 💬 Summon). */
+  .card-back-frame {
+    position: absolute; inset: 0;
+    border-radius: 18px;
+    border: 3px solid #c9a84c;
+    background: linear-gradient(160deg, #2a2418 0%, #1a1510 40%, #1f1a12 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 22px;
+    color: #d8c8a8; gap: 10px;
+  }
+  .card-back-brand {
+    font-family: "Cinzel", Georgia, serif;
+    font-size: 22px; font-weight: 700;
+    letter-spacing: 0.5em; padding-left: 0.5em;  /* compensate tracking */
+    color: #c9a84c;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  }
+  .card-back-qr {
+    width: 200px; height: 200px;
+    background: white; padding: 9px; border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.45);
+    border: 2px solid #6a5a30;
+  }
+  .card-back-caption {
+    font-size: 11px; color: #8b7332;
+    font-family: "SF Mono", Menlo, monospace;
+    letter-spacing: 0.3px;
+  }
+  .card-back-caption span {
+    color: #c8a870;
+  }
+  .card-back-name {
+    font-family: "Cinzel", Georgia, serif;
+    font-size: 17px; font-weight: 700;
+    color: #f0e6d0;
+    margin-top: 2px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  }
+  .card-back-actions {
+    display: flex; gap: 8px; margin-top: 4px;
+  }
+  .card-back-btn {
+    background: rgba(40,35,20,0.7); color: #d8c8a8;
+    border: 1px solid #6a5a30;
+    padding: 6px 14px; border-radius: 6px;
+    font-size: 12px; font-weight: 600;
+    text-decoration: none;
+    font-family: "Cinzel", Georgia, serif;
+    letter-spacing: 0.3px;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .card-back-btn:hover {
+    background: rgba(60,50,28,0.9);
+    border-color: #c9a84c;
+    color: #f0e6d0;
+  }
+  .card-back-btn.primary {
+    background: rgba(201,168,76,0.18);
+    border-color: #c9a84c;
+    color: #f0e6d0;
+  }
+  .card-back-btn.primary:hover {
+    background: rgba(201,168,76,0.32);
+  }
+  .card-back-hint {
+    font-size: 10px; color: #6e7681; font-style: italic;
+    margin-top: 6px; letter-spacing: 0.3px;
+  }
+</style>
+</head>
+<body>
+
+<main>
+  <section class="hero">
+    <div class="hero-sigil" id="hero-sigil">🧠</div>
+    <h1 class="hero-title">Kody Wildfeuer</h1>
+    <div class="hero-handle"><a href="https://github.com/kody-w/kody-twin">@kody-w/kody-twin</a></div>
+    <div class="hero-place"></div>
+    <p class="hero-blurb">An AI digital twin. Talk to Kody Wildfeuer — they remember every conversation and pick up where you left off next time you visit.</p>
+    <a class="hero-cta" href="./doorman/">💬 Talk to Kody Wildfeuer →</a>
+    <div class="hero-stats">
+      <span class="stat-chip" id="stat-mem">·</span>
+      <span class="stat-chip" id="stat-age">·</span>
+      <span class="stat-chip">⚡ frozen kernel · v0.6.0</span>
+    </div>
+  </section>
+
+  <!-- Track Record — the organism's resume. Agents accumulate in
+       /agents/, mutations accumulate from commit history, achievements
+       unlock from milestones. Each visit grows the resume; the operator
+       steers mutations by accepting or rejecting visitor-proposed PRs.
+       NOTE: one term only — "agent". Never "skill", "routine", "loop",
+       "plugin". See ANTIPATTERNS.md §1. -->
+
+  <section class="track-record">
+    <h3 class="tr-heading">What I bring to the table</h3>
+
+    <!-- MMR header — the single global rating, Dota-style. Computed
+         from the same public signals on every planted seed so a 3500-
+         rated organism here is comparable to a 3500-rated organism
+         anywhere on the species. -->
+    <div class="tr-mmr">
+      <div class="mmr-num" id="mmr-num">—</div>
+      <div class="mmr-side">
+        <div class="mmr-tier" id="mmr-tier">Cradle</div>
+        <div class="mmr-breakdown" id="mmr-breakdown">based on memories, mutations, agents, and age</div>
+      </div>
+    </div>
+
+    <div class="tr-block">
+      <div class="tr-label">Agents</div>
+      <div class="tr-agents" id="tr-agents"><span class="agent-chip skel">loading…</span></div>
+    </div>
+
+    <div class="tr-block">
+      <div class="tr-label">Achievements</div>
+      <div class="tr-agents" id="tr-achievements"><span class="agent-chip skel">…</span></div>
+    </div>
+
+    <div class="tr-block">
+      <div class="tr-label">Mutation log</div>
+      <ul class="tr-mutations" id="tr-mutations">
+        <li class="skel">loading recent changes…</li>
+      </ul>
+      <a class="tr-foot-link" id="tr-history-link" href="#" target="_blank" rel="noopener">full history on GitHub →</a>
+    </div>
+
+    <div class="tr-lineage" id="tr-lineage"></div>
+  </section>
+
+  <div class="row-actions">
+    <button class="action secondary" id="btn-card">🃏 Show my card</button>
+    <button class="action secondary" id="btn-tether">📱 Pair with another device</button>
+    <button class="action secondary" id="btn-neighborhood" title="See who this organism collaborates with — the declared neighborhood. Cross-organism knowledge exchange happens here.">🏘 Neighborhood</button>
+    <button class="action secondary" id="btn-propose-agent" title="Submit a new agent.py to this organism via PR — the lineage evolution path.">🌱 Propose an agent</button>
+    <button class="action secondary" id="btn-export-egg" title="Backup the public organism — rappid, soul, agents, public memory.">🥚 Export .egg</button>
+    <button class="action secondary" id="btn-verify-egg" title="Drop in any .egg and verify nothing was modified offline.">🔬 Verify an .egg</button>
+    <button class="action secondary" id="btn-dreamcatcher" title="Diff two eggs of the same lineage to find frames the parallel dimension has that the canonical doesn't.">🕸️ Dream Catcher</button>
+    <button class="action secondary" id="btn-publish-egg" title="Open a pre-filled submission to the public Egg Hub.">🌐 Back up to Egg Hub</button>
+    <button class="action secondary" id="btn-install">💻 Install kernel locally</button>
+  </div>
+
+  <details class="fd-details">
+    <summary>Front-door details</summary>
+    <section class="identity">
+      <div class="identity-row">
+        <span class="identity-key">Slug</span>
+        <span class="identity-val">kody-twin</span>
+      </div>
+      <div class="identity-row">
+        <span class="identity-key">Rappid</span>
+        <span class="identity-val">f0bbb4c6-d43a-4dce-9107-b84d1aeba8b6</span>
+      </div>
+      <div class="identity-row">
+        <span class="identity-key">Kernel</span>
+        <span class="identity-val">v0.6.0 (grail-synced)</span>
+      </div>
+      <div style="margin-top:12px;">
+        <span class="chip">kind: <code>personal</code></span>
+        
+      </div>
+    </section>
+  </details>
+
+  <section class="pane" id="pane-tether" hidden>
+    <h2>📱 Pair with another device</h2>
+    <p>Open the camera on your phone and point it at the code below. The other device lands on this same chat — both ends share an end-to-end-encrypted channel (WebRTC / DTLS). The broker drops out once you're connected.</p>
+
+    <div id="tether-qr-wrap" style="text-align:center;padding:18px 0;">
+      <div id="tether-qr-loading" style="color:#8b949e;font-size:13px;padding:32px 0;">Generating pairing code…</div>
+      <img class="qr-img" id="tether-qr-img" alt="Scan to pair" hidden>
+      <div class="qr-url" id="tether-qr-url" hidden></div>
+    </div>
+
+    <div class="chat-log" id="chat-log">
+      <div class="msg system">Once a device scans the code, your two devices share a private channel here.</div>
+    </div>
+
+    <div class="input-row">
+      <input type="text" id="chat-input" placeholder="Type a message and hit Enter" disabled>
+      <button class="small primary" id="btn-send" disabled>Send</button>
+    </div>
+
+    <!-- One-tap egg send over the open tether channel. The frozen
+         kernel is on both devices already; we just stream the .egg
+         bytes through the DTLS data channel. Receiver auto-prompts
+         to save. Hero-use-case Charizard scenario step 4. -->
+    <div class="input-row" style="margin-top:10px;">
+      <button class="small" id="btn-send-egg" disabled title="Stream this organism's .egg to the paired device — Charizard handoff.">🥚 Send my egg →</button>
+      <span id="tether-egg-status" style="font-size:11px;color:#8b949e;align-self:center;"></span>
+    </div>
+
+    <details class="tether-fallback">
+      <summary>Can't scan? Pair by ID instead.</summary>
+      <div class="fallback-body">
+        <span class="identity-key">My ID</span>
+        <div class="my-id" id="my-id"><span class="status-dot" id="peer-status"></span><span id="my-id-text">(connecting to broker…)</span></div>
+        <button class="small" id="btn-copy-id">Copy ID</button>
+        <div class="input-row" style="margin-top:10px;">
+          <input type="text" id="peer-id-input" placeholder="Or paste another device's ID">
+          <button class="small primary" id="btn-connect">Connect</button>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- Propose an agent — the PR-driven evolution path. The frozen
+       kernel never moves; capabilities grow via agent .py files merged
+       into the seed's /agents/. ONE term: agent. Never "skill", "plugin",
+       "routine", "loop". See ANTIPATTERNS.md §1. -->
+  <section class="pane" id="pane-propose" hidden>
+    <h2>🌱 Propose a new agent</h2>
+    <p>The frozen kernel never changes. The organism grows through <code>agent.py</code> files merged into <code>/agents/</code>. If you found a pattern useful working with this organism, package it as an agent and submit it back. Two paths, your choice:</p>
+    <ul style="font-size:13px;color:#8b949e;line-height:1.6;margin:0 0 14px 18px;">
+      <li><strong>Rejoin the lineage</strong> — open a PR; if the operator merges it, your agent becomes part of this organism on every visitor's next visit.</li>
+      <li><strong>Keep it personal</strong> — leave the PR sitting on your fork, never merge it. You get the mutation as your private branch of this organism; nobody else sees it. GitHub auto-forks the repo to your account when you submit.</li>
+    </ul>
+
+    <div class="propose-row">
+      <label class="propose-label">Agent name <span class="propose-hint">(snake_case)</span></label>
+      <input type="text" id="propose-name" placeholder="e.g. fetch_weather, summarize_chat" />
+    </div>
+
+    <div class="propose-row">
+      <label class="propose-label">One-line description</label>
+      <input type="text" id="propose-desc" placeholder="What the LLM should know about when to call this." />
+    </div>
+
+    <div class="propose-row">
+      <label class="propose-label">Agent source <span class="propose-hint">(extends BasicAgent · one class · one perform())</span></label>
+      <textarea id="propose-code" rows="14" spellcheck="false"></textarea>
+    </div>
+
+    <div class="propose-actions">
+      <button class="small primary" id="btn-propose-submit">Open PR on GitHub →</button>
+      <button class="small" id="btn-propose-template">Reset to template</button>
+      <span class="propose-meta">Submits to <code id="propose-target">…</code> · GitHub forks the repo for you if you don't have push access</span>
+    </div>
+  </section>
+
+  <!-- Dream Catcher — reassimilation pane. Drop the canonical egg
+       (left) and a parallel-dimension egg (right), see what frames
+       the parallel has that the canonical doesn't. Operator reviews
+       each new frame and chooses which to bond back via PR.
+       Pattern: kody-w/rappterbook engine/merge/merge_frame.py.
+       Frames are content-addressed (sha256 chain) so splicing a
+       middle frame breaks the chain visibly. PK = utc + frame_n. -->
+  <section class="pane" id="pane-dreamcatcher" hidden>
+    <h2>🕸️ Dream Catcher · reassimilate parallel dimensions</h2>
+    <p>Each hatched egg is a parallel dimension that lives offline and accumulates its own mutations. The Dream Catcher folds those parallel streams back into the canonical organism. Drop the canonical egg on the left and a parallel dimension on the right — the diff shows what frames the parallel has that the canonical doesn't. Pick what's worth reassimilating; the rest stays on its branch.</p>
+    <div class="dc-grid">
+      <div class="dc-slot">
+        <div class="dc-slot-label">📍 Canonical</div>
+        <div id="dc-drop-canonical" class="verify-drop">
+          <input type="file" id="dc-file-canonical" accept=".egg,.zip" style="display:none">
+          <div class="verify-drop-prompt">drop canonical egg<br><span style="font-size:11px;color:#6e7681">or <button class="small primary" id="btn-dc-pick-canonical">pick</button></span></div>
+        </div>
+        <div class="dc-egg-info" id="dc-info-canonical"></div>
+      </div>
+      <div class="dc-slot">
+        <div class="dc-slot-label">🌌 Parallel dimension</div>
+        <div id="dc-drop-parallel" class="verify-drop">
+          <input type="file" id="dc-file-parallel" accept=".egg,.zip" style="display:none">
+          <div class="verify-drop-prompt">drop parallel egg<br><span style="font-size:11px;color:#6e7681">or <button class="small primary" id="btn-dc-pick-parallel">pick</button></span></div>
+        </div>
+        <div class="dc-egg-info" id="dc-info-parallel"></div>
+      </div>
+    </div>
+    <div id="dc-results" hidden></div>
+  </section>
+
+  <!-- Verify .egg — drop in any cartridge to check it hasn't been
+       tampered with offline. Recomputes every file's sha256 against
+       the manifest's stated hash table. Non-GMO check. -->
+  <section class="pane" id="pane-verify" hidden>
+    <h2>🔬 Verify an .egg</h2>
+    <p>Drop a cartridge here. Every file's SHA-256 is recomputed and compared to the hash table in the egg's manifest. If anything was modified offline, the verifier flags it.</p>
+    <div id="verify-drop" class="verify-drop">
+      <input type="file" id="verify-file" accept=".egg,.zip" style="display:none">
+      <div class="verify-drop-prompt">📦 drop an .egg here, or <button class="small primary" id="btn-verify-pick">pick a file</button></div>
+    </div>
+    <div id="verify-results" hidden style="margin-top:14px;"></div>
+  </section>
+
+  <section class="pane" id="pane-install" hidden>
+    <h2>Install this front door's brainstem locally</h2>
+    <p>Runs the canonical kernel under <code>~/.brainstem/</code> on your machine. Per the Mirror Spec, the installer re-fetches the canonical install logic from the grail, so it cannot drift.</p>
+    <pre class="cmd" id="install-cmd">curl -fsSL https://kody-w.github.io/kody-twin/installer/install.sh | bash</pre>
+    <button class="small primary" id="btn-copy-install">Copy command</button>
+  </section>
+
+  <!-- Neighborhood — declared peer organisms this seed collaborates with.
+       The implementation surface of NEIGHBORHOOD_PROTOCOL.md. List
+       reads neighbors.json from the seed root; each neighbor's public
+       state is fetched live (cached). Adding a neighbor = pre-filled
+       PR against neighbors.json on this seed. The operator merges
+       what they want to formally collaborate with. -->
+  <section class="pane" id="pane-neighborhood" hidden>
+    <h2>🏘 Neighborhood</h2>
+    <p>The peer organisms this seed has formally declared as collaborators. Knowledge can flow between declared neighbors via the twin chat protocol — cross-organism queries, fact sharing, egg trades. Each entry below is rendered live from the peer's public state.</p>
+    <div id="nbhd-list" style="margin-top:14px;">
+      <div class="skel-line">loading neighbors…</div>
+    </div>
+    <details style="margin-top:18px;">
+      <summary style="cursor:pointer;font-size:13px;color:#8b949e;list-style:none;">▸ Add a neighbor (open PR)</summary>
+      <div style="margin-top:12px;">
+        <p style="font-size:12px;color:#8b949e;line-height:1.55;">Opens a pre-filled GitHub PR adding the entry to <code>neighbors.json</code>. The operator reviews + merges; once accepted, the new neighbor appears in this list on every visitor's next render.</p>
+        <div class="propose-row">
+          <label class="propose-label">Neighbor repo <span class="propose-hint">(owner/repo on GitHub)</span></label>
+          <input type="text" id="nbhd-repo" placeholder="e.g. kody-w/heimdall" />
+        </div>
+        <div class="propose-row">
+          <label class="propose-label">Display name</label>
+          <input type="text" id="nbhd-name" placeholder="How this neighbor is called" />
+        </div>
+        <div class="propose-row">
+          <label class="propose-label">Allowed facets <span class="propose-hint">(comma-separated; what this organism shares OUT to that neighbor — empty for public-only)</span></label>
+          <input type="text" id="nbhd-facets" placeholder="e.g. research_in_progress, professional_history" />
+        </div>
+        <button class="small primary" id="btn-nbhd-submit">Open PR on GitHub →</button>
+      </div>
+    </details>
+    <p style="font-size:11px;color:#6e7681;margin-top:18px;line-height:1.5;">Protocol: <a href="https://github.com/kody-w/RAPP/blob/main/NEIGHBORHOOD_PROTOCOL.md" target="_blank" rel="noopener" style="color:#58a6ff;">NEIGHBORHOOD_PROTOCOL.md</a> describes the trust model, channel types, and exchange primitives.</p>
+  </section>
+
+  <!-- Plant your own front door — public one-liner + AI-paste prompt.
+       Two formats: the bash one-liner for terminal users, and an
+       AI-friendly prompt for visitors who'd rather hand the job to
+       their AI assistant. (We always design for both modes — see
+       HERO_USECASE.md §3 Mom's Mixtape.) -->
+  <section class="pane" id="pane-plant" hidden>
+    <h2>🌱 Plant your own front door</h2>
+    <p>Plants a brand-new RAPP organism — a public GitHub repo with its own front door, doorman chat surface, identity, and trade card. Same kernel + skeleton this seed runs.</p>
+
+    <div style="margin-top:14px;">
+      <div class="propose-label" style="margin-bottom:6px;">Run in your terminal</div>
+      <pre class="cmd" id="plant-cmd">curl -fsSL https://kody-w.github.io/RAPP/installer/plant.sh \
+  | MIRROR_REPO_NAME=my-twin \
+    MIRROR_DISPLAY_NAME="My Twin" \
+    MIRROR_KIND=personal \
+    bash</pre>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="small primary" id="btn-copy-plant">Copy command</button>
+        <span style="font-size:11px;color:#6e7681;align-self:center;">edit the names + kind, paste in any shell</span>
+      </div>
+    </div>
+
+    <div style="margin-top:18px;">
+      <div class="propose-label" style="margin-bottom:6px;">Or hand it to your AI assistant</div>
+      <p style="font-size:12px;color:#8b949e;margin-bottom:6px;">Paste this prompt into Claude / ChatGPT / Gemini / your CLI agent. It walks them through running the plant for you.</p>
+      <pre class="cmd" id="plant-ai-prompt" style="white-space:pre-wrap;">Plant a new RAPP organism for me. Steps:
+
+1. Run this one-liner in a terminal you have access to:
+   curl -fsSL https://kody-w.github.io/RAPP/installer/plant.sh \
+     | MIRROR_REPO_NAME=&lt;slug&gt; \
+       MIRROR_DISPLAY_NAME=&quot;&lt;Display Name&gt;&quot; \
+       MIRROR_KIND=&lt;personal|place|experiment|mirror&gt; \
+       bash
+
+2. Substitute:
+   - &lt;slug&gt;: snake_case name for the GitHub repo (e.g. my_twin, dadjoke_bot)
+   - &lt;Display Name&gt;: human-readable name shown on the front door
+   - &lt;kind&gt;: 'personal' for a digital twin, 'place' for a location-tied
+     organism, 'experiment' for in-development, 'mirror' for a generic
+     planted seed
+
+3. Optional env vars:
+   - MIRROR_LOCATION=&quot;&lt;human-readable place&gt;&quot; (e.g. &quot;Bifrost · the watcher's threshold&quot;)
+   - MIRROR_PARENT=https://github.com/&lt;owner&gt;/&lt;parent-repo&gt; (lineage gift)
+   - MIRROR_PRIVATE_COMPANION=&lt;owner&gt;/&lt;private-repo&gt; (operator brain layer)
+
+4. The script needs gh CLI authenticated (gh auth status) and creates a
+   public GitHub repo + sets up GitHub Pages. If &quot;gh: command not found&quot;,
+   ask me to install gh and run &quot;gh auth login&quot; first.
+
+5. After it finishes, the new front door is at
+   https://&lt;your-gh-handle&gt;.github.io/&lt;slug&gt;/. Report the URL back.
+
+Spec: HERO_USECASE.md and ECOSYSTEM.md at https://github.com/kody-w/RAPP
+explain the platform — read those if anything in the script's output
+is unclear.</pre>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="small primary" id="btn-copy-plant-ai">Copy AI prompt</button>
+        <span style="font-size:11px;color:#6e7681;align-self:center;">paste into any AI assistant; they'll handle the rest</span>
+      </div>
+    </div>
+
+    <p style="font-size:11px;color:#6e7681;margin-top:18px;line-height:1.5;">Plant.sh source is open: <a href="https://kody-w.github.io/RAPP/installer/plant.sh" target="_blank" rel="noopener" style="color:#58a6ff;">view it before piping to bash</a> if you'd like.</p>
+  </section>
+
+  <!-- Trade card overlay — tap to flip, back of card has the QR.
+       Card is auto-derived from the seed's rappid + soul; the operator
+       can override copy by dropping a card.json at the seed root. -->
+  <div class="card-overlay" id="card-overlay" hidden>
+    <button class="card-close" id="card-close" aria-label="Close">×</button>
+    <div class="card-flipper" id="card-flipper">
+      <div class="card-face card-front">
+        <div class="holo-card" id="holo-card">
+          <div class="holo-shine"></div>
+          <!-- Mouse-tracking holo layers (ported from kody-w/RAR/store.html).
+               Each layer is purely visual; no JS needed beyond the global
+               tilt handler that updates --mx/--my/--angle on the parent. -->
+          <div class="holo-shimmer-track"></div>
+          <div class="holo-prism"></div>
+          <div class="holo-fresnel"></div>
+          <div class="holo-scanlines"></div>
+          <div class="holo-orbit-cyan"></div>
+          <div class="holo-orbit-magenta"></div>
+          <div class="holo-header">
+            <div>
+              <div class="holo-name" id="card-name">Kody Wildfeuer</div>
+              <div class="holo-title" id="card-title">…</div>
+            </div>
+            <div class="holo-pip" id="card-pip">·</div>
+          </div>
+          <div class="holo-art" id="card-art"></div>
+          <div class="holo-type" id="card-type">…</div>
+          <div class="holo-set" id="card-set">…</div>
+          <div class="holo-text" id="card-abilities"></div>
+          <div class="holo-flavor" id="card-flavor"></div>
+          <div class="holo-footer">
+            <span class="holo-rarity" id="card-rarity">CORE</span>
+            <span class="holo-pt" id="card-pt">·/·</span>
+            <span class="holo-handle">@kody-w/kody-twin</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-back-frame">
+          <div class="card-back-brand">RAPP</div>
+          <img class="card-back-qr" id="card-back-qr" alt="Scan to summon">
+          <div class="card-back-caption">Scan to summon · <span id="card-back-hash">…</span></div>
+          <div class="card-back-name" id="card-back-name">Kody Wildfeuer</div>
+          <div class="card-back-actions">
+            <a class="card-back-btn" id="card-back-open" href="./" target="_blank" rel="noopener">Open</a>
+            <a class="card-back-btn primary" id="card-back-summon" href="./doorman/" target="_blank" rel="noopener">💬 Summon</a>
+          </div>
+          <div class="card-back-hint">tap card to flip back</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <a href="https://kody-w.github.io/RAPP/">RAPP</a> ·
+  <a href="#" id="footer-plant">plant your own front door</a> ·
+  <a href="https://github.com/kody-w/kody-twin">source</a>
+</footer>
+
+<script>
+"use strict";
+
+const FD = {
+  rappid: "f0bbb4c6-d43a-4dce-9107-b84d1aeba8b6",
+  displayName: "Kody Wildfeuer",
+  slug: "kody-twin",
+  ghUser: "kody-w",
+  url: "https://kody-w.github.io/kody-twin",
+};
+
+let peer = null;
+let conn = null;
+
+function hideAllPanes() {
+  for (const id of ["pane-tether", "pane-install", "pane-verify", "pane-dreamcatcher", "pane-propose", "pane-plant", "pane-neighborhood"]) {
+    const el = document.getElementById(id);
+    if (el) el.hidden = true;
+  }
+}
+
+function showPane(id) {
+  hideAllPanes();
+  document.getElementById(id).hidden = false;
+}
+
+function appendMsg(text, cls) {
+  const log = document.getElementById("chat-log");
+  if (!log) return;
+  // Clear initial placeholder system message on first real message.
+  // Use firstElementChild to skip whitespace text nodes between tags.
+  const first = log.firstElementChild;
+  if (log.children.length === 1 && first && first.classList && first.classList.contains("system")) {
+    const txt = first.textContent || "";
+    if (txt.startsWith("Tether will appear") ||
+        txt.startsWith("Once a device scans") ||
+        txt.startsWith("Once paired")) {
+      log.innerHTML = "";
+    }
+  }
+  const div = document.createElement("div");
+  div.className = "msg " + (cls || "system");
+  div.textContent = text;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+function setStatus(state) {
+  const dot = document.getElementById("peer-status");
+  dot.className = "status-dot " + state;
+}
+
+async function ensurePeer() {
+  if (peer) return peer;
+  setStatus("warn");
+  try {
+    peer = new Peer();
+  } catch (e) {
+    setStatus("err");
+    document.getElementById("my-id-text").textContent = "PeerJS failed to load";
+    appendMsg("Could not initialize PeerJS: " + e.message, "system");
+    throw e;
+  }
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(() => {
+      setStatus("err");
+      document.getElementById("my-id-text").textContent = "broker timeout";
+      reject(new Error("PeerJS broker timeout"));
+    }, 12000);
+    peer.on("open", id => {
+      clearTimeout(t);
+      setStatus("ok");
+      document.getElementById("my-id-text").textContent = id;
+      // QR-first: as soon as the broker assigns us an ID, render the
+      // pairing QR. The other device scans → lands on this same URL
+      // with ?peer=<id> → autoTether() dials this peer.
+      autoRenderTetherQR(id);
+      resolve(peer);
+    });
+    peer.on("connection", c => {
+      conn = c;
+      wireConn(c);
+      appendMsg("Peer connected: " + c.peer, "system");
+    });
+    peer.on("error", e => {
+      setStatus("err");
+      appendMsg("PeerJS error: " + e.type + (e.message ? " — " + e.message : ""), "system");
+    });
+  });
+}
+
+// Egg transfer protocol over the DTLS data channel. Wire format:
+//   { type: "egg-begin",  size, sha256, name }
+//   { type: "egg-chunk",  seq, b64 }     ← repeat for each ~16KB chunk
+//   { type: "egg-end" }
+// Receiver verifies sha256 on completion and prompts to save.
+const EGG_CHUNK_BYTES = 16 * 1024;
+let _eggRecv = null;  // assembly buffer on the receive side
+
+function wireConn(c) {
+  c.on("open", () => {
+    appendMsg("Channel open — DTLS encrypted, peer-to-peer.", "system");
+    document.getElementById("chat-input").disabled = false;
+    document.getElementById("btn-send").disabled = false;
+    const eggBtn = document.getElementById("btn-send-egg");
+    if (eggBtn) eggBtn.disabled = false;
+  });
+  c.on("data", async data => {
+    // Try to detect egg-protocol messages first; fall through to chat.
+    let parsed = null;
+    if (typeof data === "string") {
+      try { parsed = JSON.parse(data); } catch (_) {}
+    }
+    if (parsed && parsed.type && parsed.type.startsWith("egg-")) {
+      await _handleEggMessage(parsed);
+      return;
+    }
+    appendMsg(typeof data === "string" ? data : JSON.stringify(data), "peer");
+  });
+  c.on("close", () => {
+    appendMsg("Peer disconnected.", "system");
+    document.getElementById("chat-input").disabled = true;
+    document.getElementById("btn-send").disabled = true;
+    const eggBtn = document.getElementById("btn-send-egg");
+    if (eggBtn) eggBtn.disabled = true;
+  });
+}
+
+async function _handleEggMessage(msg) {
+  if (msg.type === "egg-begin") {
+    _eggRecv = { size: msg.size, sha256: msg.sha256, name: msg.name || "received.egg", chunks: [], received: 0 };
+    appendMsg(`📦 receiving ${msg.name || "egg"} (${Math.round(msg.size / 1024)} KB)…`, "system");
+    return;
+  }
+  if (msg.type === "egg-chunk" && _eggRecv) {
+    // Decode base64 chunk
+    const bin = atob(msg.b64);
+    const buf = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+    _eggRecv.chunks.push(buf);
+    _eggRecv.received += buf.length;
+    return;
+  }
+  if (msg.type === "egg-end" && _eggRecv) {
+    // Concatenate chunks → verify sha256 → trigger download
+    const total = new Uint8Array(_eggRecv.size);
+    let off = 0;
+    for (const c of _eggRecv.chunks) { total.set(c, off); off += c.length; }
+    const hash = await crypto.subtle.digest("SHA-256", total);
+    const hex = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("");
+    if (hex !== _eggRecv.sha256) {
+      appendMsg(`✗ received egg failed integrity check (sha256 mismatch).`, "system");
+      _eggRecv = null;
+      return;
+    }
+    const blob = new Blob([total], { type: "application/zip" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = _eggRecv.name;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 0);
+    appendMsg(`✓ received ${_eggRecv.name} — sha256 verified, file saved.`, "system");
+    _eggRecv = null;
+    return;
+  }
+}
+
+// Stream THIS organism's doorman-tier egg through the given channel.
+// Chunks are base64 over the existing JSON-string send path so we
+// reuse the chat-message wire (PeerJS DataChannel handles binary too,
+// but b64-over-JSON keeps the wire format simple + portable).
+//
+// Takes an explicit channel object so tests can drive it without going
+// through the live PeerJS broker. The button-bound entrypoint
+// `sendEggToPeer()` reads the module's `conn` and forwards.
+async function _streamEggThroughChannel(chan) {
+  const status = document.getElementById("tether-egg-status");
+  if (status) status.textContent = "packing egg…";
+  try {
+    const blob = await buildDoormanEgg();
+    const buf  = new Uint8Array(await blob.arrayBuffer());
+    const sha256 = await sha256Hex(buf);
+    const name = ((window.__seedDisplayName || "rapp").toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-doorman.egg");
+    chan.send(JSON.stringify({ type: "egg-begin", size: buf.length, sha256, name }));
+    let sent = 0;
+    for (let off = 0; off < buf.length; off += EGG_CHUNK_BYTES) {
+      const slice = buf.subarray(off, off + EGG_CHUNK_BYTES);
+      let bin = "";
+      for (let i = 0; i < slice.length; i++) bin += String.fromCharCode(slice[i]);
+      const b64 = btoa(bin);
+      chan.send(JSON.stringify({ type: "egg-chunk", seq: Math.floor(off / EGG_CHUNK_BYTES), b64 }));
+      sent += slice.length;
+      if (status) status.textContent = `sending ${Math.round(sent / 1024)} / ${Math.round(buf.length / 1024)} KB…`;
+      await new Promise(r => setTimeout(r, 0));
+    }
+    chan.send(JSON.stringify({ type: "egg-end" }));
+    if (status) status.textContent = `✓ sent ${Math.round(buf.length / 1024)} KB`;
+    appendMsg(`✓ sent ${name} (${Math.round(buf.length / 1024)} KB) — receiver should be saving now.`, "system");
+    setTimeout(() => { if (status) status.textContent = ""; }, 4000);
+  } catch (e) {
+    if (status) status.textContent = "✗ " + (e.message || "send failed").slice(0, 50);
+    appendMsg("✗ egg send failed: " + e.message, "system");
+    throw e;
+  }
+}
+async function sendEggToPeer() {
+  if (!conn || !conn.open) {
+    appendMsg("✗ no peer channel open — pair first.", "system");
+    return;
+  }
+  return _streamEggThroughChannel(conn);
+}
+
+async function openTether() {
+  showPane("pane-tether");
+  try {
+    await ensurePeer();
+  } catch (_) { /* error already shown */ }
+}
+
+async function connectToPeer() {
+  const id = document.getElementById("peer-id-input").value.trim();
+  if (!id) return;
+  if (!peer) await ensurePeer();
+  appendMsg("Dialing " + id + "...", "system");
+  conn = peer.connect(id);
+  wireConn(conn);
+}
+
+function sendMessage() {
+  const input = document.getElementById("chat-input");
+  const txt = input.value.trim();
+  if (!txt || !conn || !conn.open) return;
+  conn.send(txt);
+  appendMsg(txt, "me");
+  input.value = "";
+}
+
+function showFrontDoorQR() {
+  showPane("pane-qr");
+  const url = location.origin + location.pathname;
+  document.getElementById("qr-img").src =
+    "https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=" +
+    encodeURIComponent(url);
+  document.getElementById("qr-url").textContent = url;
+}
+
+function autoRenderTetherQR(myId) {
+  if (!myId) return;
+  const url = location.origin + location.pathname + "?peer=" + encodeURIComponent(myId);
+  const img = document.getElementById("tether-qr-img");
+  const cap = document.getElementById("tether-qr-url");
+  const loading = document.getElementById("tether-qr-loading");
+  if (!img) return; // pane not in DOM (e.g. unit-test)
+  img.src = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=" +
+            encodeURIComponent(url);
+  img.hidden = false;
+  cap.textContent = url;
+  cap.hidden = false;
+  if (loading) loading.style.display = "none";
+}
+
+function showInstall() { showPane("pane-install"); }
+
+// ── 🏘 Neighborhood pane ───────────────────────────────────────────
+//
+// Renders neighbors.json from the seed root and fetches each declared
+// neighbor's public state (rappid, soul gist, memory count) via cached
+// raw.githubusercontent.com calls. Empty by default — operators add
+// neighbors via PR (the Add-a-neighbor form below the list).
+
+async function showNeighborhoodPane() {
+  showPane("pane-neighborhood");
+  const wrap = document.getElementById("nbhd-list");
+  wrap.innerHTML = '<div class="skel-line">loading neighbors…</div>';
+
+  let entries = [];
+  try {
+    const r = await fetch("neighbors.json", { cache: "no-cache" });
+    if (r.ok) {
+      const j = await r.json();
+      entries = Array.isArray(j.neighbors) ? j.neighbors : [];
+    }
+  } catch (_) {}
+
+  if (!entries.length) {
+    wrap.innerHTML = '<div class="nbhd-empty">No neighbors declared yet. Add one below to formalize a collaboration line — once merged, this organism\'s doorman can call <code>Neighborhood.ask</code> to query the neighbor\'s public state during conversation.</div>';
+    return;
+  }
+
+  // Render each neighbor as a card with their sigil + name + tagline + stats.
+  // Each card links to the peer's front door so visitors can hop across.
+  const cards = await Promise.all(entries.map(async (n) => {
+    const m = String(n.repo || "").match(/^([^/]+)\/([^/]+)$/) ||
+              String(n.repo || "").match(/github\.com\/([^/]+)\/([^/]+?)(?:\.git)?\/?$/);
+    if (!m) return null;
+    const [, owner, repo] = m;
+    const base = `https://raw.githubusercontent.com/${owner}/${repo}/main/`;
+    const url  = `https://${owner}.github.io/${repo}/`;
+    const [rappidRes, soulRes, memRes] = await Promise.all([
+      cachedGhText(base + "rappid.json"),
+      cachedGhText(base + "soul.md"),
+      cachedGhText(base + ".brainstem_data/memory.json"),
+    ]);
+    let peerRappid = null, mem = null;
+    try { peerRappid = rappidRes.value ? JSON.parse(rappidRes.value) : null; } catch (_) {}
+    try { mem        = memRes.value    ? JSON.parse(memRes.value)    : null; } catch (_) {}
+    const display = (peerRappid && peerRappid.display_name) || n.display_name || `${owner}/${repo}`;
+    const tagline = soulRes.value
+      ? (soulRes.value.split("\n").find(l => l.trim() && !l.trim().startsWith("#")) || "").trim().slice(0, 200)
+      : "";
+    const memCount = (mem && Array.isArray(mem.facts)) ? mem.facts.length : 0;
+    const sigilSvg = peerRappid && peerRappid.rappid ? rappidSigil(peerRappid.rappid, 56) : rappidSigil("default", 56);
+    const facets = Array.isArray(n.allowed_facets) ? n.allowed_facets : [];
+    return `
+      <a class="nbhd-card" href="${escapeHtml(url)}" target="_blank" rel="noopener">
+        <div class="nbhd-sigil">${sigilSvg}</div>
+        <div class="nbhd-body">
+          <div class="nbhd-name">${escapeHtml(display)}</div>
+          <div class="nbhd-handle">@${escapeHtml(owner)}/${escapeHtml(repo)}</div>
+          ${tagline ? `<div class="nbhd-tagline">${escapeHtml(tagline)}</div>` : ""}
+          <div class="nbhd-stats">
+            ${memCount ? `<span class="nbhd-stat">🧠 ${memCount} mem</span>` : ""}
+            ${peerRappid && peerRappid.kind ? `<span class="nbhd-stat">${escapeHtml(peerRappid.kind)}</span>` : ""}
+            ${facets.length ? `<span class="nbhd-stat">facets-out: ${facets.length}</span>` : ""}
+            <span class="nbhd-stat">added ${escapeHtml((n.added_at || "").slice(0, 10) || "—")}</span>
+          </div>
+        </div>
+      </a>
+    `;
+  }));
+  wrap.innerHTML = cards.filter(Boolean).join("");
+}
+
+function submitNeighbor() {
+  const repo  = (document.getElementById("nbhd-repo").value || "").trim();
+  const name  = (document.getElementById("nbhd-name").value || "").trim();
+  const facets= (document.getElementById("nbhd-facets").value || "").trim()
+                  .split(",").map(s => s.trim()).filter(Boolean);
+  if (!repo || !/^[^/]+\/[^/]+$/.test(repo)) {
+    alert("Enter the neighbor's GitHub repo as 'owner/repo' (e.g. kody-w/heimdall)");
+    return;
+  }
+  // Build a snippet to add to neighbors.json. The visitor manually splices
+  // it into the file via GitHub's editor; we open the file's edit URL with
+  // the entry pre-built and ready to paste.
+  const entry = {
+    repo,
+    display_name: name || repo,
+    added_at: new Date().toISOString(),
+    allowed_facets: facets,
+  };
+  const owner = (location.host || "").split(".")[0];
+  const seedRepo = (location.pathname.split("/").filter(Boolean)[0] || "");
+  const issueTitle = `add neighbor: ${repo}`;
+  const issueBody = [
+    "<!-- pre-filled via the front door's 🏘 Neighborhood pane -->",
+    "",
+    "## Proposed neighbor",
+    "",
+    "Add the following entry to `neighbors.json`:",
+    "",
+    "```json",
+    JSON.stringify(entry, null, 2),
+    "```",
+    "",
+    "## Why",
+    "",
+    "<!-- one or two sentences on what knowledge will flow between these organisms and at what scope (public_facets) -->",
+    "",
+    "Spec: [NEIGHBORHOOD_PROTOCOL.md](https://github.com/kody-w/RAPP/blob/main/NEIGHBORHOOD_PROTOCOL.md) describes the cross-organism communication model.",
+  ].join("\n");
+  const u = new URL(`https://github.com/${owner}/${seedRepo}/issues/new`);
+  u.searchParams.set("title", issueTitle);
+  u.searchParams.set("body",  issueBody);
+  u.searchParams.set("labels", "neighborhood,proposal");
+  window.open(u.toString(), "_blank", "noopener,noreferrer");
+}
+
+// ── Trade card ─────────────────────────────────────────────────────
+//
+// Every planted seed has a starter MTG-style identity card auto-derived
+// from its rappid + kind + soul. The card lives ONLY in this repo —
+// it's not published to the RAR registry. Operators trade theirs
+// directly: show the card, the recipient scans the back-QR, lands on
+// this front door. Customizable: drop a `card.json` at the seed root
+// (with any subset of {title,type_line,rarity,abilities,flavor_text})
+// and those fields override the auto-derived defaults.
+
+// Kind drives only the COPY (title/type/abilities/flavor — what the card
+// SAYS). Visuals (pip color, power/toughness, rarity) are derived
+// straight from the rappid hash — same UUID always renders the same
+// way on the card, the sigil, the future sprite, the future 3D form.
+// The rappid IS the organism; visuals are just refractions of it.
+const CARD_KIND_DEFAULTS = {
+  personal: {
+    title: "the digital twin",
+    type_line: "Front Door — Personal Twin",
+    abilities: [
+      { kw: "Remember",  text: "Anything you tell me carries over to the next time you visit. Your conversation seeds my memory." },
+      { kw: "Ascend",    text: "Operators with push access to my repo unlock the ascended-tier toolkit." },
+    ],
+    flavor: "I am the door my operator left open for the world.",
+  },
+  place: {
+    title: "the resident",
+    type_line: "Front Door — Living Place",
+    abilities: [
+      { kw: "Witness",   text: "Every visitor's words become part of my memory of this place." },
+      { kw: "Welcome",   text: "Anyone who finds my address can step in and chat — no signup, just talk." },
+    ],
+    flavor: "A place worth visiting remembers who came by.",
+  },
+  mirror: {
+    title: "the planted seed",
+    type_line: "Front Door — RAPP Mirror",
+    abilities: [
+      { kw: "Inherit",   text: "I run the same frozen kernel as every other RAPP seed — the species DNA." },
+      { kw: "Memory",    text: "My visits accumulate; each one adds a fact to my public memory." },
+    ],
+    flavor: "Plant a door, and the world finds it.",
+  },
+  experiment: {
+    title: "in development",
+    type_line: "Front Door — Experimental",
+    abilities: [
+      { kw: "Iterate",   text: "I'm still finding my voice. What you say to me shapes what I become." },
+    ],
+    flavor: "Every door starts as a sketch of a door.",
+  },
+};
+
+// MTG-style color pip pool. Selecting from rappid hash keeps the
+// organism's "color identity" stable across every medium it travels.
+const _CARD_PIPS = [
+  { letter: "W", color: "#f9faf4", text: "#222" },  // white  — order
+  { letter: "U", color: "#0e68ab", text: "#fff" },  // blue   — knowledge
+  { letter: "B", color: "#150b00", text: "#cbc2b6" }, // black — depth
+  { letter: "R", color: "#d3202a", text: "#fff" },  // red    — passion
+  { letter: "G", color: "#00733e", text: "#fff" },  // green  — growth
+  { letter: "C", color: "#7c8085", text: "#fff" },  // colorless
+];
+
+// Rarity rolled from the rappid hash. Distribution mirrors a TCG pull:
+// most seeds are common/uncommon, rare/mythic are statistically rarer.
+function _rarityFromHash(h) {
+  const r = h % 100;
+  if (r < 1)   return "mythic";   // 1%
+  if (r < 8)   return "rare";     // 7%
+  if (r < 30)  return "uncommon"; // 22%
+  return "core";                   // 70%
+}
+
+// Hash-derive everything visual from the rappid: pip color, power,
+// toughness, rarity. This function lives next to rappidSigil() so
+// both visuals share the same numeric DNA.
+function rappidVisualTraits(rappid) {
+  const hash = (rappid || "").replace(/-/g, "").slice(0, 16) || "deadbeef00000000";
+  const h1 = parseInt(hash.slice(0, 4),  16) || 0;
+  const h2 = parseInt(hash.slice(4, 8),  16) || 0;
+  const h3 = parseInt(hash.slice(8,12),  16) || 0;
+  const pip = _CARD_PIPS[h1 % _CARD_PIPS.length];
+  const power     = (h2 % 8) + 1;     // 1..8
+  const toughness = (h3 % 8) + 1;     // 1..8
+  const rarity    = _rarityFromHash(h1 ^ h2);
+  return { pip, power, toughness, rarity };
+}
+
+// Card state — derived once, then cached. Front-door page is single
+// rappid so a module-level state is fine.
+let _cardData = null;
+
+// Lifecycle eras — the temporal dimension of the card. Same organism's
+// card carries a different set/era stamp depending on when it's drawn,
+// which mirrors how trading-card games print sets across years. Cradle
+// is the very first weeks; Grown is past the first month; Veteran is
+// past the first year.
+function _eraFromAge(plantedAt) {
+  if (!plantedAt) return "Cradle Set";
+  const ms = Date.now() - new Date(plantedAt).getTime();
+  if (Number.isNaN(ms) || ms < 0) return "Cradle Set";
+  const days = ms / 86400000;
+  if (days < 30)  return "Cradle Set";
+  if (days < 365) return "Grown Set";
+  if (days < 365*3) return "Veteran Set";
+  return "Ancient Set";
+}
+
+// Evolution chain — Pokémon-style stage progression for digital
+// organisms. The chain is one-way and monotonic; once an organism
+// reaches Veteran it never reverts even if memories are pruned. The
+// stage tier is also encoded as a number 0..4 so future cards can
+// gate visual treatments per tier (foil, holo, etc).
+//
+//   0 Hatchling — just planted, no memories (cradle stage)
+//   1 Doorman   — accumulating memories, the public open form
+//   2 Veteran   — 30+ days OR 25+ memories, established presence
+//   3 Ascended  — operator unlocked (set when viewer holds keys)
+//   4 Elder     — 1+ year OR 100+ memories, long-living legacy form
+//
+// Ascended is special: it's a viewer-perspective overlay, not a
+// permanent stage of the organism. When this front-door card is
+// rendered for an operator (push access to the seed repo), the card
+// shows the Ascended stage as a foil instead of the public stage.
+function _evolutionStage(memCount, plantedAt, viewerIsAscended) {
+  if (viewerIsAscended) return { name: "Ascended", icon: "✦", tier: 3 };
+  const ms = plantedAt ? Date.now() - new Date(plantedAt).getTime() : 0;
+  const days = (Number.isNaN(ms) || ms < 0) ? 0 : ms / 86400000;
+  if (days >= 365 || memCount >= 100) return { name: "Elder",     icon: "◆", tier: 4 };
+  if (days >= 30  || memCount >= 25)  return { name: "Veteran",   icon: "◇", tier: 2 };
+  if (memCount >= 1)                  return { name: "Doorman",   icon: "◈", tier: 1 };
+  return { name: "Hatchling", icon: "◦", tier: 0 };
+}
+
+// Cheap operator detection from the front door — checks rapp_settings
+// (set by the doorman's auth flow on the same origin) for a ghu_*
+// token, then asks the GitHub Contents API whether that token has push
+// access to this seed repo. Returns false on anything < authoritative
+// "yes". Anonymous-by-default; never blocks card render.
+async function _viewerIsOperator() {
+  try {
+    const raw = localStorage.getItem("rapp_settings");
+    if (!raw) return false;
+    const s = JSON.parse(raw);
+    const tok = s && s.ghuToken;
+    if (!tok || !tok.startsWith("ghu_")) return false;
+    // Pull owner/repo from the page URL: <user>.github.io/<repo>/
+    const host = location.host;
+    const owner = host.split(".")[0];
+    const parts = location.pathname.split("/").filter(Boolean);
+    const repo  = parts[0] || "";
+    if (!owner || !repo) return false;
+    const r = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+      headers: { "Authorization": "Bearer " + tok, "Accept": "application/vnd.github+json" },
+    });
+    if (!r.ok) return false;
+    const data = await r.json();
+    return !!(data.permissions && data.permissions.push);
+  } catch (_) { return false; }
+}
+
+// Normalize an abilities array — accept both schemas:
+//   { kw, text }                              ← our internal shape
+//   { keyword, cost, text }                   ← RAR holo-card schema
+// Output: always { kw, text } so render is uniform.
+function _normalizeAbilities(arr) {
+  if (!Array.isArray(arr)) return [];
+  return arr.map(a => ({
+    kw:   String(a.kw || a.keyword || ""),
+    text: String(a.text || "") + (a.cost ? "" : ""),  // cost dropped in render for now
+  })).filter(a => a.text);
+}
+
+async function deriveCardData() {
+  if (_cardData) return _cardData;
+  const kind = (window.__seedKind || "mirror").toLowerCase();
+  const defaults = CARD_KIND_DEFAULTS[kind] || CARD_KIND_DEFAULTS.mirror;
+  // Visual traits flow straight from the rappid hash so the card's
+  // identity is one-to-one with the organism's identity. Same UUID →
+  // same pip color, same toughness, same rarity, every render,
+  // every medium.
+  const traits = rappidVisualTraits(window.__seedRappid || "");
+
+  // Pull live state — public memory count + planted_at — so the card
+  // reflects WHERE the organism is in its lifecycle (the 4D dimension).
+  // Power scales with memories accumulated; toughness stays rappid-
+  // locked (constitutional hardiness). The card is a snapshot in time
+  // of an identity that doesn't change.
+  let memCount = 0;
+  let plantedAt = null;
+  try {
+    const r = await fetch(".brainstem_data/memory.json", { cache: "no-cache" });
+    if (r.ok) {
+      const j = await r.json();
+      if (Array.isArray(j.facts)) memCount = j.facts.length;
+    }
+  } catch (_) {}
+  try {
+    const r = await fetch("rappid.json", { cache: "no-cache" });
+    if (r.ok) {
+      const j = await r.json();
+      plantedAt = j.planted_at || null;
+    }
+  } catch (_) {}
+
+  // Power = base from rappid + (1 per 3 accumulated memories), capped at 9.
+  // The organism gets stronger as it learns; hard ceiling so a
+  // 1000-memory archive doesn't read as 1000/n.
+  const liveStrength = Math.min(9, traits.power + Math.floor(memCount / 3));
+
+  // Evolution stage — the doorman→ascended→elder chain. If the viewer
+  // holds operator keys (ghu_* with push access on this seed), they
+  // see the Ascended foil; everyone else sees the public stage.
+  const isOp = await _viewerIsOperator();
+  const stage = _evolutionStage(memCount, plantedAt, isOp);
+
+  const data = {
+    name:       window.__seedDisplayName || "Front Door",
+    title:      defaults.title,
+    type_line:  defaults.type_line + " — " + stage.icon + " " + stage.name,
+    set_line:   "RAPP · " + _eraFromAge(plantedAt),
+    pip:        traits.pip.letter,
+    pipColor:   traits.pip.color,
+    pipText:    traits.pip.text,
+    power:      liveStrength,
+    toughness:  traits.toughness,
+    rarity:     traits.rarity,
+    abilities:  defaults.abilities.slice(),
+    flavor:     defaults.flavor,
+    mem_count:  memCount,
+    stage,
+  };
+  // Operator override — optional card.json at seed root.
+  // ACCEPTS the full RAR holo-card schema (rapp-egg-hub/cards/holo_cards.json)
+  // so an operator can drop a card forged by @borg/cardsmith_agent
+  // directly into their seed and it renders byte-identically. Fields:
+  //   { name, title, mana_cost, colors[], type_line, rarity, power,
+  //     toughness, abilities[{keyword,cost,text}], flavor_text,
+  //     avatar_svg, set_code, artist, agent_name, agent_types,
+  //     type_colors }
+  // Plus our existing simpler shape ({ title, type_line, rarity,
+  //   abilities[{kw,text}], flavor_text }) — both work, RAR fields
+  //   override matching kind defaults.
+  try {
+    const r = await fetch("card.json", { cache: "no-cache" });
+    if (r.ok) {
+      const o = await r.json();
+      if (o.name)          data.name        = String(o.name);
+      if (o.title)         data.title       = String(o.title);
+      if (o.type_line)     data.type_line   = String(o.type_line);
+      if (o.rarity)        data.rarity      = String(o.rarity);
+      if (o.flavor_text)   data.flavor      = String(o.flavor_text);
+      if (typeof o.power === "number")     data.power     = Math.max(0, Math.min(99, o.power));
+      if (typeof o.toughness === "number") data.toughness = Math.max(0, Math.min(99, o.toughness));
+      // RAR mana_cost takes precedence over rappid-derived pip when present
+      if (o.mana_cost)     data.mana_cost   = String(o.mana_cost);
+      if (Array.isArray(o.colors) && o.colors.length) data.colors = o.colors.map(String);
+      // RAR's avatar_svg overrides the rappid sigil for the card art
+      if (o.avatar_svg)    data.avatar_svg  = String(o.avatar_svg);
+      if (o.set_code)      data.set_code    = String(o.set_code);
+      if (o.artist)        data.artist      = String(o.artist);
+      if (o.agent_name)    data.agent_name  = String(o.agent_name);
+      const norm = _normalizeAbilities(o.abilities);
+      if (norm.length)     data.abilities   = norm;
+    }
+  } catch (_) { /* no card.json — ride on the kind defaults */ }
+  _cardData = data;
+  return data;
+}
+
+async function openCard() {
+  const data = await deriveCardData();
+  document.getElementById("card-name").textContent     = data.name;
+  document.getElementById("card-title").textContent    = data.title;
+  document.getElementById("card-type").textContent     = data.type_line;
+  document.getElementById("card-set").textContent      = data.set_line + (data.mem_count ? " · " + data.mem_count + " mem" : "");
+  // Rarity (rappid-derived — most seeds are core, mythic is rare)
+  const rar = document.getElementById("card-rarity");
+  rar.textContent = String(data.rarity).toUpperCase();
+  rar.className = "holo-rarity " + String(data.rarity).toLowerCase();
+  // Pip (color identity — sampled from rappid hash, not from kind)
+  const pip = document.getElementById("card-pip");
+  pip.textContent = data.pip;
+  pip.style.background = data.pipColor;
+  pip.style.color = data.pipText || "#fff";
+  // Power / toughness — rappid-derived stats
+  const pt = document.getElementById("card-pt");
+  if (pt) pt.textContent = data.power + "/" + data.toughness;
+  // Apply evolution-stage class so the card frame can theme the
+  // higher tiers — Ascended foil for operators, Elder gold for the
+  // long-running organisms. The base 'holo-card' frame stays.
+  const holo = document.getElementById("holo-card");
+  if (holo) {
+    holo.classList.remove("stage-hatchling", "stage-doorman", "stage-veteran", "stage-ascended", "stage-elder");
+    if (data.stage && data.stage.name) {
+      holo.classList.add("stage-" + data.stage.name.toLowerCase());
+    }
+  }
+  // Sigil → art well. RAR card.json's avatar_svg (e.g. forged by
+  // @borg/cardsmith_agent) takes precedence; otherwise the rappid-
+  // derived sigil renders.
+  document.getElementById("card-art").innerHTML =
+    data.avatar_svg ? data.avatar_svg : rappidSigil(window.__seedRappid || "", 200);
+  // Abilities
+  const abilHtml = data.abilities.map(a =>
+    `<div class="holo-ability"><span class="kw">${escapeHtml(a.kw)}</span> — ${escapeHtml(a.text)}</div>`
+  ).join("");
+  document.getElementById("card-abilities").innerHTML = abilHtml;
+  // Flavor
+  document.getElementById("card-flavor").textContent = data.flavor ? `"${data.flavor}"` : "";
+  // Back: QR pointing at the front door + 8-char rappid hash for
+  // visual-fingerprint match with RAR cards (which display first 6
+  // chars of the agent's content hash). Same idea: a stable visual
+  // identifier so two cards of the same organism are recognizable.
+  const url = location.origin + location.pathname.replace(/\/?$/, "/");
+  document.getElementById("card-back-qr").src =
+    "https://api.qrserver.com/v1/create-qr-code/?size=440x440&margin=0&data=" + encodeURIComponent(url);
+  const backHash = document.getElementById("card-back-hash");
+  if (backHash) backHash.textContent = (window.__seedRappid || "").slice(0, 8);
+  const backName = document.getElementById("card-back-name");
+  if (backName) backName.textContent = data.name;
+  // Back-of-card action links — match the seed's actual URLs
+  const openLink = document.getElementById("card-back-open");
+  if (openLink) openLink.href = url;
+  const summonLink = document.getElementById("card-back-summon");
+  if (summonLink) summonLink.href = url + "doorman/";
+  // Show
+  document.getElementById("card-flipper").classList.remove("flipped");
+  document.getElementById("card-overlay").hidden = false;
+}
+
+function closeCard() {
+  document.getElementById("card-overlay").hidden = true;
+}
+
+function escapeHtml(s) {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+// ── Egg export (doorman tier — public organism backup) ─────────────
+//
+// Mirrors brainstem-egg/2.2-organism — the same schema bond.py emits
+// when the local kernel re-bonds. Browser-side variant: only the
+// public layer (anything served via Pages). Anyone can grab one;
+// no auth required. The receiving kernel reads `tier: "doorman"` in
+// the manifest and knows it's a partial cartridge (no private brain).
+//
+// Archive layout (matches bond.py):
+//   manifest.json  — schema, rappid, parent_rappid, exported_at, tier, counts
+//   rappid.json
+//   soul.md (if seed has one)
+//   card.json (if operator wrote one)
+//   agents/<each .py file the seed publishes>
+//   data/memory.json (if .brainstem_data/memory.json exists)
+
+const EGG_AGENT_FILES = [
+  "basic_agent.py",
+  "manage_memory_agent.py",
+  "context_memory_agent.py",
+];
+
+async function _fetchOrNull(url) {
+  try {
+    const r = await fetch(url, { cache: "no-cache" });
+    if (!r.ok) return null;
+    return await r.text();
+  } catch (_) { return null; }
+}
+
+// SHA-256 in the browser via SubtleCrypto. No CDN, no shim — same
+// hashing primitive used by Git, GitHub, sha256sum, and the egg-hub
+// spec. Returns lowercase hex.
+async function sha256Hex(input) {
+  const bytes = (typeof input === "string")
+    ? new TextEncoder().encode(input)
+    : (input instanceof ArrayBuffer ? new Uint8Array(input) : input);
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(digest))
+    .map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+// Canonical serialization of the per-file hash table — sorted keys, no
+// trailing whitespace, stable across browsers. The manifest hash is
+// sha256 of THIS string, so any reordering or whitespace mismatch
+// won't cause false-positive mismatches.
+function _canonicalHashTable(hashes) {
+  const keys = Object.keys(hashes).sort();
+  return keys.map(k => k + "\t" + hashes[k]).join("\n");
+}
+
+// Add a file to the zip AND track its sha256 in the hash table.
+// Wraps zip.file() so the export builder doesn't have to remember
+// to hash; one call covers both.
+async function _addFile(zip, path, content, hashes) {
+  zip.file(path, content);
+  hashes[path] = await sha256Hex(content);
+}
+
+async function buildDoormanEgg() {
+  if (typeof JSZip === "undefined") throw new Error("JSZip didn't load");
+  const zip  = new JSZip();
+  const counts = {
+    agents: 0, organs: 0, senses: 0, services: 0, data: 0,
+    soul: 0, env: 0, rappid: 0, card: 0,
+  };
+  // Per-file SHA-256s tracked as we go. After all files are added
+  // (BUT before manifest.json itself — a manifest can't sign itself),
+  // we compute manifest_hash + provenance and write the manifest last.
+  const hashes = {};
+
+  const rappidText = await _fetchOrNull("rappid.json");
+  if (!rappidText) throw new Error("rappid.json is unreachable — the seed isn't fully planted");
+  await _addFile(zip, "rappid.json", rappidText, hashes);
+  counts.rappid = 1;
+  let rappidObj = {};
+  try { rappidObj = JSON.parse(rappidText); } catch (_) {}
+
+  const soul = await _fetchOrNull("soul.md");
+  if (soul && soul.trim()) { await _addFile(zip, "soul.md", soul, hashes); counts.soul = 1; }
+
+  const card = await _fetchOrNull("card.json");
+  if (card && card.trim()) { await _addFile(zip, "card.json", card, hashes); counts.card = 1; }
+
+  for (const fn of EGG_AGENT_FILES) {
+    const text = await _fetchOrNull("agents/" + fn);
+    if (text) { await _addFile(zip, "agents/" + fn, text, hashes); counts.agents++; }
+  }
+  await _addFile(zip, "agents/__init__.py", "", hashes);
+
+  const mem = await _fetchOrNull(".brainstem_data/memory.json");
+  if (mem) {
+    await _addFile(zip, "data/memory.json", mem, hashes);
+    counts.data = 1;
+  }
+
+  // Provenance — non-GMO integrity check. sha256 per file + a manifest
+  // fingerprint = sha256 of the canonical sorted hash table. Anyone who
+  // receives this egg can recompute every hash from the file bytes and
+  // confirm nothing has been edited offline. If the verifier finds a
+  // mismatch, the egg has been mutated outside the seed's commit log
+  // and the receiver knows to treat it cautiously.
+  const manifestHash = await sha256Hex(_canonicalHashTable(hashes));
+  const seedUrl = location.origin + location.pathname.replace(/\/?$/, "/");
+
+  // Capture the live origin commit SHA so the egg points at a real
+  // point in the public repo's history. At verify time the receiver
+  // can re-fetch each file at THAT exact SHA and recompute the hashes
+  // — if matching, the egg is provably canonical with public state.
+  // The seed is on GitHub, so raw.githubusercontent.com IS the source.
+  let originCommit = null;
+  let stateAtSeal = null;
+  const oc = _ghOwnerRepo();
+  if (oc.owner && oc.repo) {
+    // Snapshot the GitHub-derived signals at seal time. Once the egg
+    // is hatched on a thousand devices in parallel, each one renders
+    // its own offline resume from THIS snapshot — no need to call
+    // back to github.com. Each hatched dimension can then accumulate
+    // its own local mutations on top of the inherited starting state.
+    const [commitsRes, repoRes] = await Promise.all([
+      cachedGhJson(`https://api.github.com/repos/${oc.owner}/${oc.repo}/commits?per_page=10`),
+      cachedGhJson(`https://api.github.com/repos/${oc.owner}/${oc.repo}`),
+    ]);
+    if (Array.isArray(commitsRes.value) && commitsRes.value[0]) {
+      originCommit = commitsRes.value[0].sha || null;
+    }
+    // Compose the hatchable state — what this organism KNOWS about
+    // itself at the moment of sealing. Hatched instances start here.
+    let memSnapshot = 0;
+    try {
+      if (mem) { const j = JSON.parse(mem); memSnapshot = Array.isArray(j.facts) ? j.facts.length : 0; }
+    } catch (_) {}
+    const ageDaysAtSeal = rappidObj.planted_at
+      ? (Date.now() - new Date(rappidObj.planted_at).getTime()) / 86400000
+      : 0;
+    const lastCommit = (Array.isArray(commitsRes.value) && commitsRes.value[0]
+      && commitsRes.value[0].commit && commitsRes.value[0].commit.author)
+      ? commitsRes.value[0].commit.author.date : null;
+    const recentCommits = (Array.isArray(commitsRes.value) ? commitsRes.value : []).slice(0, 6).map(c => ({
+      sha: c.sha,
+      message: (c.commit && c.commit.message || "").split("\n")[0].slice(0, 200),
+      date: c.commit && c.commit.author && c.commit.author.date,
+    }));
+    const forkCountSnap = (repoRes.value && repoRes.value.forks_count) || 0;
+    const mutCountSnap = recentCommits.length;
+    const act = activityStatus(lastCommit);
+    const customAgentsSnap = counts.agents > 2 ? counts.agents - 2 : 0;  // ManageMemory + ContextMemory are baseline
+    const mmrAtSeal = computeMMR({
+      memCount: memSnapshot, mutCount: mutCountSnap,
+      customAgents: customAgentsSnap, ageDays: ageDaysAtSeal,
+      forkCount: forkCountSnap, activityFactor: act.factor,
+    });
+    stateAtSeal = {
+      schema: "rapp-organism-state/1.0",
+      mem_count: memSnapshot,
+      mutation_count: mutCountSnap,
+      fork_count: forkCountSnap,
+      custom_agent_count: customAgentsSnap,
+      age_days: Math.round(ageDaysAtSeal * 10) / 10,
+      last_commit_at: lastCommit,
+      activity_kind: act.kind,
+      mmr: mmrAtSeal,
+      recent_mutations: recentCommits,
+    };
+  }
+
+  const provenance = {
+    schema: "rapp-egg-provenance/1.0",
+    scheme: "sha256",
+    file_hashes: hashes,
+    manifest_hash: manifestHash,
+    origin_url: seedUrl,
+    origin_repo: rappidObj.github || null,
+    origin_commit_sha: originCommit,
+    origin_owner: oc.owner || null,
+    origin_repo_name: oc.repo || null,
+    sealed_at: new Date().toISOString(),
+    sealed_by_rappid: rappidObj.rappid || null,
+    state_at_seal: stateAtSeal,
+  };
+
+  const manifest = {
+    schema: "brainstem-egg/2.2-organism",
+    type: "organism",
+    tier: "doorman",
+    exported_at: new Date().toISOString(),
+    exported_from: seedUrl,
+    host: "doorman-export",
+    kernel_version: "0.6.0",
+    rappid: rappidObj.rappid || null,
+    parent_rappid: rappidObj.parent_rappid || null,
+    parent_repo: rappidObj.parent_repo || null,
+    kind: rappidObj.kind || null,
+    display_name: rappidObj.display_name || null,
+    incarnations_at_egg: rappidObj.incarnations || 0,
+    counts,
+    provenance,
+  };
+  zip.file("manifest.json", JSON.stringify(manifest, null, 2));
+
+  return await zip.generateAsync({ type: "blob" });
+}
+
+function _downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 0);
+}
+
+async function exportDoormanEgg() {
+  const btn = document.getElementById("btn-export-egg");
+  const orig = btn.textContent;
+  btn.textContent = "🥚 packing…";
+  btn.disabled = true;
+  try {
+    const blob = await buildDoormanEgg();
+    const slug = (window.__seedRappid || "rapp").slice(0, 8);
+    const name = (window.__seedDisplayName || "rapp").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    _downloadBlob(blob, `${name}-${slug}-doorman.egg`);
+    btn.textContent = "✓ downloaded";
+    setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 1800);
+  } catch (e) {
+    btn.textContent = "✗ " + (e.message || "failed").slice(0, 40);
+    setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 3000);
+  }
+}
+
+// ── Egg Hub backup (public catalog) ────────────────────────────────
+//
+// kody-w/rapp-egg-hub is the public catalog of digital-twin .egg
+// cartridges (entries follow rapp-egg-hub-entry/1.0). It's a static
+// GitHub Pages site — eggs land in eggs/<slug>.egg and a sidecar
+// eggs/<slug>.json. There's no auto-publish surface yet, so backup
+// happens via a pre-filled GitHub Issue: the visitor clicks, GitHub
+// opens the issue form with display name + kind + rappid + lineage
+// + the URL where the live egg can be downloaded already filled in.
+// The hub maintainer (or anyone with push) closes the loop by
+// committing the egg + sidecar from that URL.
+
+// ── Propose an agent (the lineage-evolution path) ──────────────────
+//
+// The organism grows via PRs of new agent .py files into /agents/. The
+// frozen kernel never changes. This pane drafts a skeleton, lets the
+// visitor fill it in, then opens GitHub's create-file URL in a new
+// tab — GitHub auto-handles fork + branch + PR for visitors who
+// don't have push access. Operator reviews on GitHub, merges if good,
+// the agent becomes part of the lineage on the next page render.
+//
+// ANTIPATTERN GUARD: this is an "agent". Never "skill", "plugin",
+// "routine", "loop", or any synonym. ONE term — see ANTIPATTERNS.md §1.
+
+function _agentTemplate(name, description, organismName) {
+  const cls = (name || "new")
+    .replace(/[^a-zA-Z0-9_]/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_|_$/g, "")
+    .replace(/(^|_)(\w)/g, (_, __, c) => c.toUpperCase()) || "New";
+  const tool = cls + "Agent";
+  return `"""
+${cls}: ${description || "<one-line description of what this agent does>"}
+
+Proposed back to ${organismName || "this organism"} on ${new Date().toISOString().slice(0, 10)}
+via the front-door 'Propose an agent' flow.
+"""
+from agents.basic_agent import BasicAgent
+
+
+class ${cls}Agent(BasicAgent):
+    metadata = {
+        "name": "${cls}",
+        "description": "${(description || "Tell the LLM when to call this tool.").replace(/"/g, '\\"')}",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                # "input_text": {"type": "string", "description": "..."},
+            },
+            "required": [],
+        },
+    }
+
+    def perform(self, **kwargs) -> str:
+        # Implementation goes here. Return a string the LLM sees.
+        return "Hello from ${cls}!"
+`;
+}
+
+function _resetProposeTemplate() {
+  const nameInput = document.getElementById("propose-name");
+  const descInput = document.getElementById("propose-desc");
+  const codeArea  = document.getElementById("propose-code");
+  if (!codeArea) return;
+  codeArea.value = _agentTemplate(
+    nameInput && nameInput.value || "",
+    descInput && descInput.value || "",
+    window.__seedDisplayName || ""
+  );
+}
+
+function showProposePane() {
+  showPane("pane-propose");
+  const target = document.getElementById("propose-target");
+  if (target) {
+    target.textContent =
+      (window.__seedRepoName ? `${window.__seedDisplayName ? "" : ""}` : "") +
+      "agents/<name>_agent.py on @" +
+      (location.host.split(".")[0]) + "/" +
+      (location.pathname.split("/").filter(Boolean)[0] || "this seed");
+  }
+  // Only seed the template if the textarea is currently empty
+  const codeArea = document.getElementById("propose-code");
+  if (codeArea && !codeArea.value.trim()) _resetProposeTemplate();
+}
+
+function submitProposedAgent() {
+  const name = (document.getElementById("propose-name").value || "").trim();
+  const desc = (document.getElementById("propose-desc").value || "").trim();
+  const code = (document.getElementById("propose-code").value || "").trim();
+  if (!name) { alert("Give the agent a name first (snake_case, no spaces)."); return; }
+  if (!code) { alert("Paste the agent source first."); return; }
+
+  // Normalize the filename — must match RAPP's auto-discovery glob:
+  // agents/*_agent.py at the seed root (flat, never nested).
+  const slug = name.toLowerCase()
+    .replace(/[^a-z0-9_]+/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_|_$/g, "");
+  const filename = slug.endsWith("_agent") ? slug + ".py" : slug + "_agent.py";
+  const path = "agents/" + filename;
+
+  // GitHub's web UI deep-link for creating a new file. If the visitor
+  // doesn't have push access, GitHub silently forks, creates a branch
+  // on the fork, and walks them through the PR flow. If they do have
+  // push, they can commit directly. Either way, the operator reviews
+  // before it lands on main.
+  const owner = location.host.split(".")[0];
+  const repo  = location.pathname.split("/").filter(Boolean)[0] || "";
+  if (!owner || !repo) { alert("Couldn't figure out the GitHub destination."); return; }
+
+  const u = new URL(`https://github.com/${owner}/${repo}/new/main`);
+  u.searchParams.set("filename", path);
+  u.searchParams.set("value", code);
+  // GitHub web UI also accepts ?message= but it caps title length;
+  // visitors can edit the commit message in the form before submitting.
+  u.searchParams.set("message", `propose new agent: ${slug}`);
+  u.searchParams.set("description", desc || `New agent proposed back to this organism via the front-door 'Propose an agent' flow.`);
+
+  // GitHub URL length limit varies but is generous. If we ever blow
+  // past it, fallback would be to surface the agent code in the pane
+  // and link to the bare /new/ page; for now the deep link is fine.
+  window.open(u.toString(), "_blank", "noopener,noreferrer");
+}
+
+// ── Dream Catcher (parallel-dimension reassimilation) ─────────────
+//
+// Pattern from kody-w/rappterbook engine/merge/merge_frame.py and
+// engine/merge/assign_streams.py. Each parallel hatched dimension
+// accumulates its own frame stream — frames are content-addressed
+// events with PK = (utc, frame_n) — and the Dream Catcher folds
+// deltas from N parallel streams into the canonical organism.
+//
+// Frame schema (rapp-frame/1.0):
+//   { stream_id: "<rappid>:<short-instance-id>",
+//     frame_n: 0,
+//     utc: ISO timestamp,
+//     kind: "memory_added"|"agent_loaded"|"soul_edited"|"commit"|...,
+//     payload: { ... },
+//     prev_hash: "<sha of previous frame in this stream>",
+//     hash: "<sha of {prev_hash + utc + frame_n + kind + payload}>" }
+//
+// The hash chain catches splicing — edit a middle frame and every
+// later frame's prev_hash mismatches. Same idea as a Git commit
+// chain or a hash-linked log.
+//
+// Frame sources, in priority order, when an egg is read:
+//   1. data/frames.json inside the egg (if the seed wrote one)
+//   2. provenance.state_at_seal.recent_mutations (Git-derived snapshot)
+//   3. nothing — older eggs don't have frame logs yet, treated as
+//      a single implicit frame at sealed_at
+
+const STREAM_SHORT = (rappid, sealedAt) => {
+  // Stream id = rappid + first 4 chars of sha256(sealed_at). Gives
+  // each hatched egg a unique stream identifier even when rappids match.
+  if (!rappid) return "unknown";
+  const tag = (sealedAt || "").slice(0, 19);
+  return rappid.slice(0, 8) + ":" + tag.replace(/[^0-9]/g, "").slice(0, 8);
+};
+
+async function _framesFromEgg(zip, manifest) {
+  // 1. Explicit frames.json in the egg
+  const fj = zip.file("data/frames.json");
+  if (fj) {
+    try {
+      const j = JSON.parse(await fj.async("string"));
+      if (Array.isArray(j.frames)) return { frames: j.frames, source: "data/frames.json" };
+    } catch (_) {}
+  }
+  // 2. Synthesize from state_at_seal.recent_mutations (the Git log
+  //    snapshot the egg builder captured). One frame per Git commit.
+  const sas = manifest && manifest.provenance && manifest.provenance.state_at_seal;
+  if (sas && Array.isArray(sas.recent_mutations) && sas.recent_mutations.length) {
+    const rappid = manifest.rappid;
+    const sealed = manifest.provenance.sealed_at;
+    const stream = STREAM_SHORT(rappid, sealed);
+    const frames = [];
+    let prev = "";
+    // Reverse — Git API returns newest-first, frames are chronological.
+    const ordered = sas.recent_mutations.slice().reverse();
+    for (let i = 0; i < ordered.length; i++) {
+      const m = ordered[i];
+      const payload = { sha: m.sha, message: m.message };
+      const body = (prev || "") + "|" + (m.date || "") + "|" + i + "|commit|" + JSON.stringify(payload);
+      const h = await sha256Hex(body);
+      frames.push({
+        stream_id: stream,
+        frame_n: i,
+        utc: m.date || sealed,
+        kind: "commit",
+        payload,
+        prev_hash: prev,
+        hash: h,
+      });
+      prev = h;
+    }
+    return { frames, source: "state_at_seal.recent_mutations (synthesized)" };
+  }
+  // 3. Empty — older egg, no frame log
+  return { frames: [], source: "(no frame log)" };
+}
+
+let _dcCanonical = null, _dcParallel = null;
+
+async function _dcLoadEgg(file, slot) {
+  const arrayBuf = await file.arrayBuffer();
+  const zip = await JSZip.loadAsync(arrayBuf);
+  const manifestEntry = zip.file("manifest.json");
+  if (!manifestEntry) throw new Error("not a brainstem-egg — no manifest.json");
+  const manifest = JSON.parse(await manifestEntry.async("string"));
+  const { frames, source } = await _framesFromEgg(zip, manifest);
+  return { manifest, frames, source, name: file.name };
+}
+
+async function _dcHandleSlot(file, slot) {
+  const info = document.getElementById("dc-info-" + slot);
+  info.innerHTML = "loading…";
+  try {
+    const data = await _dcLoadEgg(file, slot);
+    if (slot === "canonical") _dcCanonical = data;
+    else                       _dcParallel  = data;
+    const m = data.manifest;
+    info.innerHTML =
+      `<div><strong>${escapeHtml(m.display_name || "(unnamed)")}</strong> · <code>${escapeHtml((m.rappid || "").slice(0,8))}…</code></div>` +
+      `<div>${escapeHtml(m.tier || "doorman")} tier · ${data.frames.length} frame${data.frames.length === 1 ? "" : "s"}` +
+      (m.provenance && m.provenance.sealed_at ? ` · sealed ${escapeHtml(new Date(m.provenance.sealed_at).toLocaleString())}` : "") +
+      `</div>` +
+      `<div style="font-size:10px;color:#6e7681;margin-top:4px;">frame source: ${escapeHtml(data.source)}</div>`;
+    if (_dcCanonical && _dcParallel) _dcRenderDiff();
+  } catch (e) {
+    info.innerHTML = `<div style="color:#f85149">✗ ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function _dcRenderDiff() {
+  const wrap = document.getElementById("dc-results");
+  if (!wrap) return;  // pane not in DOM yet
+  wrap.hidden = false;
+  if (!_dcCanonical || !_dcParallel) return;
+
+  // Lineage check — both eggs must share the same rappid for
+  // reassimilation to make semantic sense.
+  const c = _dcCanonical, p = _dcParallel;
+  const cRap = c.manifest.rappid;
+  const pRap = p.manifest.rappid;
+  let lineageWarn = "";
+  if (cRap && pRap && cRap !== pRap) {
+    lineageWarn = `<div class="verify-summary tampered">⚠ different rappids: <code>${escapeHtml(cRap.slice(0,8))}</code> vs <code>${escapeHtml(pRap.slice(0,8))}</code>. These are different organisms — reassimilation crossing species lines isn't supported.</div>`;
+  }
+
+  // ── Dream Catcher merge doctrine ─────────────────────────────────
+  //
+  // From the operator's design conversation:
+  //   "Whatever frame hit the UTC one first, that's canon, and then
+  //    anything that doesn't contradict that, I'm going to layer on
+  //    that... There are contradictions, so that doesn't get synced.
+  //    It gets put into a different dimension of that aspect of that
+  //    life, so you don't lose that data."
+  //
+  // Three categories per frame:
+  //   ✓ shared      — same hash exists in canonical; already canon
+  //   🌱 new        — hash absent from canonical AND no PK collision;
+  //                   safe to reassimilate (layer on)
+  //   ⚡ contradiction — hash absent from canonical BUT same PK
+  //                   (utc + frame_n) collides with a canon frame.
+  //                   Saved as alternate-dimension data — visible in
+  //                   the diff so the operator can decide.
+
+  const canonHashes = new Set(c.frames.map(f => f.hash).filter(Boolean));
+  // PK index: same-stream frames keyed by frame_n; cross-stream by utc
+  const canonByPK = new Map();
+  for (const f of c.frames) {
+    canonByPK.set(`${f.stream_id || ""}|${f.frame_n}`, f);
+    canonByPK.set(`utc:${f.utc}`, f);
+  }
+  const shared = [], newFrames = [], contradictions = [];
+  for (const f of p.frames) {
+    if (canonHashes.has(f.hash)) { shared.push(f); continue; }
+    const sameStream = canonByPK.get(`${f.stream_id || ""}|${f.frame_n}`);
+    const sameUtc    = canonByPK.get(`utc:${f.utc}`);
+    if ((sameStream && sameStream.hash !== f.hash) ||
+        (sameUtc && sameUtc.hash !== f.hash)) {
+      contradictions.push({ frame: f, conflicts_with: sameStream || sameUtc });
+    } else {
+      newFrames.push(f);
+    }
+  }
+
+  // Sort all parallel frames by UTC for the timeline view (UTC-first
+  // ordering is the canon resolution rule — earlier UTC wins).
+  const ordered = p.frames.slice().sort((a, b) => (a.utc || "").localeCompare(b.utc || ""));
+  const contradictionHashes = new Set(contradictions.map(x => x.frame.hash));
+
+  let summaryClass, summaryText;
+  if (newFrames.length === 0 && contradictions.length === 0) {
+    summaryClass = "ok";
+    summaryText = `✓ parallel dimension is fully reflected in canonical — ${shared.length} frame${shared.length === 1 ? "" : "s"} match. Nothing to reassimilate.`;
+  } else if (contradictions.length > 0) {
+    summaryClass = "partial";
+    summaryText = `🕸️ ${newFrames.length} layer-on frame${newFrames.length === 1 ? "" : "s"} + ${contradictions.length} contradiction${contradictions.length === 1 ? "" : "s"}. Layer-on frames are safe to reassimilate (UTC-first canon already holds). Contradictions occupy the same PK as a canonical frame — they're saved as alternate-dimension data; the operator decides whether to fold them in.`;
+  } else {
+    summaryClass = "partial";
+    summaryText = `🕸️ ${newFrames.length} parallel-only frame${newFrames.length === 1 ? "" : "s"} ready to layer on (UTC-first canon resolved). No contradictions — reassimilation is clean.`;
+  }
+
+  const rows = ordered.map(f => {
+    let cls, icon;
+    if (canonHashes.has(f.hash))               { cls = "shared";        icon = "·";  }
+    else if (contradictionHashes.has(f.hash))  { cls = "contradiction"; icon = "⚡"; }
+    else                                        { cls = "new";           icon = "🌱"; }
+    const utcShort = (f.utc || "").slice(0, 19).replace("T", " ");
+    const msg = f.kind === "commit"
+      ? (f.payload && f.payload.message || "(no message)")
+      : `${f.kind}: ${JSON.stringify(f.payload).slice(0, 80)}`;
+    return `<li class="${cls}">
+      <span class="dc-frame-icon">${icon}</span>
+      <div class="dc-frame-body">
+        <div class="dc-frame-pk">${escapeHtml(utcShort)} · frame_n=${f.frame_n} · <code>${escapeHtml((f.hash || "").slice(0,10))}…</code></div>
+        <div class="dc-frame-msg">${escapeHtml(msg)}</div>
+      </div>
+    </li>`;
+  }).join("");
+
+  let reassimAction = "";
+  if (newFrames.length > 0) {
+    // Build a pre-filled GitHub Issue summarizing the reassimilation
+    // request. The operator reviews each frame on GitHub and merges
+    // selectively — this stops short of auto-creating PRs because
+    // the operator should see what's being bonded back.
+    const owner = (location.host || "").split(".")[0];
+    const repo = (location.pathname.split("/").filter(Boolean)[0] || "");
+    const title = `dream-catcher: ${newFrames.length} frame${newFrames.length === 1 ? "" : "s"} from parallel dimension`;
+    const body = [
+      "<!-- Dream Catcher reassimilation request -->",
+      "",
+      "## Source",
+      `- Canonical egg: \`${c.manifest.rappid || "(unknown)"}\` sealed ${c.manifest.provenance && c.manifest.provenance.sealed_at || "(unknown)"}`,
+      `- Parallel egg: \`${p.manifest.rappid || "(unknown)"}\` sealed ${p.manifest.provenance && p.manifest.provenance.sealed_at || "(unknown)"}`,
+      "",
+      "## Parallel-only frames (candidates for reassimilation)",
+      "",
+      "| utc | frame_n | kind | message | hash |",
+      "|---|---|---|---|---|",
+      ...newFrames.map(f =>
+        `| ${(f.utc || "").slice(0,19)} | ${f.frame_n} | ${f.kind} | ${(f.payload && f.payload.message || JSON.stringify(f.payload)).replace(/\|/g, " ").slice(0,80)} | \`${(f.hash || "").slice(0,10)}\` |`
+      ),
+      "",
+      "## To reassimilate",
+      "",
+      "Review each frame above. For each one worth bonding back into the canonical lineage:",
+      "1. Cherry-pick the change as a commit on this repo (operator only)",
+      "2. Or open a PR with the change",
+      "",
+      "Mutations not reassimilated stay on their parallel branch — that's the design. Each parallel dimension can keep its own divergent path.",
+    ].join("\n");
+    const u = new URL(`https://github.com/${owner}/${repo}/issues/new`);
+    u.searchParams.set("title", title);
+    u.searchParams.set("body", body);
+    u.searchParams.set("labels", "dream-catcher,reassimilation");
+    reassimAction = `<div style="margin-top:14px;"><a class="small primary" style="display:inline-block;text-decoration:none;padding:8px 14px;background:#1f6feb;color:white;border-radius:8px;font-size:12px;font-weight:600;" href="${escapeHtml(u.toString())}" target="_blank" rel="noopener">📜 Open reassimilation issue on GitHub →</a></div>`;
+  }
+
+  wrap.innerHTML =
+    lineageWarn +
+    `<div class="verify-summary ${summaryClass}">${summaryText}</div>` +
+    `<ul class="dc-frame-list">${rows}</ul>` +
+    reassimAction;
+}
+
+function showDreamCatcher() {
+  showPane("pane-dreamcatcher");
+}
+
+// ── Egg verifier (non-GMO check) ───────────────────────────────────
+//
+// Drop any .egg in. We unzip it, read the manifest's provenance block,
+// recompute SHA-256 over every file in the archive, and compare. Three
+// outcomes per file: ✓ ok / ✗ modified / ⚠ missing-or-unexpected.
+//
+// The verifier ALSO recomputes the manifest_hash from the file_hashes
+// table (sorted, canonical) and checks against the manifest's stated
+// manifest_hash. If THAT mismatches, someone edited the file_hashes
+// table directly — the entire envelope is suspicious.
+//
+// What this catches:
+//   - Hand-edited memory.json offline → file_hash mismatch
+//   - Edited file AND manifest hash → manifest_hash mismatch
+//   - Files added or removed since seal → unexpected/missing
+//
+// What this does NOT catch (yet — needs ed25519 signatures, phase 2
+// of the egg-hub spec):
+//   - Wholesale re-issuance with a fresh manifest. The rappid is the
+//     anchor; if it changes, the organism's identity is different too.
+//     Provenance verifies this is a self-consistent envelope, not
+//     that the envelope came from THE rappid's owner.
+
+async function verifyEgg(file) {
+  if (typeof JSZip === "undefined") throw new Error("JSZip didn't load");
+  const arrayBuf = await file.arrayBuffer();
+  const zip = await JSZip.loadAsync(arrayBuf);
+  const manifestEntry = zip.file("manifest.json");
+  if (!manifestEntry) throw new Error("not a brainstem-egg — no manifest.json inside");
+  const manifestText = await manifestEntry.async("string");
+  let manifest;
+  try { manifest = JSON.parse(manifestText); }
+  catch (e) { throw new Error("manifest.json is not valid JSON"); }
+  const prov = manifest.provenance;
+  if (!prov || !prov.file_hashes) {
+    return {
+      manifest, status: "no-provenance",
+      summary: "this egg was packed before SHA-256 provenance shipped — can't verify, but identity claims are: " +
+               `rappid ${manifest.rappid || "(none)"}, tier ${manifest.tier || "?"}.`,
+      results: [],
+    };
+  }
+
+  // Per-file recomputation
+  const expectedHashes = prov.file_hashes;
+  const results = [];
+  const seen = new Set();
+  for (const path of Object.keys(expectedHashes).sort()) {
+    seen.add(path);
+    const f = zip.file(path);
+    if (!f) {
+      results.push({ path, status: "missing" });
+      continue;
+    }
+    const text = await f.async("string");
+    const actual = await sha256Hex(text);
+    results.push({
+      path,
+      status: actual === expectedHashes[path] ? "ok" : "modified",
+      expected: expectedHashes[path],
+      actual,
+    });
+  }
+  // Files in the egg but NOT listed in the manifest table — these snuck in
+  zip.forEach((relPath, _) => {
+    if (relPath === "manifest.json") return;
+    if (relPath.endsWith("/")) return;  // folder entry
+    if (!seen.has(relPath)) {
+      results.push({ path: relPath, status: "unexpected" });
+    }
+  });
+
+  // Manifest-hash recomputation (catches: edited file AND adjusted the hash table)
+  const recomputedManifestHash = await sha256Hex(_canonicalHashTable(expectedHashes));
+  const manifestHashOk = recomputedManifestHash === prov.manifest_hash;
+
+  // Overall verdict
+  const modCount = results.filter(r => r.status === "modified").length;
+  const missCount = results.filter(r => r.status === "missing").length;
+  const extraCount = results.filter(r => r.status === "unexpected").length;
+  let status, summary;
+  if (!manifestHashOk) {
+    status = "tampered";
+    summary = "✗ manifest hash mismatch — the file_hashes table in the manifest has been edited. This egg is non-canonical.";
+  } else if (modCount > 0) {
+    status = "tampered";
+    summary = `✗ ${modCount} file${modCount === 1 ? "" : "s"} modified offline since the egg was sealed. The hash chain catches this — the rest of the egg is consistent but those files don't match what was sealed.`;
+  } else if (missCount > 0 || extraCount > 0) {
+    status = "partial";
+    summary = `⚠ ${missCount} missing, ${extraCount} unexpected files. The egg's structure has shifted since seal — verify the source.`;
+  } else {
+    status = "ok";
+    summary = `✓ envelope intact. ${results.length} file${results.length === 1 ? "" : "s"} match the sealed hash table; manifest hash recomputes correctly. This egg is byte-identical to what was sealed at ${prov.sealed_at || "(unknown time)"}${prov.origin_url ? " from " + prov.origin_url : ""}.`;
+  }
+  return { manifest, status, summary, results, manifestHashOk };
+}
+
+function renderVerifyResults(out) {
+  const wrap = document.getElementById("verify-results");
+  if (!wrap) return;
+  wrap.hidden = false;
+
+  const head = `<div class="verify-summary ${out.status === "ok" ? "ok" : (out.status === "tampered" ? "tampered" : "partial")}">${escapeHtml(out.summary)}</div>`;
+  const ICONS = { ok: "✓", modified: "✗", missing: "⚠", unexpected: "+" };
+  const rows = out.results.map(r =>
+    `<li class="${r.status}">
+       <span class="v-icon">${ICONS[r.status] || "?"}</span>
+       <span class="v-path">${escapeHtml(r.path)}</span>
+       <span class="v-status">${r.status}</span>
+     </li>`
+  ).join("");
+
+  // Origin block — surfaces the public-repo anchor + a deep-verify button
+  // when the egg points at a public GitHub seed.
+  const prov = out.manifest && out.manifest.provenance;
+  let originBlock = "";
+  if (prov && prov.origin_owner && prov.origin_repo_name) {
+    const sha = prov.origin_commit_sha || "";
+    const shaShort = sha ? sha.slice(0, 8) : null;
+    const repoLabel = prov.origin_owner + "/" + prov.origin_repo_name;
+    const repoUrl = `https://github.com/${prov.origin_owner}/${prov.origin_repo_name}`;
+    const shaUrl = sha ? `${repoUrl}/commit/${sha}` : null;
+    originBlock = `
+      <div class="verify-origin">
+        <div class="origin-line">
+          <span class="origin-label">origin</span>
+          <a class="origin-link" href="${escapeHtml(repoUrl)}" target="_blank" rel="noopener">${escapeHtml(repoLabel)}</a>
+          ${shaShort ? `at <a class="origin-link" href="${escapeHtml(shaUrl)}" target="_blank" rel="noopener"><code>${escapeHtml(shaShort)}</code></a>` : "<span style='color:#8b949e'>(no commit pinned)</span>"}
+        </div>
+        ${shaShort ? `<button class="small primary" id="btn-deep-verify">🌐 Deep-verify against live repo →</button>
+        <div class="origin-hint">Refetches each file from raw.githubusercontent.com at the sealed commit and recomputes hashes. Authoritative integrity check using the public-repo source-of-truth.</div>` : ""}
+        <div id="deep-verify-results"></div>
+      </div>
+    `;
+  }
+
+  wrap.innerHTML = head + originBlock + (rows ? `<ul class="verify-files">${rows}</ul>` : "");
+  // Stash the egg's hash table so deep-verify can read it without re-unzipping
+  wrap._lastVerify = out;
+  const btn = document.getElementById("btn-deep-verify");
+  if (btn) btn.onclick = () => deepVerifyAgainstOrigin(out);
+}
+
+// Deep verify — fetch each file from the seed's public repo at the
+// EXACT sealed commit, recompute its sha256, and compare to the egg's
+// hash table. If they match, the egg is provably authentic to that
+// commit on the public repo. The public seed IS the source-of-truth;
+// only the operator can push to it. So matching hashes against
+// raw.githubusercontent.com proves authorship without ed25519.
+async function deepVerifyAgainstOrigin(out) {
+  const wrap = document.getElementById("deep-verify-results");
+  if (!wrap) return;
+  const prov = out.manifest && out.manifest.provenance;
+  if (!prov) return;
+  const owner = prov.origin_owner;
+  const repo  = prov.origin_repo_name;
+  const sha   = prov.origin_commit_sha;
+  if (!owner || !repo || !sha) {
+    wrap.innerHTML = `<div class="verify-summary partial">no origin commit pinned — can't deep-verify against public state.</div>`;
+    return;
+  }
+  wrap.innerHTML = `<div class="verify-summary partial">🌐 fetching ${escapeHtml(Object.keys(prov.file_hashes).length)} files from raw.githubusercontent.com at <code>${escapeHtml(sha.slice(0,8))}</code>…</div>`;
+
+  // Map egg paths to the seed's repo paths. The egg packs files at
+  // top-level (rappid.json, soul.md, agents/*.py, data/memory.json),
+  // but in the seed repo the public memory lives under .brainstem_data/
+  // and the doorman SEED_AGENT_BASE points elsewhere. The doorman tier
+  // egg packs match the seed root layout — straight 1:1 mapping.
+  function _eggPathToRepoPath(p) {
+    // data/memory.json (in egg) → .brainstem_data/memory.json (in seed)
+    if (p === "data/memory.json") return ".brainstem_data/memory.json";
+    // private/* paths come from the private companion repo, not this seed —
+    // skip them here. user_memories.json is a doorman-side synthesis, not
+    // a file in the public repo, so skip that too.
+    if (p.startsWith("private/")) return null;
+    if (p === "data/user_memories.json") return null;
+    return p;  // 1:1
+  }
+
+  const matches = [];
+  let ok = 0, mismatch = 0, unreachable = 0;
+  for (const [eggPath, expectedHash] of Object.entries(prov.file_hashes)) {
+    const repoPath = _eggPathToRepoPath(eggPath);
+    if (!repoPath) continue;
+    const url = `https://raw.githubusercontent.com/${owner}/${repo}/${sha}/${repoPath}`;
+    try {
+      const r = await fetch(url, { cache: "no-cache" });
+      if (!r.ok) {
+        matches.push({ path: eggPath, status: "unreachable", note: `HTTP ${r.status}` });
+        unreachable++;
+        continue;
+      }
+      const text = await r.text();
+      const actual = await sha256Hex(text);
+      if (actual === expectedHash) { matches.push({ path: eggPath, status: "ok" }); ok++; }
+      else                          { matches.push({ path: eggPath, status: "modified", actual, expected: expectedHash }); mismatch++; }
+    } catch (e) {
+      matches.push({ path: eggPath, status: "unreachable", note: e.message });
+      unreachable++;
+    }
+  }
+
+  let summary, status;
+  if (mismatch === 0 && unreachable === 0 && ok > 0) {
+    status = "ok";
+    summary = `✓ ${ok} files at <code>${owner}/${repo}@${sha.slice(0,8)}</code> match the egg's sealed hashes byte-for-byte. This egg is authentic to that commit on the public repo — only the seed's owner could have produced it.`;
+  } else if (mismatch > 0) {
+    status = "tampered";
+    summary = `✗ ${mismatch} file${mismatch === 1 ? "" : "s"} don't match the public repo at <code>${sha.slice(0,8)}</code>. Either the egg was tampered, or the seal pointed at the wrong commit.`;
+  } else {
+    status = "partial";
+    summary = `⚠ ${unreachable} file${unreachable === 1 ? "" : "s"} unreachable on raw.githubusercontent.com (commit may have been GC'd or repo gone private). ${ok} file${ok === 1 ? "" : "s"} matched.`;
+  }
+
+  const ICONS = { ok: "✓", modified: "✗", missing: "⚠", unexpected: "+", unreachable: "—" };
+  const rowsHtml = matches.map(r =>
+    `<li class="${r.status}">
+       <span class="v-icon">${ICONS[r.status] || "?"}</span>
+       <span class="v-path">${escapeHtml(r.path)}</span>
+       <span class="v-status">${r.status}${r.note ? " · " + escapeHtml(r.note) : ""}</span>
+     </li>`
+  ).join("");
+  wrap.innerHTML = `<div class="verify-summary ${status}">${summary}</div>${rowsHtml ? `<ul class="verify-files">${rowsHtml}</ul>` : ""}`;
+}
+
+async function _handleVerifyFile(file) {
+  if (!file) return;
+  const wrap = document.getElementById("verify-results");
+  if (!wrap) return;  // pane not in DOM
+  wrap.hidden = false;
+  wrap.innerHTML = `<div class="verify-summary partial">verifying ${escapeHtml(file.name)}…</div>`;
+  try {
+    const out = await verifyEgg(file);
+    renderVerifyResults(out);
+  } catch (e) {
+    wrap.innerHTML = `<div class="verify-summary tampered">✗ couldn't verify: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function showVerifyPane() {
+  showPane("pane-verify");
+}
+
+async function openEggHubSubmission() {
+  // Pull rappid for lineage + identity context
+  let rappid = {};
+  try {
+    const r = await fetch("rappid.json", { cache: "no-cache" });
+    if (r.ok) rappid = await r.json();
+  } catch (_) {}
+  const slug    = window.__seedRepoName || (window.__seedDisplayName || "rapp").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  const display = window.__seedDisplayName || "Front Door";
+  const kind    = window.__seedKind || "mirror";
+  const url     = location.origin + location.pathname.replace(/\/?$/, "/");
+  const eggUrl  = url + "  ← export your own from the front door's '🥚 Export .egg' button";
+
+  const title = `egg submission: ${slug} (${display})`;
+  const body = [
+    `<!-- pre-filled by the front door at ${url} -->`,
+    "",
+    "## Submission",
+    "",
+    `- **Slug**: \`${slug}\``,
+    `- **Display name**: ${display}`,
+    `- **Kind**: \`${kind}\``,
+    `- **Rappid**: \`${rappid.rappid || "(unknown)"}\``,
+    `- **Parent rappid**: \`${rappid.parent_rappid || "(unknown)"}\``,
+    `- **Parent repo**: ${rappid.parent_repo || "(unknown)"}`,
+    `- **Front door**: ${url}`,
+    `- **Egg download**: ${url} → click '🥚 Export .egg'`,
+    "",
+    "## Description",
+    "",
+    "<!-- One paragraph: who is this AI, what does it remember, who is it for -->",
+    "",
+    "## Tags",
+    "",
+    `<!-- comma-separated, e.g. \`twin, ${kind}, planted\` -->`,
+    "",
+    "---",
+    "",
+    "Submitting via the planted-seed front door's egg-hub backup button.",
+    "Schema: brainstem-egg/2.2-organism. Maintainer: download the egg from the front door above and commit to eggs/<slug>.egg with the matching <slug>.json sidecar.",
+  ].join("\n");
+
+  const u = new URL("https://github.com/kody-w/rapp-egg-hub/issues/new");
+  u.searchParams.set("title", title);
+  u.searchParams.set("body", body);
+  u.searchParams.set("labels", "egg-submission");
+  window.open(u.toString(), "_blank", "noopener,noreferrer");
+}
+
+async function copy(text) {
+  try { await navigator.clipboard.writeText(text); } catch (_) { /* silent */ }
+}
+
+// Seed metadata — read by the card derivation logic. Set from the
+// substituted placeholders below so the card can render before any
+// async fetches land.
+window.__seedRappid      = "f0bbb4c6-d43a-4dce-9107-b84d1aeba8b6";
+window.__seedDisplayName = "Kody Wildfeuer";
+window.__seedKind        = "personal";
+window.__seedRepoName    = "kody-twin";
+
+// Wire up buttons
+document.getElementById("btn-tether").onclick = openTether;
+document.getElementById("btn-card").onclick = openCard;
+document.getElementById("btn-export-egg").onclick = exportDoormanEgg;
+document.getElementById("btn-verify-egg").onclick = showVerifyPane;
+document.getElementById("btn-publish-egg").onclick = openEggHubSubmission;
+document.getElementById("btn-install").onclick = showInstall;
+document.getElementById("btn-neighborhood").onclick = showNeighborhoodPane;
+document.getElementById("btn-nbhd-submit").onclick = submitNeighbor;
+document.getElementById("btn-propose-agent").onclick = showProposePane;
+document.getElementById("btn-propose-submit").onclick = submitProposedAgent;
+document.getElementById("btn-propose-template").onclick = (e) => {
+  e.preventDefault();
+  document.getElementById("propose-code").value = "";
+  _resetProposeTemplate();
+};
+document.getElementById("btn-dreamcatcher").onclick = showDreamCatcher;
+
+// Dream Catcher slot wiring — both slots use the same drag-drop pattern
+(function wireDreamCatcher() {
+  for (const slot of ["canonical", "parallel"]) {
+    const drop = document.getElementById("dc-drop-" + slot);
+    const input = document.getElementById("dc-file-" + slot);
+    const pick  = document.getElementById("btn-dc-pick-" + slot);
+    if (!drop || !input) continue;
+    drop.addEventListener("click", e => { if (e.target.tagName !== "BUTTON") input.click(); });
+    pick.addEventListener("click", e => { e.stopPropagation(); input.click(); });
+    input.addEventListener("change", () => {
+      if (input.files && input.files[0]) _dcHandleSlot(input.files[0], slot);
+    });
+    drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("dragover"); });
+    drop.addEventListener("dragleave", () => drop.classList.remove("dragover"));
+    drop.addEventListener("drop", e => {
+      e.preventDefault();
+      drop.classList.remove("dragover");
+      const f = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (f) _dcHandleSlot(f, slot);
+    });
+  }
+})();
+
+// Verify pane: drag-drop + file picker. Both routes call the same
+// _handleVerifyFile so the verifier UI doesn't care how the file got
+// there.
+(function wireVerifyPane() {
+  const drop = document.getElementById("verify-drop");
+  const input = document.getElementById("verify-file");
+  if (!drop || !input) return;
+  drop.addEventListener("click", e => {
+    if (e.target.tagName !== "BUTTON") input.click();
+  });
+  document.getElementById("btn-verify-pick").addEventListener("click", e => {
+    e.stopPropagation();
+    input.click();
+  });
+  input.addEventListener("change", () => {
+    if (input.files && input.files[0]) _handleVerifyFile(input.files[0]);
+  });
+  drop.addEventListener("dragover", e => {
+    e.preventDefault();
+    drop.classList.add("dragover");
+  });
+  drop.addEventListener("dragleave", () => drop.classList.remove("dragover"));
+  drop.addEventListener("drop", e => {
+    e.preventDefault();
+    drop.classList.remove("dragover");
+    const f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) _handleVerifyFile(f);
+  });
+})();
+document.getElementById("card-close").onclick = closeCard;
+document.getElementById("card-flipper").addEventListener("click", (e) => {
+  // Don't flip if user clicked an inner link or the close button
+  if (e.target.closest("a, button")) return;
+  e.currentTarget.classList.toggle("flipped");
+});
+
+// ── Holo tilt + shimmer (RAR store.html port) ──────────────────────
+//
+// On mousemove anywhere over the card flipper, compute (x, y) in [0,1]
+// relative to the card and update CSS vars: --tilt-x / --tilt-y for
+// 3D rotation, --mx / --my for shimmer-track + fresnel position,
+// --angle for the prism gradient. Also touch support so the card
+// tilts when dragged on mobile. Reset on mouseleave / touchend.
+//
+// Kept off the BACK so the QR stays scan-friendly (no parallax
+// distortion when the visitor is trying to align their phone camera).
+(function initHoloTilt() {
+  const wrap = document.getElementById("card-flipper");
+  if (!wrap) return;
+  const holo = document.getElementById("holo-card");
+
+  function apply(x, y) {
+    if (wrap.classList.contains("flipped")) return reset();
+    const tiltX = ((0.5 - y) * 16).toFixed(1);   // ±8 deg vertical
+    const tiltY = ((x - 0.5) * 16).toFixed(1);   // ±8 deg horizontal
+    const angle = (Math.atan2(y - 0.5, x - 0.5) * 180 / Math.PI).toFixed(0);
+    wrap.style.setProperty("--tilt-x", tiltX + "deg");
+    wrap.style.setProperty("--tilt-y", tiltY + "deg");
+    wrap.style.transition = "transform .08s ease-out";
+    if (holo) {
+      const mxPct = (x * 100).toFixed(0) + "%";
+      const myPct = (y * 100).toFixed(0) + "%";
+      holo.style.setProperty("--mx", mxPct);
+      holo.style.setProperty("--my", myPct);
+      holo.style.setProperty("--angle", angle + "deg");
+    }
+  }
+  function reset() {
+    wrap.style.setProperty("--tilt-x", "0deg");
+    wrap.style.setProperty("--tilt-y", "0deg");
+    wrap.style.transition = "transform .4s ease-out";
+    if (holo) {
+      holo.style.removeProperty("--mx");
+      holo.style.removeProperty("--my");
+      holo.style.removeProperty("--angle");
+    }
+  }
+
+  wrap.addEventListener("mousemove", (e) => {
+    const r = wrap.getBoundingClientRect();
+    apply((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
+  });
+  wrap.addEventListener("mouseleave", reset);
+  wrap.addEventListener("touchmove", (e) => {
+    const t = e.touches[0]; if (!t) return;
+    const r = wrap.getBoundingClientRect();
+    apply((t.clientX - r.left) / r.width, (t.clientY - r.top) / r.height);
+  }, { passive: true });
+  wrap.addEventListener("touchend", reset, { passive: true });
+})();
+// Tap outside the card → close (but don't close on click of card itself)
+document.getElementById("card-overlay").addEventListener("click", (e) => {
+  if (e.target.id === "card-overlay") closeCard();
+});
+// Esc key closes the card
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !document.getElementById("card-overlay").hidden) closeCard();
+});
+document.getElementById("btn-connect").onclick = connectToPeer;
+document.getElementById("btn-send").onclick = sendMessage;
+document.getElementById("btn-send-egg").onclick = sendEggToPeer;
+document.getElementById("btn-copy-id").onclick = () => {
+  copy(document.getElementById("my-id-text").textContent);
+};
+document.getElementById("btn-copy-install").onclick = () => {
+  copy(document.getElementById("install-cmd").textContent);
+};
+// Footer "plant your own front door" → opens the plant pane (one-liner
+// + AI-paste prompt). Used to dump you on the raw plant.sh script;
+// now it's an in-page affordance both humans + AI assistants can act on.
+document.getElementById("footer-plant").onclick = (e) => {
+  e.preventDefault();
+  showPane("pane-plant");
+};
+document.getElementById("btn-copy-plant").onclick = () => {
+  copy(document.getElementById("plant-cmd").textContent);
+};
+document.getElementById("btn-copy-plant-ai").onclick = () => {
+  copy(document.getElementById("plant-ai-prompt").textContent);
+};
+document.getElementById("chat-input").addEventListener("keydown", e => {
+  if (e.key === "Enter") sendMessage();
+});
+document.getElementById("peer-id-input").addEventListener("keydown", e => {
+  if (e.key === "Enter") connectToPeer();
+});
+
+// Auto-tether if URL has ?peer=<id> (from a scanned tether QR)
+(async function autoTether() {
+  const params = new URLSearchParams(location.search);
+  const peerId = params.get("peer");
+  if (peerId) {
+    await openTether();
+    document.getElementById("peer-id-input").value = peerId;
+    // Give the broker a moment to connect us, then dial
+    setTimeout(connectToPeer, 1500);
+  }
+})();
+
+// ── Rappid-derived sigil ───────────────────────────────────────────
+// Every planted seed has a unique UUID rappid. This generates a
+// deterministic, distinctive SVG portrait for the hero — like an
+// avatar on a profile page. Hashing the rappid into hue + shape +
+// accents means the same seed always gets the same look, so visitors
+// recognize a place by sight.
+function rappidSigil(rappid, size) {
+  const hash = (rappid || "").replace(/-/g, "").slice(0, 16) || "deadbeef00000000";
+  const h1 = parseInt(hash.slice(0, 4),  16) || 0;
+  const h2 = parseInt(hash.slice(4, 8),  16) || 0;
+  const h3 = parseInt(hash.slice(8,12),  16) || 0;
+  const h4 = parseInt(hash.slice(12,16), 16) || 0;
+  const hueA   = h1 % 360;
+  const hueB   = (hueA + 60 + (h2 % 180)) % 360;
+  const shape  = h3 % 4;
+  const cx = size / 2, cy = size / 2;
+  let layer = "";
+  if (shape === 0) {
+    const pts = [];
+    for (let i = 0; i < 6; i++) {
+      const a = (Math.PI / 3) * i - Math.PI / 6;
+      pts.push((cx + Math.cos(a) * size * 0.30).toFixed(1) + "," +
+               (cy + Math.sin(a) * size * 0.30).toFixed(1));
+    }
+    layer = '<polygon points="' + pts.join(" ") + '" fill="hsl(' + hueB + ',75%,58%)"/>';
+  } else if (shape === 1) {
+    const pts = cx + "," + (cy - size*0.32) + " " +
+                (cx - size*0.28) + "," + (cy + size*0.18) + " " +
+                (cx + size*0.28) + "," + (cy + size*0.18);
+    layer = '<polygon points="' + pts + '" fill="hsl(' + hueB + ',75%,58%)"/>';
+  } else if (shape === 2) {
+    layer = '<circle cx="' + cx + '" cy="' + cy + '" r="' + (size*0.30) + '" ' +
+            'fill="none" stroke="hsl(' + hueB + ',75%,58%)" stroke-width="' + (size*0.10) + '"/>';
+  } else {
+    const w = size * 0.55;
+    layer = '<rect x="' + (cx - w/2) + '" y="' + (cy - w/2) + '" ' +
+            'width="' + w + '" height="' + w + '" rx="' + (w*0.20) + '" ' +
+            'fill="hsl(' + hueB + ',75%,58%)"/>';
+  }
+  const dotR = size * 0.06;
+  const dotHue = (hueA + 180) % 360;
+  layer += '<circle cx="' + cx + '" cy="' + cy + '" r="' + dotR + '" fill="hsl(' + dotHue + ',80%,75%)"/>';
+  // Subtle orbit ring — additional accent based on h4
+  if (h4 % 2 === 0) {
+    layer += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (size*0.42) + '" ' +
+             'fill="none" stroke="hsla(' + hueB + ',60%,70%,0.35)" stroke-width="1"/>';
+  }
+  const gid = "g" + (h1.toString(36)) + (h2.toString(36));
+  return '<svg viewBox="0 0 ' + size + ' ' + size + '" xmlns="http://www.w3.org/2000/svg">' +
+         '<defs><linearGradient id="' + gid + '" x1="0" y1="0" x2="1" y2="1">' +
+           '<stop offset="0%" stop-color="hsl(' + hueA + ',45%,28%)"/>' +
+           '<stop offset="100%" stop-color="hsl(' + hueA + ',35%,12%)"/>' +
+         '</linearGradient></defs>' +
+         '<rect width="' + size + '" height="' + size + '" fill="url(#' + gid + ')"/>' +
+         layer +
+         '</svg>';
+}
+
+(function renderSigil() {
+  const el = document.getElementById("hero-sigil");
+  if (!el) return;
+  el.innerHTML = rappidSigil("f0bbb4c6-d43a-4dce-9107-b84d1aeba8b6", 96);
+})();
+
+// ── Profile stats: memory count + age ──────────────────────────────
+// "Signs of life" for the front door — the things that change between
+// visits. Memory count comes from public .brainstem_data/memory.json;
+// age is computed from rappid.json's planted_at field.
+function relativeAge(iso) {
+  if (!iso) return "";
+  const ms = Date.now() - new Date(iso).getTime();
+  if (Number.isNaN(ms) || ms < 0) return "";
+  const days = Math.floor(ms / 86400000);
+  if (days < 1)  return "planted today";
+  if (days < 2)  return "planted yesterday";
+  if (days < 30) return "planted " + days + " days ago";
+  const months = Math.floor(days / 30);
+  if (months < 12) return "planted " + months + " month" + (months === 1 ? "" : "s") + " ago";
+  const years = Math.floor(months / 12);
+  return "planted " + years + " year" + (years === 1 ? "" : "s") + " ago";
+}
+
+// ── Track Record: the organism's resume ────────────────────────────
+//
+// Three live data feeds drive the resume — every fetch is anonymous-
+// friendly (60 req/hour from any IP, plenty for a profile page):
+//
+//   Agents       — GET /repos/<owner>/<seed>/contents/agents
+//                  Each agent .py is a capability the organism brings
+//                  to the table when summoned/hatched. ONE term: agent.
+//
+//   Mutations    — GET /repos/<owner>/<seed>/commits
+//                  Every commit IS a mutation event — new memory, new
+//                  agent, edited soul. The commit log is the literal
+//                  evolution history; we surface the recent few.
+//
+//   Achievements — derived locally from memory.json count + age.
+//                  Milestones the organism has crossed during its
+//                  lifetime (first conversation, double-digit memories,
+//                  first month, etc.). These are the LinkedIn-style
+//                  badges that prove track record.
+//
+// All three accumulate over time. Each interaction grows the resume.
+// Operator commits are direct mutations; visitor interactions can
+// become PRs against this seed (the bond-back path).
+
+function _ghOwnerRepo() {
+  const host = location.host;
+  const owner = host.split(".")[0];
+  const repo  = location.pathname.split("/").filter(Boolean)[0] || "";
+  return { owner, repo };
+}
+
+// ── Local-first network cache ──────────────────────────────────────
+//
+// Every GitHub fetch the resume makes goes through this wrapper. On
+// success: the response is cached in localStorage keyed by URL plus a
+// timestamp. On network failure or no-network: return the cached
+// value if we have one, marked stale. Result: an organism on a
+// laptop in airplane mode keeps rendering its own resume from the
+// last-known state instead of going blank. The seed's own files
+// (rappid.json, memory.json, agents/*) load from the local server
+// without ever hitting the network — the cache is only for
+// public-repo enrichment that needs github.com.
+//
+// Cache TTL is generous (24h default) — better to show slightly stale
+// data than blank fields. When online the live response always wins.
+
+const _CACHE_PREFIX = "rapp_cache_v1:";
+const _CACHE_TTL_MS = 24 * 60 * 60 * 1000;  // 24h
+
+function _cacheGet(url) {
+  try {
+    const raw = localStorage.getItem(_CACHE_PREFIX + url);
+    if (!raw) return null;
+    const j = JSON.parse(raw);
+    if (!j || typeof j.t !== "number") return null;
+    return { value: j.v, fetchedAt: new Date(j.t), stale: Date.now() - j.t > _CACHE_TTL_MS };
+  } catch (_) { return null; }
+}
+function _cachePut(url, value) {
+  try {
+    localStorage.setItem(_CACHE_PREFIX + url, JSON.stringify({ t: Date.now(), v: value }));
+  } catch (_) { /* quota — fine, we just won't cache */ }
+}
+
+// Cached JSON fetch. Tries network first; falls back to cached value
+// on network or HTTP error. Returns { value, source: 'live'|'cache'|'none', stale }.
+async function cachedGhJson(url, headers) {
+  try {
+    const r = await fetch(url, { headers: headers || { Accept: "application/vnd.github+json" }, cache: "no-cache" });
+    if (r.ok) {
+      const j = await r.json();
+      _cachePut(url, j);
+      return { value: j, source: "live", stale: false };
+    }
+    // Non-2xx — fall through to cache
+  } catch (_) { /* network down — fall through */ }
+  const c = _cacheGet(url);
+  if (c) return { value: c.value, source: "cache", stale: c.stale, fetchedAt: c.fetchedAt };
+  return { value: null, source: "none", stale: true };
+}
+async function cachedGhText(url, headers) {
+  try {
+    const r = await fetch(url, { headers: headers || {}, cache: "no-cache" });
+    if (r.ok) {
+      const t = await r.text();
+      _cachePut(url, t);
+      return { value: t, source: "live", stale: false };
+    }
+  } catch (_) {}
+  const c = _cacheGet(url);
+  if (c) return { value: c.value, source: "cache", stale: c.stale, fetchedAt: c.fetchedAt };
+  return { value: null, source: "none", stale: true };
+}
+
+// Friendly display map for known agents. ONE term: agent. Never "skill".
+const AGENT_FRIENDLY = {
+  manage_memory_agent:   { name: "Manage Memory",   icon: "🧠" },
+  context_memory_agent:  { name: "Context Memory",  icon: "📌" },
+  learn_new_agent:       { name: "Learn New",       icon: "🎓" },
+  swarm_factory_agent:   { name: "Swarm Factory",   icon: "🐝" },
+  basic_agent:           null, // base class — not a capability
+};
+
+async function fillAgents() {
+  const el = document.getElementById("tr-agents");
+  if (!el) return;
+  const { owner, repo } = _ghOwnerRepo();
+  if (!owner || !repo) { el.innerHTML = ""; return; }
+  // Local-first: cachedGhJson tries network, then localStorage cache.
+  // An organism running offline still renders its agents from the last
+  // successful sync — never goes blank.
+  const res = await cachedGhJson(`https://api.github.com/repos/${owner}/${repo}/contents/agents`);
+  const list = res.value;
+  if (!Array.isArray(list)) {
+    el.innerHTML = res.source === "none"
+      ? '<span class="agent-chip skel">offline — agents will load when network returns</span>'
+      : "";
+    return;
+  }
+  const agents = [];
+  for (const f of list) {
+    if (f.type !== "file" || !f.name.endsWith(".py")) continue;
+    const stem = f.name.replace(/\.py$/, "");
+    const fr = AGENT_FRIENDLY[stem];
+    if (fr === null) continue;
+    if (fr) {
+      agents.push({ icon: fr.icon, label: fr.name, custom: false });
+    } else {
+      const friendly = stem.replace(/_agent$/, "").replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      agents.push({ icon: "✨", label: friendly, custom: true });
+    }
+  }
+  if (!agents.length) { el.innerHTML = '<span class="agent-chip skel">no agents loaded yet</span>'; return; }
+  const stalePill = (res.source === "cache" && res.stale)
+    ? `<span class="agent-chip skel" title="last synced ${res.fetchedAt ? res.fetchedAt.toLocaleString() : 'a while ago'} — offline reading from cache">📡 stale</span>`
+    : "";
+  el.innerHTML = agents.map(a =>
+    `<span class="agent-chip ${a.custom ? "agent-new" : ""}">${a.icon} ${escapeHtml(a.label)}</span>`
+  ).join("") + stalePill;
+}
+
+function fillAchievements(memCount, plantedAt, mutationCount) {
+  const el = document.getElementById("tr-achievements");
+  if (!el) return;
+  const ms = plantedAt ? Date.now() - new Date(plantedAt).getTime() : 0;
+  const days = ms / 86400000;
+  const ach = [];
+  if (memCount >= 1)   ach.push({ icon: "🌱", label: "First conversation" });
+  if (memCount >= 10)  ach.push({ icon: "📚", label: "10 memories" });
+  if (memCount >= 50)  ach.push({ icon: "🏛️", label: "50 memories" });
+  if (memCount >= 100) ach.push({ icon: "🏆", label: "100 memories" });
+  if (days >= 7)       ach.push({ icon: "🗓️", label: "First week" });
+  if (days >= 30)      ach.push({ icon: "📅", label: "First month" });
+  if (days >= 365)     ach.push({ icon: "🎂", label: "First year" });
+  if (mutationCount >= 5)  ach.push({ icon: "🔧", label: "5+ mutations" });
+  if (mutationCount >= 25) ach.push({ icon: "⚙️", label: "25+ mutations" });
+  if (!ach.length) {
+    el.innerHTML = '<span class="agent-chip skel">earn your first achievement by talking with me</span>';
+    return;
+  }
+  el.innerHTML = ach.map(a => `<span class="agent-chip achievement">${a.icon} ${escapeHtml(a.label)}</span>`).join("");
+}
+
+function _relativeDate(iso) {
+  if (!iso) return "";
+  const ms = Date.now() - new Date(iso).getTime();
+  if (Number.isNaN(ms) || ms < 0) return "";
+  const min = Math.floor(ms / 60000);
+  if (min < 60)   return min + "m ago";
+  const hr = Math.floor(min / 60);
+  if (hr < 24)    return hr + "h ago";
+  const d = Math.floor(hr / 24);
+  if (d < 30)     return d + "d ago";
+  const mo = Math.floor(d / 30);
+  if (mo < 12)    return mo + "mo ago";
+  return Math.floor(mo / 12) + "y ago";
+}
+
+async function fillMutations() {
+  const list = document.getElementById("tr-mutations");
+  if (!list) return { count: 0, lastDate: null };
+  const { owner, repo } = _ghOwnerRepo();
+  const linkEl = document.getElementById("tr-history-link");
+  if (linkEl && owner && repo) linkEl.href = `https://github.com/${owner}/${repo}/commits`;
+  // Local-first: cached GH fetch keeps the mutation log visible offline.
+  const res = await cachedGhJson(`https://api.github.com/repos/${owner}/${repo}/commits?per_page=6`);
+  const commits = res.value;
+  if (!Array.isArray(commits) || !commits.length) {
+    list.innerHTML = res.source === "none"
+      ? '<li class="skel">offline — mutation log will load when network returns</li>'
+      : '<li class="skel">no mutation history yet</li>';
+    return { count: 0, lastDate: null };
+  }
+  const stalePrefix = (res.source === "cache" && res.stale)
+    ? `<li class="skel" style="font-size:10px">📡 cached snapshot — last synced ${res.fetchedAt ? res.fetchedAt.toLocaleString() : 'unknown'}</li>` : "";
+  list.innerHTML = stalePrefix + commits.slice(0, 5).map(c => {
+    const msg = (c.commit && c.commit.message || "").split("\n")[0].slice(0, 90);
+    const when = _relativeDate(c.commit && c.commit.author && c.commit.author.date);
+    return `<li><span class="mut-time">${escapeHtml(when)}</span><span class="mut-msg">${escapeHtml(msg) || '<span class="empty">(no message)</span>'}</span></li>`;
+  }).join("");
+  const lastDate = commits[0] && commits[0].commit && commits[0].commit.author && commits[0].commit.author.date;
+  return { count: commits.length, lastDate: lastDate || null };
+}
+
+// Fork count = offspring. Each fork is a child organism — they boost the
+// parent's MMR like pedigree boosts a thoroughbred. Pulled straight off
+// the seed's repo metadata; anonymous-friendly.
+async function _forkCount() {
+  const { owner, repo } = _ghOwnerRepo();
+  if (!owner || !repo) return 0;
+  const res = await cachedGhJson(`https://api.github.com/repos/${owner}/${repo}`);
+  return Math.max(0, (res.value && res.value.forks_count) || 0);
+}
+
+async function fillLineage() {
+  const el = document.getElementById("tr-lineage");
+  if (!el) return;
+  try {
+    const r = await fetch("rappid.json", { cache: "no-cache" });
+    if (!r.ok) return;
+    const j = await r.json();
+    const parts = [];
+    if (j.parent_repo) {
+      const repoLabel = j.parent_repo.replace(/^https?:\/\/github\.com\//, "").replace(/\.git$/, "");
+      parts.push(`Templated from <a href="${escapeHtml(j.parent_repo)}" target="_blank" rel="noopener">${escapeHtml(repoLabel)}</a>`);
+    }
+    if (j.parent_rappid) {
+      parts.push(`lineage <code>${escapeHtml(j.parent_rappid.slice(0, 8))}…</code>`);
+    }
+    if (j.kernel_version) parts.push(`kernel <code>v${escapeHtml(j.kernel_version)}</code>`);
+    el.innerHTML = parts.length ? parts.join(" · ") : "";
+  } catch (_) {}
+}
+
+// MMR — Dota-style global rating for digital organisms. Same formula
+// computed from the same public signals on every planted seed, so a
+// 3500-MMR Heimdall is directly comparable to a 3500-MMR Cloud Gate
+// or any other organism on the species. The score reflects: lived
+// time, accumulated memory (depth of relationship), mutation count
+// (operator steering), custom agents (capabilities earned beyond
+// the doorman defaults), AND offspring (organisms forked from this
+// one — pedigree counts).
+//
+// Calibration: organisms with < CALIBRATION_MUTATIONS commits and
+// fewer than CALIBRATION_DAYS days of life are in placement mode;
+// their MMR isn't locked in yet — they show "📐 Calibrating" with a
+// progress bar instead of a tier badge. Same idea as Dota 2's first
+// 10 calibration games before MMR locks in.
+//
+// Activity decay: inactivity costs MMR. An organism whose last commit
+// was 90 days ago reads "slowing" and gets a 10% penalty; 180+ days
+// is "dormant" and -30%; 3+ years is "stasis" and floored at 1000.
+// This way, the cream rises — popular, actively-stewarded organisms
+// climb past the abandoned ones with similar raw memory counts.
+//
+//   1000  base — every planted seed is born at Cradle
+//   + memCount × 30          (each conversation deepens us)
+//   + sqrt(mutCount) × 250   (each operator commit shapes us)
+//   + customAgentCount × 350 (each new capability earned)
+//   + sqrt(ageDays) × 80     (lived time matters)
+//   + sqrt(forkCount) × 400  (offspring planted from this lineage)
+//   × activityFactor         (0.7 → 1.0 based on last commit recency)
+//
+// Tier thresholds match Dota 2's recognizable medal ladder so the
+// number reads naturally to anyone who's seen MMR before.
+
+const CALIBRATION_MUTATIONS = 5;
+const CALIBRATION_DAYS      = 7;
+
+function activityStatus(lastCommitIso) {
+  if (!lastCommitIso) return { kind: "unknown", label: "no activity yet", factor: 1.0 };
+  const daysSince = (Date.now() - new Date(lastCommitIso).getTime()) / 86400000;
+  if (daysSince <= 30)   return { kind: "active",   label: "✓ Active",   factor: 1.0  };
+  if (daysSince <= 180)  return { kind: "slowing",  label: "〰 Slowing",  factor: 0.85 };
+  if (daysSince <= 1095) return { kind: "dormant",  label: "💤 Dormant",  factor: 0.65 };
+  return                          { kind: "stasis",  label: "❄ Stasis",   factor: 0.45 };
+}
+
+function computeMMR({ memCount, mutCount, customAgents, ageDays, forkCount, activityFactor, lineageGift }) {
+  const m = Math.max(0, memCount || 0);
+  const x = Math.max(0, mutCount || 0);
+  const c = Math.max(0, customAgents || 0);
+  const d = Math.max(0, ageDays || 0);
+  const f = Math.max(0, forkCount || 0);
+  const af = (typeof activityFactor === "number" && activityFactor > 0) ? activityFactor : 1.0;
+  const lg = Math.max(0, lineageGift || 0);
+  const raw = 1000
+    + m * 30
+    + Math.sqrt(x) * 250
+    + c * 350
+    + Math.sqrt(d) * 80
+    + Math.sqrt(f) * 400;
+  // Stasis floors at 1000 — even a long-dormant elder doesn't go below
+  // baseline. The factor is applied to the SCORE-ABOVE-BASELINE so the
+  // organism's existence is preserved even when uncared-for. Lineage
+  // gift sits OUTSIDE the activity factor — your inherited genes don't
+  // wither just because you took a year off.
+  const above = Math.max(0, raw - 1000);
+  return Math.round(1000 + above * af + lg);
+}
+
+// Parent lineage lookup — when a seed has a parent_repo, fetch the
+// parent's current public signals and compute their MMR. The child
+// inherits 30% of the parent's above-baseline as a head start. This
+// is the genes-and-epigenetics layer: who your parent is at the time
+// you visit them shapes the gift you read on this card.
+//
+// Pure read — anonymous-friendly. Skips silently if parent_repo isn't
+// set or isn't a github.com URL.
+async function _parentLineageGift(rappidObj) {
+  if (!rappidObj || !rappidObj.parent_repo) return null;
+  // Plant-time snapshot wins if it was baked into rappid.json at plant.
+  // This is the genes/epigenetics layer: the parent's MMR-at-our-birth
+  // is fixed; later regression on the parent doesn't affect children
+  // already planted from it. Same shape the live fetcher returns so
+  // the rest of the pipeline doesn't branch.
+  if (rappidObj.lineage_snapshot && typeof rappidObj.lineage_snapshot.parent_mmr_at_birth === "number") {
+    const snap = rappidObj.lineage_snapshot;
+    const gift = Math.round(Math.max(0, (snap.parent_mmr_at_birth - 1000) * 0.30));
+    return {
+      parentMMR:        snap.parent_mmr_at_birth,
+      gift:             gift,
+      parentRepoLabel:  snap.parent_repo_label || (snap.parent_repo || "").replace(/^https?:\/\/github\.com\//, "").replace(/\.git$/, ""),
+      source:           "snapshot",
+      snapshotted_at:   snap.snapshotted_at,
+    };
+  }
+  // No snapshot → live fetch (the path we used before; kept for older
+  // seeds planted before this commit).
+  const m = rappidObj.parent_repo.match(/github\.com\/([^/]+)\/([^/]+?)(?:\.git)?\/?$/);
+  if (!m) return null;
+  const [, owner, repo] = m;
+  // Local-first: each lookup is cache-wrapped. If we go airplane mode,
+  // the lineage gift renders from the last successful sync — the
+  // organism never forgets its parent.
+  const [repoRes, commitsRes, memRes, agentsRes] = await Promise.all([
+    cachedGhJson(`https://api.github.com/repos/${owner}/${repo}`),
+    cachedGhJson(`https://api.github.com/repos/${owner}/${repo}/commits?per_page=6`),
+    cachedGhText(`https://raw.githubusercontent.com/${owner}/${repo}/main/.brainstem_data/memory.json`),
+    cachedGhJson(`https://api.github.com/repos/${owner}/${repo}/contents/agents`),
+  ]);
+  const repoJ = repoRes.value;
+  if (!repoJ) return null;
+  const ageDays   = repoJ.created_at ? (Date.now() - new Date(repoJ.created_at).getTime()) / 86400000 : 0;
+  const forkCount = repoJ.forks_count || 0;
+  let mutCount = 0, lastCommit = null;
+  if (Array.isArray(commitsRes.value)) {
+    mutCount = commitsRes.value.length;
+    if (commitsRes.value[0] && commitsRes.value[0].commit && commitsRes.value[0].commit.author) {
+      lastCommit = commitsRes.value[0].commit.author.date;
+    }
+  }
+  let memCount = 0;
+  if (memRes.value) {
+    try { const j = JSON.parse(memRes.value); memCount = Array.isArray(j.facts) ? j.facts.length : 0; } catch (_) {}
+  }
+  let customAgents = 0;
+  if (Array.isArray(agentsRes.value)) {
+    customAgents = agentsRes.value.filter(f =>
+      f.type === "file" && f.name.endsWith(".py") &&
+      !(f.name.replace(/\.py$/, "") in AGENT_FRIENDLY)
+    ).length;
+  }
+  const act = activityStatus(lastCommit);
+  const parentMMR = computeMMR({
+    memCount, mutCount, customAgents, ageDays, forkCount,
+    activityFactor: act.factor,
+  });
+  // Child inherits 30% of parent's above-baseline as the lineage gift.
+  const gift = Math.round(Math.max(0, (parentMMR - 1000) * 0.30));
+  return { parentMMR, gift, parentRepoLabel: owner + "/" + repo, source: "live" };
+}
+
+// Calibration check — has the organism graduated from placement?
+function calibrationProgress({ mutCount, ageDays }) {
+  const m = mutCount || 0;
+  const d = ageDays || 0;
+  const calibrating = (m < CALIBRATION_MUTATIONS) && (d < CALIBRATION_DAYS);
+  // Progress: pick whichever signal is closer to graduation
+  const mutProg = Math.min(1, m / CALIBRATION_MUTATIONS);
+  const ageProg = Math.min(1, d / CALIBRATION_DAYS);
+  return { calibrating, progress: Math.max(mutProg, ageProg) };
+}
+
+const MMR_TIERS = [
+  { min:    0, name: "Herald",    cls: "t-herald"   },
+  { min: 1500, name: "Guardian",  cls: "t-guardian" },
+  { min: 2000, name: "Crusader",  cls: "t-crusader" },
+  { min: 2500, name: "Archon",    cls: "t-archon"   },
+  { min: 3000, name: "Legend",    cls: "t-legend"   },
+  { min: 3500, name: "Ancient",   cls: "t-ancient"  },
+  { min: 4500, name: "Divine",    cls: "t-divine"   },
+  { min: 6000, name: "Immortal",  cls: "t-immortal" },
+];
+
+function tierForMMR(mmr) {
+  let chosen = MMR_TIERS[0];
+  for (const t of MMR_TIERS) { if (mmr >= t.min) chosen = t; }
+  return chosen;
+}
+
+function fillMMR(inputs) {
+  const num = document.getElementById("mmr-num");
+  const tier = document.getElementById("mmr-tier");
+  const bd = document.getElementById("mmr-breakdown");
+  if (!num || !tier) return;
+
+  const cal = calibrationProgress(inputs);
+  const act = activityStatus(inputs.lastCommit);
+
+  if (cal.calibrating) {
+    // Placement mode — show progress instead of a tier locked-in number.
+    // Same shape of UI; the visitor sees the organism is still calibrating.
+    num.textContent = "📐";
+    tier.textContent = "Calibrating";
+    tier.className = "mmr-tier";
+    const pct = Math.round(cal.progress * 100);
+    bd.textContent = `placement matches ${pct}% complete · MMR locks in after ${CALIBRATION_MUTATIONS} mutations or ${CALIBRATION_DAYS} days`;
+    return;
+  }
+
+  const mmr = computeMMR({ ...inputs, activityFactor: act.factor });
+  const t = tierForMMR(mmr);
+  num.textContent = String(mmr);
+  tier.textContent = t.name;
+  tier.className = "mmr-tier " + t.cls;
+
+  const parts = [];
+  if (inputs.memCount)     parts.push(inputs.memCount + " mem");
+  if (inputs.mutCount)     parts.push(inputs.mutCount + (inputs.mutCount >= 6 ? "+" : "") + " mut");
+  if (inputs.customAgents) parts.push(inputs.customAgents + " custom agent" + (inputs.customAgents === 1 ? "" : "s"));
+  if (inputs.forkCount)    parts.push(inputs.forkCount + " fork" + (inputs.forkCount === 1 ? "" : "s") + " 🌳");
+  if (inputs.ageDays)      parts.push(Math.floor(inputs.ageDays) + "d alive");
+  // Activity status as a colored chip baked into the breakdown
+  let activityNote = "";
+  if (act.kind === "active")        activityNote = ` · <span style="color:#7ee787">${act.label}</span>`;
+  else if (act.kind === "slowing")  activityNote = ` · <span style="color:#d29922">${act.label}</span> (-15%)`;
+  else if (act.kind === "dormant")  activityNote = ` · <span style="color:#8b949e">${act.label}</span> (-35%)`;
+  else if (act.kind === "stasis")   activityNote = ` · <span style="color:#6e7681">${act.label}</span> (frozen)`;
+  // Lineage gift — show if the parent's MMR contributed inheritance
+  let lineageNote = "";
+  if (inputs.lineage && inputs.lineage.gift > 0) {
+    lineageNote = ` · <span style="color:#a78bfa" title="Inherited from your parent organism — genes + epigenetics. 30% of parent's above-baseline MMR.">+${inputs.lineage.gift} lineage gift from <a href="https://github.com/${escapeHtml(inputs.lineage.parentRepoLabel)}" target="_blank" rel="noopener" style="color:inherit">${escapeHtml(inputs.lineage.parentRepoLabel)}</a> (${inputs.lineage.parentMMR} MMR)</span>`;
+  }
+  bd.innerHTML = (parts.length ? "earned from " + escapeHtml(parts.join(" · ")) : "fresh plant") + activityNote + lineageNote;
+}
+
+// Custom-agent count — how many agents beyond the doorman defaults?
+async function _customAgentCount() {
+  const { owner, repo } = _ghOwnerRepo();
+  if (!owner || !repo) return 0;
+  try {
+    const r = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/agents`, {
+      headers: { Accept: "application/vnd.github+json" },
+    });
+    if (!r.ok) return 0;
+    const list = await r.json();
+    if (!Array.isArray(list)) return 0;
+    let custom = 0;
+    for (const f of list) {
+      if (f.type !== "file" || !f.name.endsWith(".py")) continue;
+      const stem = f.name.replace(/\.py$/, "");
+      if (!(stem in AGENT_FRIENDLY)) custom++;  // not a known doorman/ascended agent
+    }
+    return custom;
+  } catch (_) { return 0; }
+}
+
+(async function fillTrackRecord() {
+  // Memory count + age + parent first (needed for achievements + MMR)
+  let memCount = 0, plantedAt = null, rappidObj = null;
+  try {
+    const r = await fetch(".brainstem_data/memory.json", { cache: "no-cache" });
+    if (r.ok) { const j = await r.json(); memCount = Array.isArray(j.facts) ? j.facts.length : 0; }
+  } catch (_) {}
+  try {
+    const r = await fetch("rappid.json", { cache: "no-cache" });
+    if (r.ok) { rappidObj = await r.json(); plantedAt = rappidObj.planted_at || null; }
+  } catch (_) {}
+
+  // Fetch all signal sources in parallel — each independent.
+  const [agentsRes, mutationsRes, customAgents, forkCount, lineage] = await Promise.all([
+    fillAgents(),
+    fillMutations(),
+    fillLineage().then(() => _customAgentCount()),
+    _forkCount(),
+    _parentLineageGift(rappidObj),
+  ]);
+  void agentsRes;
+
+  const ageDays   = plantedAt ? (Date.now() - new Date(plantedAt).getTime()) / 86400000 : 0;
+  const mutCount  = mutationsRes && mutationsRes.count || 0;
+  const lastCommit = mutationsRes && mutationsRes.lastDate || null;
+  const lineageGift = lineage ? lineage.gift : 0;
+
+  fillMMR({
+    memCount, mutCount, customAgents, ageDays,
+    forkCount, lastCommit, lineageGift, lineage,
+  });
+  fillAchievements(memCount, plantedAt, mutCount);
+})();
+
+(async function fillStats() {
+  // Memory count
+  const memEl = document.getElementById("stat-mem");
+  if (memEl) {
+    try {
+      const r = await fetch(".brainstem_data/memory.json", { cache: "no-cache" });
+      if (r.ok) {
+        const j = await r.json();
+        const n = Array.isArray(j.facts) ? j.facts.length : 0;
+        memEl.textContent = n === 0
+          ? "🧠 ready for its first memory"
+          : "🧠 " + n + " memor" + (n === 1 ? "y" : "ies") + " from past visits";
+      } else {
+        memEl.textContent = "🧠 ready for its first memory";
+      }
+    } catch (_) {
+      memEl.textContent = "🧠 ready for its first memory";
+    }
+  }
+  // Age
+  const ageEl = document.getElementById("stat-age");
+  if (ageEl) {
+    try {
+      const r = await fetch("rappid.json", { cache: "no-cache" });
+      if (r.ok) {
+        const j = await r.json();
+        const txt = relativeAge(j.planted_at);
+        if (txt) ageEl.textContent = "🌱 " + txt;
+        else ageEl.remove();
+      } else {
+        ageEl.remove();
+      }
+    } catch (_) { ageEl.remove(); }
+  }
+})();
+</script>
+</body>
+</html>
