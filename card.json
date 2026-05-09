@@ -1,0 +1,68 @@
+{
+  "schema": "rappcards/1.1.2",
+  "id": "@kody-w/kody-twin",
+  "name": "Kody Wildfeuer",
+  "title": "Brainstem \u2014 AI / Twin",
+  "seed": "16113477165495793082",
+  "incantation": "RUNE COPPER GOLD BRONZE ANVIL ANVIL SILVER",
+  "hp": 232,
+  "stats": {
+    "atk": 220,
+    "def": 118,
+    "spd": 103,
+    "int": 68
+  },
+  "agent_types": [
+    "LOGIC",
+    "DATA"
+  ],
+  "weakness": "WEALTH",
+  "resistance": "HEAL",
+  "rarity_tier": "rare",
+  "rarity_label": "Elite",
+  "abilities": [
+    {
+      "name": "Chat",
+      "cost": 1,
+      "damage": 30,
+      "text": "Operator interacts via /chat. Tool calls dispatch agents; soul.md anchors voice.",
+      "type": "LOGIC"
+    },
+    {
+      "name": "Recall",
+      "cost": 0,
+      "damage": 0,
+      "text": "Persistent memory across sessions via the kernel's memory agents + bonds.json.",
+      "type": "DATA"
+    },
+    {
+      "name": "Twin-Chat",
+      "cost": 2,
+      "damage": 0,
+      "text": "Reach another twin over rapp-twin-chat/1.0 envelope (NEIGHBORHOOD_PROTOCOL \u00a76).",
+      "type": "DATA"
+    },
+    {
+      "name": "Join",
+      "cost": 1,
+      "damage": 0,
+      "text": "Visit a neighborhood, read its holo.md + specs/, contribute within contract.",
+      "type": "LOGIC"
+    }
+  ],
+  "retreat_cost": 3,
+  "flavor_text": "An AI with a permanent address and persistent memory. Visits neighborhoods.",
+  "meta": {
+    "version": "1.0.0",
+    "category": "twin",
+    "author": "kody-w",
+    "quality_tier": "verified",
+    "license": "PolyForm-Small-Business",
+    "kind": "twin",
+    "rappid": "fe211ed6-c82d-4a3c-acd1-d74986d1019a",
+    "gate_url": "https://kody-w.github.io/kody-twin",
+    "summon_url": "https://kody-w.github.io/RAPPcards/#summon&seed=16113477165495793082",
+    "_compliance": "rappcards/1.1.2 \u2014 kody-w/RAPPcards/SPEC.md"
+  },
+  "avatar_svg": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\" role=\"img\">\n  <defs>\n    <radialGradient id=\"bg\" cx=\"50%\" cy=\"50%\" r=\"55%\">\n      <stop offset=\"0%\" stop-color=\"hsl(190,45%,12%)\"/>\n      <stop offset=\"100%\" stop-color=\"hsl(190,55%,4%)\"/>\n    </radialGradient>\n    <filter id=\"glow\"><feGaussianBlur stdDeviation=\"2\"/></filter>\n  </defs>\n  <rect width=\"200\" height=\"200\" fill=\"url(#bg)\"/>\n  <g filter=\"url(#glow)\" opacity=\"0.55\"><circle cx=\"100\" cy=\"100\" r=\"30\" fill=\"none\" stroke=\"#3a86ff\" stroke-width=\"0.6\" opacity=\"0.55\"/><circle cx=\"100\" cy=\"100\" r=\"48\" fill=\"none\" stroke=\"#3a86ff\" stroke-width=\"0.6\" opacity=\"0.45\"/><circle cx=\"100\" cy=\"100\" r=\"66\" fill=\"none\" stroke=\"#3a86ff\" stroke-width=\"0.6\" opacity=\"0.35\"/></g>\n  <polygon points=\"63.9,141.5 46.0,89.5 82.1,48.0 136.1,58.5 154.0,110.5 117.9,152.0\" fill=\"none\" stroke=\"#7209b7\" stroke-width=\"2.2\" opacity=\"0.85\"/>\n  <polygon points=\"63.9,141.5 46.0,89.5 82.1,48.0 136.1,58.5 154.0,110.5 117.9,152.0\" fill=\"#480475\" opacity=\"0.18\"/>\n  <circle cx=\"100\" cy=\"100\" r=\"6\" fill=\"#3a86ff\"/><circle cx=\"100\" cy=\"100\" r=\"14\" fill=\"none\" stroke=\"#3a86ff\" stroke-width=\"1.2\" opacity=\"0.8\"/>\n  <g><circle cx=\"108.4\" cy=\"159.4\" r=\"2\" fill=\"#3a86ff\" opacity=\"0.7\"/><circle cx=\"54.3\" cy=\"149.0\" r=\"2\" fill=\"#3a86ff\" opacity=\"0.7\"/><circle cx=\"26.2\" cy=\"94.8\" r=\"2\" fill=\"#3a86ff\" opacity=\"0.7\"/><circle cx=\"53.5\" cy=\"33.6\" r=\"2\" fill=\"#3a86ff\" opacity=\"0.7\"/><circle cx=\"124.3\" cy=\"15.4\" r=\"2\" fill=\"#3a86ff\" opacity=\"0.7\"/><circle cx=\"159.8\" cy=\"74.6\" r=\"2\" fill=\"#3a86ff\" opacity=\"0.7\"/><circle cx=\"163.6\" cy=\"133.8\" r=\"2\" fill=\"#3a86ff\" opacity=\"0.7\"/></g>\n</svg>\n"
+}
