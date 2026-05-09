@@ -1,0 +1,6 @@
+{
+  "schema": "rapp-facets/1.0",
+  "rappid": "rappid:v2:twin:@kody-w/kody-twin:91d006ca7bd052bfa5021d623122012f@github.com/kody-w/kody-twin",
+  "facets": {},
+  "_note": "Declare published capabilities here over time. See specs/SPEC.md \u00a73."
+}
