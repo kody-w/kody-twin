@@ -3652,7 +3652,8 @@ _r if isinstance(_r, str) else json.dumps(_r)
                     // Marker (rappVoiceMigrationV2) prevents repeats.
                     if (!parsed.rappVoiceMigrationV2) {
                         if (parsed.voice && parsed.voice.output) parsed.voice.output.autoSpeak = true;
-                        if (parsed.voice && parsed.voice.input)  parsed.voice.input.continuousConversation = true;
+                        if (parsed.voice && parsed.voice.output) parsed.voice.output.enabled              = true;
+                    if (parsed.voice && parsed.voice.input)  parsed.voice.input.continuousConversation = true;
                         // Backfill new fields for users with older shape
                         if (parsed.voice && parsed.voice.output) {
                             if (parsed.voice.output.elevenLabsKey === undefined) parsed.voice.output.elevenLabsKey = '';
@@ -4196,6 +4197,17 @@ _r if isinstance(_r, str) else json.dumps(_r)
                 this.isKeyPressed = false;
                 this.isPaused = false;
                 this.wasListeningBeforePause = false;
+                this.hardFailedCount = 0;       // consecutive network/service errors — cap to avoid infinite retry
+                this.giveUpRetries = false;     // set true after 3 hard errors; user must explicitly re-enable
+                this.azureRecognizer = null;    // Azure Speech SDK fallback for browsers where Web Speech is blocked (Edge tracking-prevention)
+                this.azureMode = false;         // true when running on Azure SDK instead of Web Speech
+                this.whisperPipeline = null;    // Transformers.js Whisper pipeline (lazy-loaded, ~39MB whisper-tiny.en)
+                this.whisperLoading = false;
+                this.whisperReady = false;
+                this.whisperMode = false;       // true when push-to-talk via Whisper WASM is active
+                this.whisperRecording = false;
+                this.mediaRecorder = null;
+                this.recordedChunks = [];
                 
                 this.initializeSpeechRecognition();
                 
@@ -4242,7 +4254,11 @@ _r if isinstance(_r, str) else json.dumps(_r)
                         this.aiManager.world.showModeManager.broadcastVoiceActivity('idle');
                     }
                     
-                    // Only restart if continuous mode is enabled and not paused
+                    // Only restart if continuous mode is enabled, not paused, AND we
+                    // haven't given up after consecutive hard errors.
+                    if (this.giveUpRetries) {
+                        return;
+                    }
                     if (this.continuousMode && this.isEnabled && this.aiManager.isActive && !this.isPaused) {
                         setTimeout(() => {
                             if (!this.aiManager.voiceManager.isSpeaking && !this.isPaused) {
@@ -4273,6 +4289,9 @@ _r if isinstance(_r, str) else json.dumps(_r)
                         console.log('Final transcript:', finalTranscript);
                         document.getElementById('ai-chat-input').value = finalTranscript;
                         this.aiManager.sendMessage();
+                        // Successful result — reset hard-error counter
+                        this.hardFailedCount = 0;
+                        this.giveUpRetries = false;
                         
                         if (!this.continuousMode) {
                             this.stopListening();
@@ -4286,14 +4305,50 @@ _r if isinstance(_r, str) else json.dumps(_r)
                     this.voiceInputBtn.classList.remove('recording');
                     this.listeningIndicator.classList.remove('active');
                     
-                    // Ignore aborted errors when pausing
+                    // Ignore aborted (pause) + no-speech (just silence)
                     if (event.error === 'aborted') {
-                        console.log('Speech recognition aborted (likely due to pause)');
+                        console.log('Speech recognition aborted (pause)');
+                        return;
+                    }
+                    if (event.error === 'no-speech') {
                         return;
                     }
                     
-                    if (event.error === 'no-speech') {
-                        return;
+                    // CAP retries on hard errors (network, audio-capture, service-not-allowed).
+                    // Edge / aggressive tracking prevention often blocks the free speech endpoint;
+                    // looping forever burns battery + floods console. After 3 consecutive hard
+                    // errors, give up + show a one-time notification. User can re-enable via
+                    // voice button or by reloading.
+                    const HARD_ERRORS = ['network', 'audio-capture', 'service-not-allowed', 'not-allowed'];
+                    if (HARD_ERRORS.indexOf(event.error) !== -1) {
+                        this.hardFailedCount = (this.hardFailedCount || 0) + 1;
+                        if (this.hardFailedCount >= 3) {
+                            // Web Speech API is blocked / unreachable. Try Azure Speech SDK fallback
+                            // BEFORE giving up entirely — works on Edge with tracking-prevention.
+                            const tryAzure = () => {
+                                const azureKey = this.aiManager && this.aiManager.voiceManager && this.aiManager.voiceManager.azureKey;
+                                const azureRegion = (this.aiManager && this.aiManager.voiceManager && this.aiManager.voiceManager.azureRegion) || 'eastus2';
+                                if (azureKey && window.SpeechSDK) {
+                                    console.warn('[voice] Web Speech failed 3x — switching to Microsoft Speech SDK fallback (Azure ' + azureRegion + ')');
+                                    this.showNotification('Voice: switched to Microsoft Speech SDK (Edge fallback)');
+                                    this.startAzureRecognition(azureKey, azureRegion);
+                                    return true;
+                                }
+                                return false;
+                            };
+                            if (tryAzure()) {
+                                this.hardFailedCount = 0;
+                                return;
+                            }
+                            // FINAL FALLBACK: Whisper.cpp WASM via Transformers.js — runs entirely
+                            // in-browser, no API key, no service dependency. ~39MB one-time model
+                            // download (cached forever after first use). Push-to-talk model.
+                            console.warn('[voice] Web Speech failed 3x and no Azure key — switching to Whisper WASM (push-to-talk)');
+                            this.showNotification('Voice: switching to Whisper WASM (in-browser, ~39MB on first use). Tap mic button to record.');
+                            this.giveUpRetries = true;  // stop Web Speech retries
+                            this.enableWhisperPushToTalk();
+                            return;
+                        }
                     }
                     
                     this.showNotification(`Speech recognition error: ${event.error}`);
@@ -4302,6 +4357,24 @@ _r if isinstance(_r, str) else json.dumps(_r)
 
             setupEventListeners() {
                 if (this.voiceInputBtn) {
+                    // Manual voice-button tap also resets the give-up flag
+                    this.voiceInputBtn.addEventListener('click', () => {
+                        // Whisper push-to-talk mode: tap toggles recording
+                        if (this.whisperMode) {
+                            if (this.whisperRecording) this.stopWhisperRecording();
+                            else this.startWhisperRecording();
+                            return;
+                        }
+                        if (this.giveUpRetries || this.hardFailedCount >= 3) {
+                            console.log('[voice] manual retry — clearing give-up state');
+                            this.giveUpRetries = false;
+                            this.hardFailedCount = 0;
+                        }
+                        // If currently in Azure mode, stop it so manual tap acts on Web Speech
+                        if (this.azureMode) {
+                            this.stopAzureRecognition();
+                        }
+                    });
                     if (isMobile) {
                         this.voiceInputBtn.addEventListener('touchstart', (e) => {
                             e.preventDefault();
@@ -4371,6 +4444,16 @@ _r if isinstance(_r, str) else json.dumps(_r)
             }
 
             stopListening() {
+                // Whisper push-to-talk → stop recording
+                if (this.whisperMode && this.whisperRecording) {
+                    this.stopWhisperRecording();
+                    return;
+                }
+                // Azure mode → stop Azure recognizer instead
+                if (this.azureMode) {
+                    this.stopAzureRecognition();
+                    return;
+                }
                 if (!this.recognition || !this.isListening) {
                     return;
                 }
@@ -4388,6 +4471,238 @@ _r if isinstance(_r, str) else json.dumps(_r)
                     this.stopListening();
                 }
                 this.updateButtonState();
+            }
+
+            // ── Microsoft Speech SDK fallback (used when Web Speech API is blocked,
+            //    e.g. on Edge with tracking prevention enabled).
+            //    Reuses the same azureKey + azureRegion already configured for TTS.
+            startAzureRecognition(azureKey, azureRegion) {
+                if (this.azureMode && this.azureRecognizer) return;
+                if (!window.SpeechSDK) {
+                    console.warn('[voice] Microsoft Speech SDK not loaded yet');
+                    return;
+                }
+                try {
+                    const speechConfig = window.SpeechSDK.SpeechConfig.fromSubscription(azureKey, azureRegion);
+                    speechConfig.speechRecognitionLanguage = 'en-US';
+                    const audioConfig = window.SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
+                    this.azureRecognizer = new window.SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+                    this.azureMode = true;
+
+                    // Live partial transcription → input field
+                    this.azureRecognizer.recognizing = (s, e) => {
+                        if (e.result && e.result.text) {
+                            const inp = document.getElementById('ai-chat-input');
+                            if (inp) inp.value = e.result.text;
+                        }
+                    };
+                    // Final transcription → send message
+                    this.azureRecognizer.recognized = (s, e) => {
+                        if (e.result && e.result.reason === window.SpeechSDK.ResultReason.RecognizedSpeech && e.result.text) {
+                            console.log('[voice/azure] final:', e.result.text);
+                            const inp = document.getElementById('ai-chat-input');
+                            if (inp) inp.value = e.result.text;
+                            this.aiManager.sendMessage();
+                        }
+                    };
+                    this.azureRecognizer.canceled = (s, e) => {
+                        console.warn('[voice/azure] canceled:', e.errorDetails || e.reason);
+                        this.stopAzureRecognition();
+                        // Don't auto-restart on cancel — let user explicitly re-enable
+                    };
+                    this.azureRecognizer.sessionStopped = () => {
+                        console.log('[voice/azure] session stopped');
+                        // In continuous mode, restart
+                        if (this.continuousMode && this.isEnabled && this.aiManager.isActive && !this.isPaused && !this.aiManager.voiceManager.isSpeaking) {
+                            setTimeout(() => {
+                                if (this.azureMode && this.azureRecognizer) {
+                                    this.azureRecognizer.startContinuousRecognitionAsync();
+                                }
+                            }, 500);
+                        }
+                    };
+
+                    this.azureRecognizer.startContinuousRecognitionAsync(
+                        () => {
+                            this.isListening = true;
+                            this.voiceInputBtn.classList.add('recording');
+                            this.listeningIndicator.classList.add('active');
+                            console.log('[voice/azure] started');
+                        },
+                        (err) => {
+                            console.error('[voice/azure] start failed:', err);
+                            this.azureMode = false;
+                            this.azureRecognizer = null;
+                            this.giveUpRetries = true;
+                            this.showNotification('Azure Speech failed to start: ' + err);
+                        }
+                    );
+                } catch (e) {
+                    console.error('[voice/azure] init failed:', e);
+                    this.azureMode = false;
+                    this.azureRecognizer = null;
+                    this.giveUpRetries = true;
+                    this.showNotification('Azure Speech init failed: ' + e.message);
+                }
+            }
+
+            // ── Whisper.cpp WASM fallback (Transformers.js + whisper-tiny.en) ──
+            //    Runs entirely in-browser. No API key. No external service. ~39MB
+            //    one-time model download (cached). Push-to-talk: tap mic → record →
+            //    tap again → transcribe → send. Works on every browser including
+            //    Edge with tracking prevention enabled.
+            async loadWhisperPipeline() {
+                if (this.whisperReady) return this.whisperPipeline;
+                if (this.whisperLoading) {
+                    // already loading; wait for completion
+                    while (this.whisperLoading) await new Promise(r => setTimeout(r, 200));
+                    return this.whisperPipeline;
+                }
+                this.whisperLoading = true;
+                try {
+                    this.showNotification('Whisper: downloading model (~39MB, first time only)…');
+                    const { pipeline, env } = await import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2');
+                    env.allowLocalModels = false;
+                    env.useBrowserCache = true;  // cache the model in IndexedDB
+                    this.whisperPipeline = await pipeline(
+                        'automatic-speech-recognition',
+                        'Xenova/whisper-tiny.en',
+                        { progress_callback: (p) => {
+                            if (p.status === 'progress' && p.file) {
+                                const pct = Math.round((p.progress || 0));
+                                console.log(`[whisper] ${p.file}: ${pct}%`);
+                            }
+                        }}
+                    );
+                    this.whisperReady = true;
+                    this.showNotification('Whisper ready. Tap mic to record.');
+                    return this.whisperPipeline;
+                } catch (e) {
+                    console.error('[whisper] load failed:', e);
+                    this.showNotification('Whisper load failed: ' + (e.message || e));
+                    return null;
+                } finally {
+                    this.whisperLoading = false;
+                }
+            }
+
+            enableWhisperPushToTalk() {
+                this.whisperMode = true;
+                this.azureMode = false;
+                // Pre-load the model in the background so first tap is fast
+                this.loadWhisperPipeline().catch(() => {});
+            }
+
+            async startWhisperRecording() {
+                if (this.whisperRecording) return;
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    this.showNotification('No microphone API available');
+                    return;
+                }
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    this.recordedChunks = [];
+                    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+                        ? 'audio/webm;codecs=opus'
+                        : (MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '');
+                    this.mediaRecorder = mimeType
+                        ? new MediaRecorder(stream, { mimeType })
+                        : new MediaRecorder(stream);
+                    this.mediaRecorder.ondataavailable = (e) => {
+                        if (e.data && e.data.size > 0) this.recordedChunks.push(e.data);
+                    };
+                    this.mediaRecorder.onstop = async () => {
+                        // Stop the mic stream
+                        stream.getTracks().forEach(t => t.stop());
+                        await this.transcribeWhisperAudio(new Blob(this.recordedChunks, { type: this.mediaRecorder.mimeType }));
+                        this.recordedChunks = [];
+                        this.mediaRecorder = null;
+                        this.whisperRecording = false;
+                        this.voiceInputBtn.classList.remove('recording');
+                        this.listeningIndicator.classList.remove('active');
+                    };
+                    this.mediaRecorder.start();
+                    this.whisperRecording = true;
+                    this.voiceInputBtn.classList.add('recording');
+                    this.listeningIndicator.classList.add('active');
+                    console.log('[whisper] recording started');
+                    this.showNotification('Recording… tap mic again to stop');
+                } catch (e) {
+                    console.error('[whisper] mic access failed:', e);
+                    this.showNotification('Mic access denied: ' + e.message);
+                }
+            }
+
+            stopWhisperRecording() {
+                if (!this.whisperRecording || !this.mediaRecorder) return;
+                try { this.mediaRecorder.stop(); }
+                catch (e) { console.error('[whisper] stop failed:', e); }
+            }
+
+            async transcribeWhisperAudio(blob) {
+                this.showNotification('Whisper: transcribing…');
+                try {
+                    const pipe = await this.loadWhisperPipeline();
+                    if (!pipe) { this.showNotification('Whisper not loaded'); return; }
+                    // Decode + resample to 16kHz mono Float32 (Whisper requirement)
+                    const arrayBuffer = await blob.arrayBuffer();
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                    // Mix down to mono if needed
+                    const channels = audioBuffer.numberOfChannels;
+                    const monoData = new Float32Array(audioBuffer.length);
+                    for (let c = 0; c < channels; c++) {
+                        const ch = audioBuffer.getChannelData(c);
+                        for (let i = 0; i < ch.length; i++) monoData[i] += ch[i] / channels;
+                    }
+                    // Resample to 16kHz if not already
+                    let resampled = monoData;
+                    if (audioBuffer.sampleRate !== 16000) {
+                        const offline = new OfflineAudioContext(1,
+                            Math.floor(monoData.length * 16000 / audioBuffer.sampleRate), 16000);
+                        const buf = offline.createBuffer(1, monoData.length, audioBuffer.sampleRate);
+                        buf.copyToChannel(monoData, 0);
+                        const src = offline.createBufferSource();
+                        src.buffer = buf;
+                        src.connect(offline.destination);
+                        src.start(0);
+                        const rendered = await offline.startRendering();
+                        resampled = rendered.getChannelData(0);
+                    }
+                    audioContext.close();
+                    const result = await pipe(resampled);
+                    const text = (result && result.text || '').trim();
+                    console.log('[whisper] transcribed:', text);
+                    if (text) {
+                        const inp = document.getElementById('ai-chat-input');
+                        if (inp) inp.value = text;
+                        this.aiManager.sendMessage();
+                    } else {
+                        this.showNotification('Whisper: no speech detected');
+                    }
+                } catch (e) {
+                    console.error('[whisper] transcription failed:', e);
+                    this.showNotification('Whisper failed: ' + (e.message || e));
+                }
+            }
+
+            stopAzureRecognition() {
+                if (!this.azureRecognizer) return;
+                try {
+                    this.azureRecognizer.stopContinuousRecognitionAsync(
+                        () => {
+                            this.isListening = false;
+                            this.voiceInputBtn.classList.remove('recording');
+                            this.listeningIndicator.classList.remove('active');
+                            if (this.azureRecognizer) {
+                                this.azureRecognizer.close();
+                                this.azureRecognizer = null;
+                            }
+                            this.azureMode = false;
+                        },
+                        (err) => { console.error('[voice/azure] stop failed:', err); }
+                    );
+                } catch (e) { console.error('[voice/azure] stop threw:', e); }
             }
 
             setContinuousMode(enabled) {
@@ -6409,5 +6724,37 @@ _r if isinstance(_r, str) else json.dumps(_r)
             lastY = y;
         }, { passive: false });
     </script>
+
+<!-- ── AUTO-SUMMON when ?seed=<owner>/<repo> is in the URL ───────────
+     The user already chose which twin to embody (via summon portal or
+     direct link). Skip the "tap to summon" wall by calling the canonical
+     summonDoorman() method directly via window.worldNavigator.aiManager. -->
+<script>
+(function() {
+  const params = new URLSearchParams(location.search);
+  if (!params.get("seed")) return;
+  let tries = 0;
+  const tick = setInterval(() => {
+    tries++;
+    if (tries > 60) { clearInterval(tick); console.warn("[auto-summon] gave up after 30s"); return; }
+    // Wait for: worldNavigator + aiManager + identity loaded (world-title updated)
+    const wn = window.worldNavigator;
+    if (!wn || !wn.aiManager) return;
+    const t = document.getElementById("world-title");
+    if (!t || t.textContent === "AI COMPANION HUB") return;
+    // If already summoned, nothing to do
+    if (wn.aiManager.isActive) { clearInterval(tick); return; }
+    clearInterval(tick);
+    setTimeout(() => {
+      try {
+        console.log("[auto-summon] calling aiManager.summonDoorman()");
+        wn.aiManager.summonDoorman();
+      } catch (e) {
+        console.warn("[auto-summon] summonDoorman failed:", e);
+      }
+    }, 400);
+  }, 500);
+})();
+</script>
 </body>
 </html>
