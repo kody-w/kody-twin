@@ -1083,7 +1083,7 @@
       </div>
       <div class="identity-row">
         <span class="identity-key">Rappid</span>
-        <span class="identity-val">f0bbb4c6-d43a-4dce-9107-b84d1aeba8b6</span>
+        <span class="identity-val">rappid:@kody-w/kody-twin:f0bbb4c6d43a4dce9107b84d1aeba8b6</span>
       </div>
       <div class="identity-row">
         <span class="identity-key">Kernel</span>
@@ -1386,7 +1386,7 @@ is unclear.</pre>
 "use strict";
 
 const FD = {
-  rappid: "f0bbb4c6-d43a-4dce-9107-b84d1aeba8b6",
+  rappid: "rappid:@kody-w/kody-twin:f0bbb4c6d43a4dce9107b84d1aeba8b6",
   displayName: "Kody Wildfeuer",
   slug: "kody-twin",
   ghUser: "kody-w",
@@ -1838,8 +1838,18 @@ function _rarityFromHash(h) {
 // Hash-derive everything visual from the rappid: pip color, power,
 // toughness, rarity. This function lives next to rappidSigil() so
 // both visuals share the same numeric DNA.
+// Extract the identity hash (hex) from a rappid. Accepts the Eternity form
+// `rappid:@<owner>/<slug>:<hex>` and the legacy bare-UUID form. All visual
+// derivation keys off the hash, never the envelope, so the same identity
+// renders identically whether expressed as a bare UUID or the Eternity string.
+function _rappidHash(rappid) {
+  const s = String(rappid || "");
+  const m = s.match(/:([0-9a-fA-F]+)$/);   // Eternity: trailing :<hex>
+  return (m ? m[1] : s).replace(/-/g, "");
+}
+
 function rappidVisualTraits(rappid) {
-  const hash = (rappid || "").replace(/-/g, "").slice(0, 16) || "deadbeef00000000";
+  const hash = _rappidHash(rappid).slice(0, 16) || "deadbeef00000000";
   const h1 = parseInt(hash.slice(0, 4),  16) || 0;
   const h2 = parseInt(hash.slice(4, 8),  16) || 0;
   const h3 = parseInt(hash.slice(8,12),  16) || 0;
@@ -2080,7 +2090,7 @@ async function openCard() {
   document.getElementById("card-back-qr").src =
     "https://api.qrserver.com/v1/create-qr-code/?size=440x440&margin=0&data=" + encodeURIComponent(url);
   const backHash = document.getElementById("card-back-hash");
-  if (backHash) backHash.textContent = (window.__seedRappid || "").slice(0, 8);
+  if (backHash) backHash.textContent = _rappidHash(window.__seedRappid || "").slice(0, 8);
   const backName = document.getElementById("card-back-name");
   if (backName) backName.textContent = data.name;
   // Back-of-card action links — match the seed's actual URLs
@@ -2321,7 +2331,7 @@ async function exportDoormanEgg() {
   btn.disabled = true;
   try {
     const blob = await buildDoormanEgg();
-    const slug = (window.__seedRappid || "rapp").slice(0, 8);
+    const slug = (_rappidHash(window.__seedRappid) || "rapp").slice(0, 8);
     const name = (window.__seedDisplayName || "rapp").toLowerCase().replace(/[^a-z0-9]+/g, "-");
     _downloadBlob(blob, `${name}-${slug}-doorman.egg`);
     btn.textContent = "✓ downloaded";
@@ -2489,7 +2499,7 @@ const STREAM_SHORT = (rappid, sealedAt) => {
   // each hatched egg a unique stream identifier even when rappids match.
   if (!rappid) return "unknown";
   const tag = (sealedAt || "").slice(0, 19);
-  return rappid.slice(0, 8) + ":" + tag.replace(/[^0-9]/g, "").slice(0, 8);
+  return _rappidHash(rappid).slice(0, 8) + ":" + tag.replace(/[^0-9]/g, "").slice(0, 8);
 };
 
 async function _framesFromEgg(zip, manifest) {
@@ -3004,7 +3014,7 @@ async function copy(text) {
 // Seed metadata — read by the card derivation logic. Set from the
 // substituted placeholders below so the card can render before any
 // async fetches land.
-window.__seedRappid      = "f0bbb4c6-d43a-4dce-9107-b84d1aeba8b6";
+window.__seedRappid      = "rappid:@kody-w/kody-twin:f0bbb4c6d43a4dce9107b84d1aeba8b6";
 window.__seedDisplayName = "Kody Wildfeuer";
 window.__seedKind        = "personal";
 window.__seedRepoName    = "kody-twin";
@@ -3196,7 +3206,7 @@ document.getElementById("peer-id-input").addEventListener("keydown", e => {
 // accents means the same seed always gets the same look, so visitors
 // recognize a place by sight.
 function rappidSigil(rappid, size) {
-  const hash = (rappid || "").replace(/-/g, "").slice(0, 16) || "deadbeef00000000";
+  const hash = _rappidHash(rappid).slice(0, 16) || "deadbeef00000000";
   const h1 = parseInt(hash.slice(0, 4),  16) || 0;
   const h2 = parseInt(hash.slice(4, 8),  16) || 0;
   const h3 = parseInt(hash.slice(8,12),  16) || 0;
@@ -3250,7 +3260,7 @@ function rappidSigil(rappid, size) {
 (function renderSigil() {
   const el = document.getElementById("hero-sigil");
   if (!el) return;
-  el.innerHTML = rappidSigil("f0bbb4c6-d43a-4dce-9107-b84d1aeba8b6", 96);
+  el.innerHTML = rappidSigil("rappid:@kody-w/kody-twin:f0bbb4c6d43a4dce9107b84d1aeba8b6", 96);
 })();
 
 // ── Profile stats: memory count + age ──────────────────────────────
@@ -3498,7 +3508,7 @@ async function fillLineage() {
       parts.push(`Templated from <a href="${escapeHtml(j.parent_repo)}" target="_blank" rel="noopener">${escapeHtml(repoLabel)}</a>`);
     }
     if (j.parent_rappid) {
-      parts.push(`lineage <code>${escapeHtml(j.parent_rappid.slice(0, 8))}…</code>`);
+      parts.push(`lineage <code>${escapeHtml(_rappidHash(j.parent_rappid).slice(0, 8))}…</code>`);
     }
     if (j.kernel_version) parts.push(`kernel <code>v${escapeHtml(j.kernel_version)}</code>`);
     el.innerHTML = parts.length ? parts.join(" · ") : "";
