@@ -400,6 +400,14 @@ const COPILOT_DEFAULT_API = "https://api.individual.githubcopilot.com";
 const MODEL              = "claude-sonnet-4";  // default model — Copilot serves this; visitor can change in settings later
 
 let identity = null;
+// Extract the identity hash (hex) from a rappid. Accepts the Eternity form
+// `rappid:@<owner>/<slug>:<hex>` and the legacy bare-UUID form, so stream ids
+// and egg filenames key off the hash rather than the envelope prefix.
+function _rappidHash(rappid) {
+  const s = String(rappid || "");
+  const m = s.match(/:([0-9a-fA-F]+)$/);   // Eternity: trailing :<hex>
+  return (m ? m[1] : s).replace(/-/g, "");
+}
 let publicSoul = null;         // soul.md at the seed root (public, served via Pages) — when present, this becomes the doorman's primary voice for everyone, replacing the kind-aware default. Operators write this to give their seed a custom persona without needing a private companion.
 let privateContext = "";       // supporting prose (README, vault entrypoint) — context, not voice
 let privateSoul = null;        // soul.md from the private companion — when loaded, the doorman ASCENDS into the full twin's voice (overrides publicSoul too)
@@ -458,7 +466,7 @@ async function appendFrame(kind, payload) {
   // gets back-filled on the next call.
   const log = _loadFrames();
   if (!log.stream_id && identity && identity.rappid) {
-    log.stream_id = identity.rappid.slice(0, 8) + ":" + _instanceId();
+    log.stream_id = _rappidHash(identity.rappid).slice(0, 8) + ":" + _instanceId();
   }
   const prev = log.frames.length ? log.frames[log.frames.length - 1].hash : "";
   const utc = new Date().toISOString();
@@ -1363,7 +1371,7 @@ async function exportAscendedEgg() {
   btn.disabled = true;
   try {
     const blob = await buildAscendedEgg();
-    const slug = ((identity && identity.rappid) || "rapp").slice(0, 8);
+    const slug = (_rappidHash(identity && identity.rappid) || "rapp").slice(0, 8);
     const name = (identity && (identity.display_name || identity.name) || "rapp")
       .toLowerCase().replace(/[^a-z0-9]+/g, "-");
     const a = document.createElement("a");

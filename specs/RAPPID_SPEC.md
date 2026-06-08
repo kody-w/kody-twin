@@ -2,6 +2,21 @@
 
 > **Frozen excerpt** of the canonical rappid contract (`rapp-rappid/2.0`). Bundled at planting time on 2026-05-09T12:52:08Z.
 
+> **Superseded format note (Constitution Art. XXXIV.1, locked 2026-06-03).** The
+> one current rappid string is the consolidated Eternity form:
+>
+> ```
+> rappid:@<owner>/<slug>:<hex>
+> ```
+>
+> No `v2:`/`v3:` prefix, no inline `<kind>:` segment, no trailing `@github.com/...`
+> suffix. `kind` now lives in the `rappid.json` **record** as a field (record
+> schema stays `rapp-rappid/2.0`). Existing hashes are preserved (never
+> regenerated); the prior string is recorded under `_migrated_from`. The legacy
+> v2 grammar below is retained for read-forever compatibility only — every legacy
+> form is still parsed and canonicalized (see `kody-w/RAPP::tools/door_address.py`
+> `canonicalize_rappid`), but only the consolidated form above is emitted.
+
 ## Format
 
 ```
