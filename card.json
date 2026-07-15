@@ -59,7 +59,7 @@
     "quality_tier": "verified",
     "license": "PolyForm-Small-Business",
     "kind": "twin",
-    "rappid": "rappid:@kody-w/kody-twin:91d006ca7bd052bfa5021d623122012f",
+    "rappid": "rappid:@kody-w/kody-twin:923bfa1ae2d27b758672d7c91ca55d85cf5580bb36421f18fe9e56e3a63ef421",
     "gate_url": "https://kody-w.github.io/kody-twin/",
     "summon_url": "https://kody-w.github.io/RAPPcards/#summon&seed=9637876191470141767",
     "_compliance": "rappcards/1.1.2 \u2014 kody-w/RAPPcards/SPEC.md"

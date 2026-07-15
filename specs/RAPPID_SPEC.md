@@ -1,6 +1,8 @@
+> **Refresh (2026-07-15):** identity/mint sections are SUPERSEDED by RAPP/1 §6 — canonical `rappid:@owner/slug:64hex`, keyless mint `Hb("rapp/1:rappid", uuid4)`; the `rappid:v2:...@host` form shown below is legacy, read-forever, never emitted. See https://raw.githubusercontent.com/kody-w/rapp-1/main/SPEC.md
+
 # RAPPID_SPEC — Identity v2
 
-> **Frozen excerpt** of the canonical rappid contract (`rapp-rappid/2.0`). Bundled at planting time on 2026-05-09T12:52:08Z.
+> **Frozen excerpt** of the canonical rappid contract (`rapp/1`, §6.1). Bundled at planting time on 2026-05-09T12:52:08Z.
 
 > **Superseded format note (Constitution Art. XXXIV.1, locked 2026-06-03).** The
 > one current rappid string is the consolidated Eternity form:
@@ -45,15 +47,15 @@ rappid:v2:<kind>:@kody-w/kody-twin:<32-hex>@github.com/kody-w/kody-twin
 
 1. **Permanence.** Once minted, a rappid is permanent for the lifetime of the neighborhood. Re-grafting, re-planting, kernel upgrades — none of these mint a new rappid.
 2. **Bond preservation.** The bond technique (egg → overlay → hatch back) preserves the rappid through every kernel upgrade.
-3. **Lineage chain.** A neighborhood's `parent_rappid` chains back to its ancestor (the species root for many: `rappid:v2:prototype:@rapp/origin:0b635450c04249fbb4b1bdb571044dec@github.com/kody-w/RAPP`).
-4. **No two organisms share a rappid.** Mint via `uuid.uuid4().hex` — collision probability is negligible.
+3. **Lineage chain.** A neighborhood's `parent_rappid` chains back to its ancestor (the species root for many: `rappid:@kody-w/rapp:9a8f0a4b5a710e20f4d819a0f37d2a4c9f113b5e78fb3c29e70b54fff48a38f9`).
+4. **No two organisms share a rappid.** Mint the 64-hex tail via `Hb("rapp/1:rappid", uuid4_bytes)` (RAPP/1 §6.2, keyless, domain-separated) — NEVER `uuid4().hex` (only 32 hex) and NEVER `sha256(owner/slug)` (the cardinal sin).
 5. **The rappid is the seed source for the neighborhood's holocard.** `derive_seed(rappid_str)` via BLAKE2b-64 produces a deterministic 64-bit ID. Same rappid → same seed → same incantation, forever.
 
-## Required fields in `../rappid.json` (`rapp-rappid/2.0`)
+## Required fields in `../rappid.json` (`rapp/1`)
 
 | Field | Required | Notes |
 |---|---|---|
-| `schema`       | yes | `rapp-rappid/2.0` |
+| `schema`       | yes | `rapp/1` |
 | `rappid`       | yes | The full v2 string |
 | `kind`         | yes | One of the 6 kinds above |
 | `name`         | yes | Slug — matches the repo name |
