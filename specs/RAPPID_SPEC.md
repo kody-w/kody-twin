@@ -37,7 +37,7 @@ rappid:v2:<kind>:@kody-w/kody-twin:<32-hex>@github.com/kody-w/kody-twin
 
 | Part | Rule |
 |---|---|
-| Prefix `rappid:v2:` | Literal. Tells parsers this is a v2 rappid. |
+| Prefix `rappid:v2:` | Literal. Tells parsers this is a legacy v2 rappid (read-forever; never minted anew). |
 | `<kind>` | One of: `neighborhood`, `ant-farm`, `braintrust`, `workspace`, `twin`, `prototype`. |
 | `@<owner>/<repo>` | The GitHub composite identity. The `@` prefix is literal and required. |
 | `<32-hex-no-dashes>` | A UUID4 with dashes stripped — 32 lowercase hex characters. Minted ONCE at planting; permanent thereafter. |
