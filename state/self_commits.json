@@ -1,0 +1,2467 @@
+[
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/8d86429f4726cc08549d82a23afdf1eb51620ac2/comments",
+  "commit": {
+   "author": {
+    "date": "2026-07-16T18:56:07Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-07-16T18:56:07Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "Estate drift steamroll 2026-07-16: converge to RAPP canon\n\n- 'Prototyping Platform' -> 'Prototype Platform' (the acronym law) where flagged\n- retired v2/v3 rappid residue marked legacy/read-forever at each site (specs,\n  constitutions, vault docs, trackers, code comments, JSON bridges with\n  same-line notes) \u2014 history kept, nothing re-minted\nDriven by the shared rapp-drift-lint; this repo now lints clean.\n\nCo-Authored-By: Claude Fable 5 <noreply@anthropic.com>",
+   "tree": {
+    "sha": "dbd06c0d69db86480cda4a1f8b6340c3c57a8e8a",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/dbd06c0d69db86480cda4a1f8b6340c3c57a8e8a"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/8d86429f4726cc08549d82a23afdf1eb51620ac2",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/8d86429f4726cc08549d82a23afdf1eb51620ac2",
+  "node_id": "C_kwDOSVbgq9oAKDhkODY0MjlmNDcyNmNjMDg1NDlkODJhMjNhZmRmMWViNTE2MjBhYzI",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/230cce42f8cd1ef8019852aba5ffdd9c3c9b7ba4",
+    "sha": "230cce42f8cd1ef8019852aba5ffdd9c3c9b7ba4",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/230cce42f8cd1ef8019852aba5ffdd9c3c9b7ba4"
+   }
+  ],
+  "sha": "8d86429f4726cc08549d82a23afdf1eb51620ac2",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/8d86429f4726cc08549d82a23afdf1eb51620ac2"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/81847?v=4",
+   "events_url": "https://api.github.com/users/claude/events{/privacy}",
+   "followers_url": "https://api.github.com/users/claude/followers",
+   "following_url": "https://api.github.com/users/claude/following{/other_user}",
+   "gists_url": "https://api.github.com/users/claude/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/claude",
+   "id": 81847,
+   "login": "claude",
+   "node_id": "MDQ6VXNlcjgxODQ3",
+   "organizations_url": "https://api.github.com/users/claude/orgs",
+   "received_events_url": "https://api.github.com/users/claude/received_events",
+   "repos_url": "https://api.github.com/users/claude/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/claude/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/claude/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/claude",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/230cce42f8cd1ef8019852aba5ffdd9c3c9b7ba4/comments",
+  "commit": {
+   "author": {
+    "date": "2026-07-15T22:43:45Z",
+    "email": "noreply@anthropic.com",
+    "name": "Claude (standing-guard)"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-07-15T22:43:45Z",
+    "email": "noreply@anthropic.com",
+    "name": "Claude (standing-guard)"
+   },
+   "message": "Frozen RAPPID_SPEC: catch the 'schema stays rapp-rappid/2.0' variant \u2192 rapp/1\n\nFollow-up: the first refresh pass missed a variant phrasing in the frozen spec\nthat still taught 'schema stays rapp-rappid/2.0' (directly contradicting Art. LIV).\nBroadened the teaching-doc refresh to canonicalize every remaining schema-name\nmention (the supersession banner already covers legacy read-forever).\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
+   "tree": {
+    "sha": "36b4c9230fec355de5e1c6bdb80f2ee3f36e8822",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/36b4c9230fec355de5e1c6bdb80f2ee3f36e8822"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/230cce42f8cd1ef8019852aba5ffdd9c3c9b7ba4",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/81847?v=4",
+   "events_url": "https://api.github.com/users/claude/events{/privacy}",
+   "followers_url": "https://api.github.com/users/claude/followers",
+   "following_url": "https://api.github.com/users/claude/following{/other_user}",
+   "gists_url": "https://api.github.com/users/claude/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/claude",
+   "id": 81847,
+   "login": "claude",
+   "node_id": "MDQ6VXNlcjgxODQ3",
+   "organizations_url": "https://api.github.com/users/claude/orgs",
+   "received_events_url": "https://api.github.com/users/claude/received_events",
+   "repos_url": "https://api.github.com/users/claude/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/claude/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/claude/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/claude",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/230cce42f8cd1ef8019852aba5ffdd9c3c9b7ba4",
+  "node_id": "C_kwDOSVbgq9oAKDIzMGNjZTQyZjhjZDFlZjgwMTk4NTJhYmE1ZmZkZDljM2M5YjdiYTQ",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/2973bf6d65e445f970494a9a04c5ed6b6a9254ac",
+    "sha": "2973bf6d65e445f970494a9a04c5ed6b6a9254ac",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/2973bf6d65e445f970494a9a04c5ed6b6a9254ac"
+   }
+  ],
+  "sha": "230cce42f8cd1ef8019852aba5ffdd9c3c9b7ba4",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/230cce42f8cd1ef8019852aba5ffdd9c3c9b7ba4"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/81847?v=4",
+   "events_url": "https://api.github.com/users/claude/events{/privacy}",
+   "followers_url": "https://api.github.com/users/claude/followers",
+   "following_url": "https://api.github.com/users/claude/following{/other_user}",
+   "gists_url": "https://api.github.com/users/claude/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/claude",
+   "id": 81847,
+   "login": "claude",
+   "node_id": "MDQ6VXNlcjgxODQ3",
+   "organizations_url": "https://api.github.com/users/claude/orgs",
+   "received_events_url": "https://api.github.com/users/claude/received_events",
+   "repos_url": "https://api.github.com/users/claude/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/claude/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/claude/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/claude",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/2973bf6d65e445f970494a9a04c5ed6b6a9254ac/comments",
+  "commit": {
+   "author": {
+    "date": "2026-07-15T22:43:03Z",
+    "email": "noreply@anthropic.com",
+    "name": "Claude (standing-guard)"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-07-15T22:43:03Z",
+    "email": "noreply@anthropic.com",
+    "name": "Claude (standing-guard)"
+   },
+   "message": "Re-anchor identity to canonical RAPP/1 \u00a76.1 (top-down standing-guard sweep)\n\nSelf-rooted twin with a 32-hex short tail + self-parent + rapp-rappid/2.0 schema.\nWidened deterministically (verified vs ant-farm) \u2014 and the result is provably\nconsistent with the estate: this repo's new id equals the value echo-brainstem's\nre-anchored parent_rappid already points at (923bfa1a\u2026), because the widening\nHb(\"rapp/1:rappid\", bytes.fromhex(old32)) is deterministic and ordering-free.\n\n- own + self-parent: 91d006ca\u2026(32) \u2192 923bfa1a\u2026(64).\n- schema rapp-rappid/2.0 \u2192 rapp/1; lineage in _migrated_from / _parent_migrated_from.\n- Coordinated across grail files; frozen spec mint teaching refreshed.\n\nrapp_check.py: COMPLIANT.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
+   "tree": {
+    "sha": "1b4dc8e1f0d9a987774e0d2194249b81c0146760",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/1b4dc8e1f0d9a987774e0d2194249b81c0146760"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/2973bf6d65e445f970494a9a04c5ed6b6a9254ac",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/81847?v=4",
+   "events_url": "https://api.github.com/users/claude/events{/privacy}",
+   "followers_url": "https://api.github.com/users/claude/followers",
+   "following_url": "https://api.github.com/users/claude/following{/other_user}",
+   "gists_url": "https://api.github.com/users/claude/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/claude",
+   "id": 81847,
+   "login": "claude",
+   "node_id": "MDQ6VXNlcjgxODQ3",
+   "organizations_url": "https://api.github.com/users/claude/orgs",
+   "received_events_url": "https://api.github.com/users/claude/received_events",
+   "repos_url": "https://api.github.com/users/claude/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/claude/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/claude/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/claude",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/2973bf6d65e445f970494a9a04c5ed6b6a9254ac",
+  "node_id": "C_kwDOSVbgq9oAKDI5NzNiZjZkNjVlNDQ1Zjk3MDQ5NGE5YTA0YzVlZDZiNmE5MjU0YWM",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/fa596124adba3f5cf4890e37a9bd0960ae442260",
+    "sha": "fa596124adba3f5cf4890e37a9bd0960ae442260",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/fa596124adba3f5cf4890e37a9bd0960ae442260"
+   }
+  ],
+  "sha": "2973bf6d65e445f970494a9a04c5ed6b6a9254ac",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/2973bf6d65e445f970494a9a04c5ed6b6a9254ac"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/fa596124adba3f5cf4890e37a9bd0960ae442260/comments",
+  "commit": {
+   "author": {
+    "date": "2026-06-08T01:35:38Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-06-08T01:35:38Z",
+    "email": "noreply@github.com",
+    "name": "GitHub"
+   },
+   "message": "Migrate rappid identifiers to the Eternity format (Art. XXXIV.1) (#4)\n\nCo-authored-by: Claude Opus 4.8 (1M context) <noreply@anthropic.com>",
+   "tree": {
+    "sha": "7566aea4fbafe8dabaac198923a198b35e2d15a0",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/7566aea4fbafe8dabaac198923a198b35e2d15a0"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/fa596124adba3f5cf4890e37a9bd0960ae442260",
+   "verification": {
+    "payload": "tree 7566aea4fbafe8dabaac198923a198b35e2d15a0\nparent 06da1c027708a0874715ac501ea905bfe20ad18b\nauthor Kody Wildfeuer <kwildfeuer@me.com> 1780882538 -0400\ncommitter GitHub <noreply@github.com> 1780882538 -0400\n\nMigrate rappid identifiers to the Eternity format (Art. XXXIV.1) (#4)\n\nCo-authored-by: Claude Opus 4.8 (1M context) <noreply@anthropic.com>",
+    "reason": "valid",
+    "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqJhxqCRC1aQ7uu5UhlAAAwwcQAIwBy9F7TtsR5vrZRXnQ+mz/\nKgrxl4wuAmNJNJPFEYe2WXpV2QpQJZIm2eObRGEbPJiT5w2Pq/VuNyMNU9USe3gY\neOdaKXl2oMgU2T17LgGNDd8n7x8DkjIFL9+X5WBemaBFyR03U0Dqcblt71nh4cgq\nlzq3LaUsduq9+RqsbAcvLojnKVQaabax/peWAJQAe8fUGWixEzD7ymYkB6KY9nXU\nVmIHX3qJxN6NlsvGp9hschC80LABKu/iMEwQkQ2MtAhTaRPh+UYQ3yZaB6e83+UE\nqUUkhh88U9nIGd7iLL5eqTIHv8N6ZKzwmYjezm91I54HY5YzujObVGFW/952f7+W\npWzfNvzZYdoPMdUixgq5ZGh8iFHL95UHclGZI3RQm5de7Q3mxquc3j92eaMvVvq4\nhgD4aTj7LfVVhT60SV8BgTyGzZTwKEOdIXwQI6KcBdiCTVtt7INLtEkXrz3YCRYB\nh5WeLzcdoAPnaetnqF5+FK3MIBYk3vgNo+7cPd2IYlUzGuTZYuMx1bGbwFTDDIaC\naVNvnYCGkK9XCu9sGKj/mH+SJnQqZTqzAU6vSaLPwc1y5+sNAeb//fToU4PS96eX\nMgZJiDc/QhvB4oPaP9TKHX8VmTxVD7M5tQWLbrbMU6kjI03XrcOKJh5keqByeTFb\n6Syn0OerRfbuxU4OMEo6\n=9Awf\n-----END PGP SIGNATURE-----\n",
+    "verified": true,
+    "verified_at": "2026-06-08T01:35:39Z"
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+   "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+   "followers_url": "https://api.github.com/users/web-flow/followers",
+   "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+   "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/web-flow",
+   "id": 19864447,
+   "login": "web-flow",
+   "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+   "organizations_url": "https://api.github.com/users/web-flow/orgs",
+   "received_events_url": "https://api.github.com/users/web-flow/received_events",
+   "repos_url": "https://api.github.com/users/web-flow/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/web-flow",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/fa596124adba3f5cf4890e37a9bd0960ae442260",
+  "node_id": "C_kwDOSVbgq9oAKGZhNTk2MTI0YWRiYTNmNWNmNDg5MGUzN2E5YmQwOTYwYWU0NDIyNjA",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/06da1c027708a0874715ac501ea905bfe20ad18b",
+    "sha": "06da1c027708a0874715ac501ea905bfe20ad18b",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/06da1c027708a0874715ac501ea905bfe20ad18b"
+   }
+  ],
+  "sha": "fa596124adba3f5cf4890e37a9bd0960ae442260",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/fa596124adba3f5cf4890e37a9bd0960ae442260"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/06da1c027708a0874715ac501ea905bfe20ad18b/comments",
+  "commit": {
+   "author": {
+    "date": "2026-06-03T19:44:37Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-06-03T19:44:37Z",
+    "email": "noreply@github.com",
+    "name": "GitHub"
+   },
+   "message": "Merge pull request #1 from kody-w/consolidate-rappid\n\nMigrate to the consolidated rappid form",
+   "tree": {
+    "sha": "c46c7ff57516947213649f8a588a0d961ccbedaf",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/c46c7ff57516947213649f8a588a0d961ccbedaf"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/06da1c027708a0874715ac501ea905bfe20ad18b",
+   "verification": {
+    "payload": "tree c46c7ff57516947213649f8a588a0d961ccbedaf\nparent 07ea334156baca87b6f1b68c7621f8412be7ffa7\nparent 3dfe88ca8ad4a930658618783702cc90d19642ad\nauthor Kody Wildfeuer <kwildfeuer@me.com> 1780515877 -0600\ncommitter GitHub <noreply@github.com> 1780515877 -0600\n\nMerge pull request #1 from kody-w/consolidate-rappid\n\nMigrate to the consolidated rappid form",
+    "reason": "valid",
+    "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqIIQlCRC1aQ7uu5UhlAAA4x8QAGaZW13Zm7UQwUww62ij7a/+\nsbXDtqraE0j5b8Unhi3vP1kmURqCHd0AOPSqIPnWlSAZPmiQ88o8Nto8EzB/FzG9\nuJAbjulBp4NyUFDGYRy+P52YQxViC+/In1GZLZNQa6QzOcB0SAMJMlHQgFYNViwF\nopve8c3mTZrciXMgL16Kc6QRAs5sBrhvpxT1yc0UeyPjrihtMQ//HG+uw6LtNcNI\nHeEnqjDuVTK57eSftF4ZGXDSrM+iGG+rQ01G2gMcjHMrye9VQaYRpTkMkTYX3lfr\ntfuGuk39qvaBTtMQfPzGH5Nc6JV8ZQk+tJs02Uh6UI08iknmxMztnELQmcbCtoxY\nkw355NstGv7ehgpYqi4EU+c2v2pPt+ZruNvtm3gEe3QJu8Fjtk0M/BczmJjdohpR\nDTH99ukC434NUYmzhKqGQnuUG2mRXdythi3scLAuV7n45V109pRI1Ne6yv+R/DAj\npTnGDQsoosDA0Q4WQJhEaxuENzpqBKdMhMPqoDHJIkqwBBfioUtGoV6TzAC4zYXE\nSfQQfZwjmOjrvLZKbXBMiu0TutluwMI6QJ+4VgqprlBU/5PFfENTlKX1J9drTPEK\nX4iqG6vU3T01e/WoysUG2409wk4We8OPT2WrqL6ukLH8qFVFtmIbRWLixGuCRIWo\nCeYUNZOPQ87T2svt6318\n=7MFX\n-----END PGP SIGNATURE-----\n",
+    "verified": true,
+    "verified_at": "2026-06-03T19:44:38Z"
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+   "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+   "followers_url": "https://api.github.com/users/web-flow/followers",
+   "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+   "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/web-flow",
+   "id": 19864447,
+   "login": "web-flow",
+   "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+   "organizations_url": "https://api.github.com/users/web-flow/orgs",
+   "received_events_url": "https://api.github.com/users/web-flow/received_events",
+   "repos_url": "https://api.github.com/users/web-flow/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/web-flow",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/06da1c027708a0874715ac501ea905bfe20ad18b",
+  "node_id": "C_kwDOSVbgq9oAKDA2ZGExYzAyNzcwOGEwODc0NzE1YWM1MDFlYTkwNWJmZTIwYWQxOGI",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/07ea334156baca87b6f1b68c7621f8412be7ffa7",
+    "sha": "07ea334156baca87b6f1b68c7621f8412be7ffa7",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/07ea334156baca87b6f1b68c7621f8412be7ffa7"
+   },
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/3dfe88ca8ad4a930658618783702cc90d19642ad",
+    "sha": "3dfe88ca8ad4a930658618783702cc90d19642ad",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/3dfe88ca8ad4a930658618783702cc90d19642ad"
+   }
+  ],
+  "sha": "06da1c027708a0874715ac501ea905bfe20ad18b",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/06da1c027708a0874715ac501ea905bfe20ad18b"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/3dfe88ca8ad4a930658618783702cc90d19642ad/comments",
+  "commit": {
+   "author": {
+    "date": "2026-06-03T19:44:32Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-06-03T19:44:32Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "Migrate rappid.json to the consolidated rappid form\n\nMigrate this door's identity to the **consolidated rappid** `rappid:@<owner>/<slug>:<64hex>` (CONSTITUTION Art. XXXIV.1, locked 2026-06-03). The hash (identity) is preserved; `kind` stays in the record; the old string is kept in `_migrated_from`. Renderers read record fields, not the string \u2014 no rendering change.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>",
+   "tree": {
+    "sha": "c46c7ff57516947213649f8a588a0d961ccbedaf",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/c46c7ff57516947213649f8a588a0d961ccbedaf"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/3dfe88ca8ad4a930658618783702cc90d19642ad",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/3dfe88ca8ad4a930658618783702cc90d19642ad",
+  "node_id": "C_kwDOSVbgq9oAKDNkZmU4OGNhOGFkNGE5MzA2NTg2MTg3ODM3MDJjYzkwZDE5NjQyYWQ",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/07ea334156baca87b6f1b68c7621f8412be7ffa7",
+    "sha": "07ea334156baca87b6f1b68c7621f8412be7ffa7",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/07ea334156baca87b6f1b68c7621f8412be7ffa7"
+   }
+  ],
+  "sha": "3dfe88ca8ad4a930658618783702cc90d19642ad",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/3dfe88ca8ad4a930658618783702cc90d19642ad"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/07ea334156baca87b6f1b68c7621f8412be7ffa7/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-09T23:19:18Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-09T23:19:18Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "backfill: set parent_rappid (Article XLVI.6)",
+   "tree": {
+    "sha": "8a230f6045273ab39033e225f2233c794e638d60",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/8a230f6045273ab39033e225f2233c794e638d60"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/07ea334156baca87b6f1b68c7621f8412be7ffa7",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/07ea334156baca87b6f1b68c7621f8412be7ffa7",
+  "node_id": "C_kwDOSVbgq9oAKDA3ZWEzMzQxNTZiYWNhODdiNmYxYjY4Yzc2MjFmODQxMmJlN2ZmYTc",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/06dc14587488e586daef41bd1fbfc0d742b03f06",
+    "sha": "06dc14587488e586daef41bd1fbfc0d742b03f06",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/06dc14587488e586daef41bd1fbfc0d742b03f06"
+   }
+  ],
+  "sha": "07ea334156baca87b6f1b68c7621f8412be7ffa7",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/07ea334156baca87b6f1b68c7621f8412be7ffa7"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/06dc14587488e586daef41bd1fbfc0d742b03f06/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-09T22:11:35Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-09T22:11:35Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "backfill: Door URL Set \u00a78 \u2014 required (empty for twins) (Article XLVI)",
+   "tree": {
+    "sha": "a124bff208c456628c715f267e0fe146746742d3",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/a124bff208c456628c715f267e0fe146746742d3"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/06dc14587488e586daef41bd1fbfc0d742b03f06",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/06dc14587488e586daef41bd1fbfc0d742b03f06",
+  "node_id": "C_kwDOSVbgq9oAKDA2ZGMxNDU4NzQ4OGU1ODZkYWVmNDFiZDFmYmZjMGQ3NDJiMDNmMDY",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/48bc57fce41a951d8780ca9352a56d671bf9ceef",
+    "sha": "48bc57fce41a951d8780ca9352a56d671bf9ceef",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/48bc57fce41a951d8780ca9352a56d671bf9ceef"
+   }
+  ],
+  "sha": "06dc14587488e586daef41bd1fbfc0d742b03f06",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/06dc14587488e586daef41bd1fbfc0d742b03f06"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/48bc57fce41a951d8780ca9352a56d671bf9ceef/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-09T22:11:34Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-09T22:11:34Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "backfill: Door URL Set \u00a79 \u2014 required (Article XLVI)",
+   "tree": {
+    "sha": "777acf6c17e350b3cb2a1e28b2a74b83d8146c84",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/777acf6c17e350b3cb2a1e28b2a74b83d8146c84"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/48bc57fce41a951d8780ca9352a56d671bf9ceef",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/48bc57fce41a951d8780ca9352a56d671bf9ceef",
+  "node_id": "C_kwDOSVbgq9oAKDQ4YmM1N2ZjZTQxYTk1MWQ4NzgwY2E5MzUyYTU2ZDY3MWJmOWNlZWY",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/3c54071cf37736c1bb783c901a9f9c07735197cb",
+    "sha": "3c54071cf37736c1bb783c901a9f9c07735197cb",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/3c54071cf37736c1bb783c901a9f9c07735197cb"
+   }
+  ],
+  "sha": "48bc57fce41a951d8780ca9352a56d671bf9ceef",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/48bc57fce41a951d8780ca9352a56d671bf9ceef"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/3c54071cf37736c1bb783c901a9f9c07735197cb/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-09T22:11:33Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-09T22:11:33Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "backfill: regenerate summon QR for reissued rappid (Article XLVI)",
+   "tree": {
+    "sha": "cef311547c1d7aaef92300d59382894d99147392",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/cef311547c1d7aaef92300d59382894d99147392"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/3c54071cf37736c1bb783c901a9f9c07735197cb",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/3c54071cf37736c1bb783c901a9f9c07735197cb",
+  "node_id": "C_kwDOSVbgq9oAKDNjNTQwNzFjZjM3NzM2YzFiYjc4M2M5MDFhOWY5YzA3NzM1MTk3Y2I",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/c30e6139fa716ca6402b2840a9662109d2a59c6f",
+    "sha": "c30e6139fa716ca6402b2840a9662109d2a59c6f",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/c30e6139fa716ca6402b2840a9662109d2a59c6f"
+   }
+  ],
+  "sha": "3c54071cf37736c1bb783c901a9f9c07735197cb",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/3c54071cf37736c1bb783c901a9f9c07735197cb"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/c30e6139fa716ca6402b2840a9662109d2a59c6f/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-09T22:11:32Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-09T22:11:32Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "backfill: regenerate avatar for reissued rappid (Article XLVI)",
+   "tree": {
+    "sha": "62170e99ed7616351e74f5c0fe7934a22fa29b10",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/62170e99ed7616351e74f5c0fe7934a22fa29b10"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/c30e6139fa716ca6402b2840a9662109d2a59c6f",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/c30e6139fa716ca6402b2840a9662109d2a59c6f",
+  "node_id": "C_kwDOSVbgq9oAKGMzMGU2MTM5ZmE3MTZjYTY0MDJiMjg0MGE5NjYyMTA5ZDJhNTljNmY",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/ba610538806d3518caba12b962b0d27648f5254b",
+    "sha": "ba610538806d3518caba12b962b0d27648f5254b",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/ba610538806d3518caba12b962b0d27648f5254b"
+   }
+  ],
+  "sha": "c30e6139fa716ca6402b2840a9662109d2a59c6f",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/c30e6139fa716ca6402b2840a9662109d2a59c6f"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/ba610538806d3518caba12b962b0d27648f5254b/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-09T22:11:31Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-09T22:11:31Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "backfill: regenerate holocard for reissued rappid (Article XLVI)",
+   "tree": {
+    "sha": "872b1657768d1d9f70c76ff777338e43b9acd5ce",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/872b1657768d1d9f70c76ff777338e43b9acd5ce"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/ba610538806d3518caba12b962b0d27648f5254b",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/ba610538806d3518caba12b962b0d27648f5254b",
+  "node_id": "C_kwDOSVbgq9oAKGJhNjEwNTM4ODA2ZDM1MThjYWJhMTJiOTYyYjBkMjc2NDhmNTI1NGI",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/bd61d76be0fad9222801fe3714512b6c6ebba96f",
+    "sha": "bd61d76be0fad9222801fe3714512b6c6ebba96f",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/bd61d76be0fad9222801fe3714512b6c6ebba96f"
+   }
+  ],
+  "sha": "ba610538806d3518caba12b962b0d27648f5254b",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/ba610538806d3518caba12b962b0d27648f5254b"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/bd61d76be0fad9222801fe3714512b6c6ebba96f/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-09T22:11:30Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-09T22:11:30Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "backfill: existing rappid invalid or missing (fe211ed6-c82d-4a3c-acd1-d74986d1019a) \u2014 reissue with canonical (Article XLVI)",
+   "tree": {
+    "sha": "733ef18390fa223dfd704f1c4cc772ed92355e01",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/733ef18390fa223dfd704f1c4cc772ed92355e01"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/bd61d76be0fad9222801fe3714512b6c6ebba96f",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/bd61d76be0fad9222801fe3714512b6c6ebba96f",
+  "node_id": "C_kwDOSVbgq9oAKGJkNjFkNzZiZTBmYWQ5MjIyODAxZmUzNzE0NTEyYjZjNmViYmE5NmY",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/14df5995828e251f466af7d897825865cfc4b3bc",
+    "sha": "14df5995828e251f466af7d897825865cfc4b3bc",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/14df5995828e251f466af7d897825865cfc4b3bc"
+   }
+  ],
+  "sha": "bd61d76be0fad9222801fe3714512b6c6ebba96f",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/bd61d76be0fad9222801fe3714512b6c6ebba96f"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/14df5995828e251f466af7d897825865cfc4b3bc/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-09T19:49:34Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-09T19:49:34Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "grail-brainstem: refresh to latest heimdall snapshot (Whisper WASM + retry cap + auto-summon + voice-first)",
+   "tree": {
+    "sha": "9af069f7065782a627bf40778fcfb3c0d14b46bb",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/9af069f7065782a627bf40778fcfb3c0d14b46bb"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/14df5995828e251f466af7d897825865cfc4b3bc",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/14df5995828e251f466af7d897825865cfc4b3bc",
+  "node_id": "C_kwDOSVbgq9oAKDE0ZGY1OTk1ODI4ZTI1MWY0NjZhZjdkODk3ODI1ODY1Y2ZjNGIzYmM",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/c9771b765beb25c392928b3cfbdc7501048a99ff",
+    "sha": "c9771b765beb25c392928b3cfbdc7501048a99ff",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/c9771b765beb25c392928b3cfbdc7501048a99ff"
+   }
+  ],
+  "sha": "14df5995828e251f466af7d897825865cfc4b3bc",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/14df5995828e251f466af7d897825865cfc4b3bc"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/c9771b765beb25c392928b3cfbdc7501048a99ff/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-09T12:52:15Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-09T12:52:15Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "specs/: bundle specs/TWIN_PROTOCOL.md (frozen at planting; self-contained governance)",
+   "tree": {
+    "sha": "f0c958bbec3aa0e7dd5a130c973e991d3aa65272",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/f0c958bbec3aa0e7dd5a130c973e991d3aa65272"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/c9771b765beb25c392928b3cfbdc7501048a99ff",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/c9771b765beb25c392928b3cfbdc7501048a99ff",
+  "node_id": "C_kwDOSVbgq9oAKGM5NzcxYjc2NWJlYjI1YzM5MjkyOGIzY2ZiZGM3NTAxMDQ4YTk5ZmY",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/cdeba231dd5ad3f4753ad2d5ba6988d265d0e1e4",
+    "sha": "cdeba231dd5ad3f4753ad2d5ba6988d265d0e1e4",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/cdeba231dd5ad3f4753ad2d5ba6988d265d0e1e4"
+   }
+  ],
+  "sha": "c9771b765beb25c392928b3cfbdc7501048a99ff",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/c9771b765beb25c392928b3cfbdc7501048a99ff"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/cdeba231dd5ad3f4753ad2d5ba6988d265d0e1e4/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-09T12:52:14Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-09T12:52:14Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "specs/: bundle specs/PARTICIPATION.md (frozen at planting; self-contained governance)",
+   "tree": {
+    "sha": "4a24923319c55da758f9dff3947b3e03c98dba17",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/4a24923319c55da758f9dff3947b3e03c98dba17"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/cdeba231dd5ad3f4753ad2d5ba6988d265d0e1e4",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/cdeba231dd5ad3f4753ad2d5ba6988d265d0e1e4",
+  "node_id": "C_kwDOSVbgq9oAKGNkZWJhMjMxZGQ1YWQzZjQ3NTNhZDJkNWJhNjk4OGQyNjVkMGUxZTQ",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/06811c702158aa46948b90501d08ec86b7fa169f",
+    "sha": "06811c702158aa46948b90501d08ec86b7fa169f",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/06811c702158aa46948b90501d08ec86b7fa169f"
+   }
+  ],
+  "sha": "cdeba231dd5ad3f4753ad2d5ba6988d265d0e1e4",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/cdeba231dd5ad3f4753ad2d5ba6988d265d0e1e4"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/06811c702158aa46948b90501d08ec86b7fa169f/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-09T12:52:13Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-09T12:52:13Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "specs/: bundle specs/SOUL_IDENTITY.md (frozen at planting; self-contained governance)",
+   "tree": {
+    "sha": "74120b26d299dcf8d00f71a523ee6c2f9a1e0457",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/74120b26d299dcf8d00f71a523ee6c2f9a1e0457"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/06811c702158aa46948b90501d08ec86b7fa169f",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/06811c702158aa46948b90501d08ec86b7fa169f",
+  "node_id": "C_kwDOSVbgq9oAKDA2ODExYzcwMjE1OGFhNDY5NDhiOTA1MDFkMDhlYzg2YjdmYTE2OWY",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/e6f3bf34e7b6b00f52f5ca19858948f4f167de2f",
+    "sha": "e6f3bf34e7b6b00f52f5ca19858948f4f167de2f",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/e6f3bf34e7b6b00f52f5ca19858948f4f167de2f"
+   }
+  ],
+  "sha": "06811c702158aa46948b90501d08ec86b7fa169f",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/06811c702158aa46948b90501d08ec86b7fa169f"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/e6f3bf34e7b6b00f52f5ca19858948f4f167de2f/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-09T12:52:12Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-09T12:52:12Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "specs/: bundle specs/ANTIPATTERNS.md (frozen at planting; self-contained governance)",
+   "tree": {
+    "sha": "e5fa06b14f40f3aa72b066952755d1e6f07a355a",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/e5fa06b14f40f3aa72b066952755d1e6f07a355a"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/e6f3bf34e7b6b00f52f5ca19858948f4f167de2f",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/e6f3bf34e7b6b00f52f5ca19858948f4f167de2f",
+  "node_id": "C_kwDOSVbgq9oAKGU2ZjNiZjM0ZTdiNmIwMGY1MmY1Y2ExOTg1ODk0OGY0ZjE2N2RlMmY",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/e79ba20056f42e40e7804f82d1e6811d67e49d83",
+    "sha": "e79ba20056f42e40e7804f82d1e6811d67e49d83",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/e79ba20056f42e40e7804f82d1e6811d67e49d83"
+   }
+  ],
+  "sha": "e6f3bf34e7b6b00f52f5ca19858948f4f167de2f",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/e6f3bf34e7b6b00f52f5ca19858948f4f167de2f"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/e79ba20056f42e40e7804f82d1e6811d67e49d83/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-09T12:52:11Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-09T12:52:11Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "specs/: bundle specs/RAPPID_SPEC.md (frozen at planting; self-contained governance)",
+   "tree": {
+    "sha": "5ef32094280d5f63e811aa1bd838161918047839",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/5ef32094280d5f63e811aa1bd838161918047839"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/e79ba20056f42e40e7804f82d1e6811d67e49d83",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/e79ba20056f42e40e7804f82d1e6811d67e49d83",
+  "node_id": "C_kwDOSVbgq9oAKGU3OWJhMjAwNTZmNDJlNDBlNzgwNGY4MmQxZTY4MTFkNjdlNDlkODM",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/048359356d356c2c24af1d5df64f18251ff5408d",
+    "sha": "048359356d356c2c24af1d5df64f18251ff5408d",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/048359356d356c2c24af1d5df64f18251ff5408d"
+   }
+  ],
+  "sha": "e79ba20056f42e40e7804f82d1e6811d67e49d83",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/e79ba20056f42e40e7804f82d1e6811d67e49d83"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/048359356d356c2c24af1d5df64f18251ff5408d/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-09T12:52:10Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-09T12:52:10Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "specs/: bundle specs/HOLOCARD_SPEC.md (frozen at planting; self-contained governance)",
+   "tree": {
+    "sha": "118ac5bb53d57c6a6786559a386ab6cbcb184bdc",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/118ac5bb53d57c6a6786559a386ab6cbcb184bdc"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/048359356d356c2c24af1d5df64f18251ff5408d",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/048359356d356c2c24af1d5df64f18251ff5408d",
+  "node_id": "C_kwDOSVbgq9oAKDA0ODM1OTM1NmQzNTZjMmMyNGFmMWQ1ZGY2NGYxODI1MWZmNTQwOGQ",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/e031b6885ecd7026a8e4490fbb9a04ac5b273ee8",
+    "sha": "e031b6885ecd7026a8e4490fbb9a04ac5b273ee8",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/e031b6885ecd7026a8e4490fbb9a04ac5b273ee8"
+   }
+  ],
+  "sha": "048359356d356c2c24af1d5df64f18251ff5408d",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/048359356d356c2c24af1d5df64f18251ff5408d"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/e031b6885ecd7026a8e4490fbb9a04ac5b273ee8/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-09T12:52:08Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-09T12:52:08Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "specs/: bundle specs/README.md (frozen at planting; self-contained governance)",
+   "tree": {
+    "sha": "8b424362a3b5c2362b47e088002cbf908cc38296",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/8b424362a3b5c2362b47e088002cbf908cc38296"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/e031b6885ecd7026a8e4490fbb9a04ac5b273ee8",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/e031b6885ecd7026a8e4490fbb9a04ac5b273ee8",
+  "node_id": "C_kwDOSVbgq9oAKGUwMzFiNjg4NWVjZDcwMjZhOGU0NDkwZmJiOWEwNGFjNWIyNzNlZTg",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/06101bec65848df5f8d4ea938ad209611d2f65e6",
+    "sha": "06101bec65848df5f8d4ea938ad209611d2f65e6",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/06101bec65848df5f8d4ea938ad209611d2f65e6"
+   }
+  ],
+  "sha": "e031b6885ecd7026a8e4490fbb9a04ac5b273ee8",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/e031b6885ecd7026a8e4490fbb9a04ac5b273ee8"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/06101bec65848df5f8d4ea938ad209611d2f65e6/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-09T12:52:07Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-09T12:52:07Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "holo-qr.svg: summon QR placeholder (seed 16113477165495793082)",
+   "tree": {
+    "sha": "43c4b2e953d16f58ca89fa99b53cd60b9e37fcd1",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/43c4b2e953d16f58ca89fa99b53cd60b9e37fcd1"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/06101bec65848df5f8d4ea938ad209611d2f65e6",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/06101bec65848df5f8d4ea938ad209611d2f65e6",
+  "node_id": "C_kwDOSVbgq9oAKDA2MTAxYmVjNjU4NDhkZjVmOGQ0ZWE5MzhhZDIwOTYxMWQyZjY1ZTY",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/bf810b5834bc24177696ef57ed34c3e6615be115",
+    "sha": "bf810b5834bc24177696ef57ed34c3e6615be115",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/bf810b5834bc24177696ef57ed34c3e6615be115"
+   }
+  ],
+  "sha": "06101bec65848df5f8d4ea938ad209611d2f65e6",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/06101bec65848df5f8d4ea938ad209611d2f65e6"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/bf810b5834bc24177696ef57ed34c3e6615be115/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-09T12:52:06Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-09T12:52:06Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "holo.svg: procedural 2D avatar (seed 16113477165495793082)",
+   "tree": {
+    "sha": "3b5824ef7bec43875eaadfc61089adbfe818bd77",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/3b5824ef7bec43875eaadfc61089adbfe818bd77"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/bf810b5834bc24177696ef57ed34c3e6615be115",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/bf810b5834bc24177696ef57ed34c3e6615be115",
+  "node_id": "C_kwDOSVbgq9oAKGJmODEwYjU4MzRiYzI0MTc3Njk2ZWY1N2VkMzRjM2U2NjE1YmUxMTU",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/75782148e2703b55584da3856894224842428cbd",
+    "sha": "75782148e2703b55584da3856894224842428cbd",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/75782148e2703b55584da3856894224842428cbd"
+   }
+  ],
+  "sha": "bf810b5834bc24177696ef57ed34c3e6615be115",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/bf810b5834bc24177696ef57ed34c3e6615be115"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/75782148e2703b55584da3856894224842428cbd/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-09T12:52:06Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-09T12:52:06Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "holo.md: friendly anonymous-AI entry doc",
+   "tree": {
+    "sha": "0feedc4872beb19fc0393ce942f084795bc1ec2c",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/0feedc4872beb19fc0393ce942f084795bc1ec2c"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/75782148e2703b55584da3856894224842428cbd",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/75782148e2703b55584da3856894224842428cbd",
+  "node_id": "C_kwDOSVbgq9oAKDc1NzgyMTQ4ZTI3MDNiNTU1ODRkYTM4NTY4OTQyMjQ4NDI0MjhjYmQ",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/3a44078a92c632d069c7e4f63489c96f32ce4671",
+    "sha": "3a44078a92c632d069c7e4f63489c96f32ce4671",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/3a44078a92c632d069c7e4f63489c96f32ce4671"
+   }
+  ],
+  "sha": "75782148e2703b55584da3856894224842428cbd",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/75782148e2703b55584da3856894224842428cbd"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/3a44078a92c632d069c7e4f63489c96f32ce4671/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-09T12:52:05Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-09T12:52:05Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "card.json: upgrade to rappcards/1.1.2 (kind=twin, seed=16113477165495793082)",
+   "tree": {
+    "sha": "b50cc205aae9ad867459ccd0a178d7ad0ec52945",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/b50cc205aae9ad867459ccd0a178d7ad0ec52945"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/3a44078a92c632d069c7e4f63489c96f32ce4671",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/3a44078a92c632d069c7e4f63489c96f32ce4671",
+  "node_id": "C_kwDOSVbgq9oAKDNhNDQwNzhhOTJjNjMyZDA2OWM3ZTRmNjM0ODljOTZmMzJjZTQ2NzE",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/1aa0cc347a5ddece7eab6a9461f289d9b03315e2",
+    "sha": "1aa0cc347a5ddece7eab6a9461f289d9b03315e2",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/1aa0cc347a5ddece7eab6a9461f289d9b03315e2"
+   }
+  ],
+  "sha": "3a44078a92c632d069c7e4f63489c96f32ce4671",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/3a44078a92c632d069c7e4f63489c96f32ce4671"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/1aa0cc347a5ddece7eab6a9461f289d9b03315e2/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-07T02:56:22Z",
+    "email": "kody-w@users.noreply.github.com",
+    "name": "kody-w"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-07T02:56:22Z",
+    "email": "kody-w@users.noreply.github.com",
+    "name": "kody-w"
+   },
+   "message": "sphere: copy-code button on device-code modal",
+   "tree": {
+    "sha": "55df1a4e1c1b3ff301a7331eccc99b2415161d86",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/55df1a4e1c1b3ff301a7331eccc99b2415161d86"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/1aa0cc347a5ddece7eab6a9461f289d9b03315e2",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/1aa0cc347a5ddece7eab6a9461f289d9b03315e2",
+  "node_id": "C_kwDOSVbgq9oAKDFhYTBjYzM0N2E1ZGRlY2U3ZWFiNmE5NDYxZjI4OWQ5YjAzMzE1ZTI",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/84042e79c0744fffff42b8b52e3895da2e59fdeb",
+    "sha": "84042e79c0744fffff42b8b52e3895da2e59fdeb",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/84042e79c0744fffff42b8b52e3895da2e59fdeb"
+   }
+  ],
+  "sha": "1aa0cc347a5ddece7eab6a9461f289d9b03315e2",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/1aa0cc347a5ddece7eab6a9461f289d9b03315e2"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/84042e79c0744fffff42b8b52e3895da2e59fdeb/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-07T02:41:16Z",
+    "email": "kody-w@users.noreply.github.com",
+    "name": "kody-w"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-07T02:41:16Z",
+    "email": "kody-w@users.noreply.github.com",
+    "name": "kody-w"
+   },
+   "message": "lock-in: 3D sphere doorman as default; classic preserved at ./classic.html",
+   "tree": {
+    "sha": "a2153ca3b853d41eb26d0274dcaa9fa01d8afd59",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/a2153ca3b853d41eb26d0274dcaa9fa01d8afd59"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/84042e79c0744fffff42b8b52e3895da2e59fdeb",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/84042e79c0744fffff42b8b52e3895da2e59fdeb",
+  "node_id": "C_kwDOSVbgq9oAKDg0MDQyZTc5YzA3NDRmZmZmZjQyYjhiNTJlMzg5NWRhMmU1OWZkZWI",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/37cc066f92114d7b3b15e9a1e3b8a32a51eacf94",
+    "sha": "37cc066f92114d7b3b15e9a1e3b8a32a51eacf94",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/37cc066f92114d7b3b15e9a1e3b8a32a51eacf94"
+   }
+  ],
+  "sha": "84042e79c0744fffff42b8b52e3895da2e59fdeb",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/84042e79c0744fffff42b8b52e3895da2e59fdeb"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/37cc066f92114d7b3b15e9a1e3b8a32a51eacf94/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-06T22:33:00Z",
+    "email": "kody-w@users.noreply.github.com",
+    "name": "kody-w"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-06T22:33:00Z",
+    "email": "kody-w@users.noreply.github.com",
+    "name": "kody-w"
+   },
+   "message": "rebond: secure-first defaults + mobile-plant guide + Article XL",
+   "tree": {
+    "sha": "7569f2c885a859130619cd29bd2324d9a600766a",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/7569f2c885a859130619cd29bd2324d9a600766a"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/37cc066f92114d7b3b15e9a1e3b8a32a51eacf94",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/37cc066f92114d7b3b15e9a1e3b8a32a51eacf94",
+  "node_id": "C_kwDOSVbgq9oAKDM3Y2MwNjZmOTIxMTRkN2IzYjE1ZTlhMWUzYjhhMzJhNTFlYWNmOTQ",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/f6f4cd896041cc9f8d291b03d0d8e6b82543d04a",
+    "sha": "f6f4cd896041cc9f8d291b03d0d8e6b82543d04a",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/f6f4cd896041cc9f8d291b03d0d8e6b82543d04a"
+   }
+  ],
+  "sha": "37cc066f92114d7b3b15e9a1e3b8a32a51eacf94",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/37cc066f92114d7b3b15e9a1e3b8a32a51eacf94"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/f6f4cd896041cc9f8d291b03d0d8e6b82543d04a/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-06T22:19:38Z",
+    "email": "kody-w@users.noreply.github.com",
+    "name": "kody-w"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-06T22:19:38Z",
+    "email": "kody-w@users.noreply.github.com",
+    "name": "kody-w"
+   },
+   "message": "rebond: PLANT_FROM_EGG support + agent-log + neighborhood + RAR card holo",
+   "tree": {
+    "sha": "64550a39bd1baaec19fad8c0920bfc8234b93ec5",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/64550a39bd1baaec19fad8c0920bfc8234b93ec5"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/f6f4cd896041cc9f8d291b03d0d8e6b82543d04a",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/f6f4cd896041cc9f8d291b03d0d8e6b82543d04a",
+  "node_id": "C_kwDOSVbgq9oAKGY2ZjRjZDg5NjA0MWNjOWY4ZDI5MWIwM2QwZDhlNmI4MjU0M2QwNGE",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/42aa48997ea0c4c49b2e926587d377af7ab0da45",
+    "sha": "42aa48997ea0c4c49b2e926587d377af7ab0da45",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/42aa48997ea0c4c49b2e926587d377af7ab0da45"
+   }
+  ],
+  "sha": "f6f4cd896041cc9f8d291b03d0d8e6b82543d04a",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/f6f4cd896041cc9f8d291b03d0d8e6b82543d04a"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/kody-twin/commits/42aa48997ea0c4c49b2e926587d377af7ab0da45/comments",
+  "commit": {
+   "author": {
+    "date": "2026-05-06T22:09:09Z",
+    "email": "kody-w@users.noreply.github.com",
+    "name": "kody-w"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-05-06T22:09:09Z",
+    "email": "kody-w@users.noreply.github.com",
+    "name": "kody-w"
+   },
+   "message": "rebond: neighborhood pane + Neighborhood doorman tool + neighbors.json",
+   "tree": {
+    "sha": "94a4a78a10b60646b039240e287b3ff9acaf16a0",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/git/trees/94a4a78a10b60646b039240e287b3ff9acaf16a0"
+   },
+   "url": "https://api.github.com/repos/kody-w/kody-twin/git/commits/42aa48997ea0c4c49b2e926587d377af7ab0da45",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/kody-twin/commit/42aa48997ea0c4c49b2e926587d377af7ab0da45",
+  "node_id": "C_kwDOSVbgq9oAKDQyYWE0ODk5N2VhMGM0YzQ5YjJlOTI2NTg3ZDM3N2FmN2FiMGRhNDU",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/kody-twin/commit/d92665b166097fdff323acd438ce0abc489faa07",
+    "sha": "d92665b166097fdff323acd438ce0abc489faa07",
+    "url": "https://api.github.com/repos/kody-w/kody-twin/commits/d92665b166097fdff323acd438ce0abc489faa07"
+   }
+  ],
+  "sha": "42aa48997ea0c4c49b2e926587d377af7ab0da45",
+  "url": "https://api.github.com/repos/kody-w/kody-twin/commits/42aa48997ea0c4c49b2e926587d377af7ab0da45"
+ }
+]

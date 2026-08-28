@@ -1,0 +1,45 @@
+name: Harvest GitHub snapshots
+
+# Article XXIV (the Static Data Covenant, kody-w/RAR CONSTITUTION.md): pages
+# read committed static data, never the GitHub API. doorman/index.html and
+# classic.html used to make unauthenticated api.github.com calls per visitor
+# (agents/ listing, recent commits, fork count — for the seed itself and for
+# its parent_repo lineage gift). This workflow harvests those once, on a
+# schedule and on push, and commits the results under state/ in the same
+# shape the API returns.
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'state/self_agents.json'
+      - 'state/self_commits.json'
+      - 'state/self_repo.json'
+      - 'state/parent_agents.json'
+      - 'state/parent_commits.json'
+      - 'state/parent_repo.json'
+  schedule:
+    - cron: '17 */6 * * *'   # refresh commit/fork counts every 6h even with no pushes
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  harvest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Harvest self + parent GitHub snapshots
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/harvest_gh_snapshots.py
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state/self_agents.json state/self_commits.json state/self_repo.json \
+                  state/parent_agents.json state/parent_commits.json state/parent_repo.json
+          git diff --cached --quiet || { git commit -m "chore: refresh GitHub snapshots [skip ci]"; git push; }
