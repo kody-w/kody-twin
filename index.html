@@ -3825,11 +3825,19 @@ _r if isinstance(_r, str) else json.dumps(_r)
                 const element = document.getElementById(elementId);
                 if (!element) return;
 
-                const value = this.getNestedValue(this.settings, settingPath);
+                const sessionOnly = elementId === 'settings-elevenlabs-key';
+                const value = sessionOnly
+                    ? sessionStorage.getItem('elevenlabs-key') || ''
+                    : this.getNestedValue(this.settings, settingPath);
+                if (sessionOnly) this.setNestedValue(this.settings, settingPath, '');
                 element.value = value || '';
 
                 element.addEventListener('input', (e) => {
-                    this.setNestedValue(this.settings, settingPath, e.target.value);
+                    if (sessionOnly) {
+                        sessionStorage.setItem('elevenlabs-key', e.target.value);
+                    } else {
+                        this.setNestedValue(this.settings, settingPath, e.target.value);
+                    }
                     this.updatePreview();
                 });
             }
@@ -3896,7 +3904,9 @@ _r if isinstance(_r, str) else json.dumps(_r)
             loadInputField(elementId, settingPath) {
                 const element = document.getElementById(elementId);
                 if (!element) return;
-                const value = this.getNestedValue(this.settings, settingPath);
+                const value = elementId === 'settings-elevenlabs-key'
+                    ? sessionStorage.getItem('elevenlabs-key') || ''
+                    : this.getNestedValue(this.settings, settingPath);
                 element.value = value || '';
             }
 
@@ -5292,7 +5302,8 @@ _r if isinstance(_r, str) else json.dumps(_r)
                         voiceEnabled: allSettings.voice.output.enabled,
                         autoSpeak: allSettings.voice.output.autoSpeak,
                         azureTTSKey: allSettings.voice.output.azureTTSKey,
-                        elevenLabsKey: allSettings.voice.output.elevenLabsKey || '',
+                        // Paste your own key — never committed.
+                        elevenLabsKey: sessionStorage.getItem('elevenlabs-key') || '',
                         elevenLabsVoiceId: allSettings.voice.output.elevenLabsVoiceId || '',
                         ttsVoiceName: allSettings.voice.output.ttsVoiceName,
                         voiceInputEnabled: allSettings.voice.input.enabled,
