@@ -87,34 +87,17 @@
   "user_view_type": "public"
  },
  "permissions": {
-  "admin": true,
-  "maintain": true,
-  "pull": true,
-  "push": true,
-  "triage": true
+  "admin": false,
+  "maintain": false,
+  "pull": false,
+  "push": false,
+  "triage": false
  },
  "private": false,
  "pull_request_creation_policy": "all",
  "pulls_url": "https://api.github.com/repos/kody-w/kody-twin/pulls{/number}",
- "pushed_at": "2026-07-16T18:56:08Z",
+ "pushed_at": "2026-08-28T03:02:34Z",
  "releases_url": "https://api.github.com/repos/kody-w/kody-twin/releases{/id}",
- "security_and_analysis": {
-  "dependabot_security_updates": {
-   "status": "disabled"
-  },
-  "secret_scanning": {
-   "status": "enabled"
-  },
-  "secret_scanning_non_provider_patterns": {
-   "status": "disabled"
-  },
-  "secret_scanning_push_protection": {
-   "status": "enabled"
-  },
-  "secret_scanning_validity_checks": {
-   "status": "disabled"
-  }
- },
  "size": 326,
  "squash_merge_commit_message": "COMMIT_MESSAGES",
  "squash_merge_commit_title": "COMMIT_OR_PR_TITLE",
