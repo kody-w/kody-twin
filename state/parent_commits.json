@@ -21,6 +21,590 @@
    "url": "https://api.github.com/users/github-actions%5Bbot%5D",
    "user_view_type": "public"
   },
+  "comments_url": "https://api.github.com/repos/kody-w/RAPP/commits/4022144a1f0976098de8ea84c7c66f943e5d1fae/comments",
+  "commit": {
+   "author": {
+    "date": "2026-08-30T19:52:00Z",
+    "email": "github-actions[bot]@users.noreply.github.com",
+    "name": "github-actions[bot]"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-08-30T19:52:00Z",
+    "email": "github-actions[bot]@users.noreply.github.com",
+    "name": "github-actions[bot]"
+   },
+   "message": "chore: harvest metropolis activity snapshot",
+   "tree": {
+    "sha": "b5592f96cc8fdd47743954429840ce77ddc169e4",
+    "url": "https://api.github.com/repos/kody-w/RAPP/git/trees/b5592f96cc8fdd47743954429840ce77ddc169e4"
+   },
+   "url": "https://api.github.com/repos/kody-w/RAPP/git/commits/4022144a1f0976098de8ea84c7c66f943e5d1fae",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+   "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+   "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+   "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+   "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/apps/github-actions",
+   "id": 41898282,
+   "login": "github-actions[bot]",
+   "node_id": "MDM6Qm90NDE4OTgyODI=",
+   "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+   "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+   "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+   "type": "Bot",
+   "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/RAPP/commit/4022144a1f0976098de8ea84c7c66f943e5d1fae",
+  "node_id": "C_kwDOQbq5VtoAKDQwMjIxNDRhMWYwOTc2MDk4ZGU4ZWE4NGM3YzY2Zjk0M2U1ZDFmYWU",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/RAPP/commit/cb921ae59b5d762ce0bdd5493764cbb1c8b539fe",
+    "sha": "cb921ae59b5d762ce0bdd5493764cbb1c8b539fe",
+    "url": "https://api.github.com/repos/kody-w/RAPP/commits/cb921ae59b5d762ce0bdd5493764cbb1c8b539fe"
+   }
+  ],
+  "sha": "4022144a1f0976098de8ea84c7c66f943e5d1fae",
+  "url": "https://api.github.com/repos/kody-w/RAPP/commits/4022144a1f0976098de8ea84c7c66f943e5d1fae"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/RAPP/commits/cb921ae59b5d762ce0bdd5493764cbb1c8b539fe/comments",
+  "commit": {
+   "author": {
+    "date": "2026-08-30T17:59:15Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-08-30T17:59:15Z",
+    "email": "noreply@github.com",
+    "name": "GitHub"
+   },
+   "message": "Make the RAPP philosophy safe to mirror\n\nUse explicit canonical RAPP links so protocol mirrors cannot reinterpret product authority, status, or rights statements.\n\nCo-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>\nCopilot-Session: 690f70cf-c834-40ff-b050-37382ea46b0d",
+   "tree": {
+    "sha": "7e86cb5406d5c3f6acc4a2cd5b66dd1993b97cd4",
+    "url": "https://api.github.com/repos/kody-w/RAPP/git/trees/7e86cb5406d5c3f6acc4a2cd5b66dd1993b97cd4"
+   },
+   "url": "https://api.github.com/repos/kody-w/RAPP/git/commits/cb921ae59b5d762ce0bdd5493764cbb1c8b539fe",
+   "verification": {
+    "payload": "tree 7e86cb5406d5c3f6acc4a2cd5b66dd1993b97cd4\nparent b7a1af9b5d670b7a7784b42b550034bc6b36157f\nparent 4e3574bab9f86ba7c5f28f8fe05e46db519d1bcf\nauthor Kody Wildfeuer <kwildfeuer@me.com> 1788112755 -0400\ncommitter GitHub <noreply@github.com> 1788112755 -0400\n\nMake the RAPP philosophy safe to mirror\n\nUse explicit canonical RAPP links so protocol mirrors cannot reinterpret product authority, status, or rights statements.\n\nCo-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>\nCopilot-Session: 690f70cf-c834-40ff-b050-37382ea46b0d",
+    "reason": "valid",
+    "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqlG9zCRC1aQ7uu5UhlAAANUYQAI5ocyZ92fP4VIeFhPGv/PqN\n0e9r0IBPYf04pKHgVCqloR6xiNozaDVKD17ifiq2pem8Fd8fwCEs9LUJ+4ONpg5n\nqWLcYeM2AgJriMTOUR5JyvFfHPaLMLsri/TGzMBn5G8QqDFSppunLcEorbBUTml6\nSU7lVG2g9AQbV/aT4tD3djB8udfGXLMuwl9xZt9V8BKeY5CvptYkse4DEc8L3JEb\nOtPvCXMSM+FcZdpe7rMi6Jl+tlP8a2H1yIrqqR/3d35LhNQ6MkOBO/2VmQZ41VpU\ndC1lktMArNfvlgilTz53vHa0PDt1L9f2UXKGrEegiSe7h2bjqXpTRw91XIbA6JDo\nGeD2+rs55p29BL9vKvTkj+By9RlvA0h/vg/eGzq+BbuTLGWrIWvDnghKrCUTKKCl\nKkOTxoBd5aZJBkGjI7AvZGDAo7chRE7rz9XmEER5Mh3FKGfOMzc3cauLuY9rHEVV\n1BfsZl9cNBw+4IIKVcQ0DZStsMb22VdmwMIpF25REE+Uu6ozDSqsTzOIcGEMnasa\ncBDw8fuS73muAWieB/iFkcVbVbLqRUiX1dBLrWNtEF2pDilOyIXGF/NwgXWPF18Q\ne+FnI1KVljAVDaCImEYJbmOQ/wSlUh8cye1PH/Sw5XjMZ5tTNxcwMknGZMBtIUUP\nisNIwuE3iV7ofboTWnBw\n=XdKp\n-----END PGP SIGNATURE-----\n",
+    "verified": true,
+    "verified_at": "2026-08-30T17:59:15Z"
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+   "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+   "followers_url": "https://api.github.com/users/web-flow/followers",
+   "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+   "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/web-flow",
+   "id": 19864447,
+   "login": "web-flow",
+   "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+   "organizations_url": "https://api.github.com/users/web-flow/orgs",
+   "received_events_url": "https://api.github.com/users/web-flow/received_events",
+   "repos_url": "https://api.github.com/users/web-flow/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/web-flow",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/RAPP/commit/cb921ae59b5d762ce0bdd5493764cbb1c8b539fe",
+  "node_id": "C_kwDOQbq5VtoAKGNiOTIxYWU1OWI1ZDc2MmNlMGJkZDU0OTM3NjRjYmIxYzhiNTM5ZmU",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/RAPP/commit/b7a1af9b5d670b7a7784b42b550034bc6b36157f",
+    "sha": "b7a1af9b5d670b7a7784b42b550034bc6b36157f",
+    "url": "https://api.github.com/repos/kody-w/RAPP/commits/b7a1af9b5d670b7a7784b42b550034bc6b36157f"
+   },
+   {
+    "html_url": "https://github.com/kody-w/RAPP/commit/4e3574bab9f86ba7c5f28f8fe05e46db519d1bcf",
+    "sha": "4e3574bab9f86ba7c5f28f8fe05e46db519d1bcf",
+    "url": "https://api.github.com/repos/kody-w/RAPP/commits/4e3574bab9f86ba7c5f28f8fe05e46db519d1bcf"
+   }
+  ],
+  "sha": "cb921ae59b5d762ce0bdd5493764cbb1c8b539fe",
+  "url": "https://api.github.com/repos/kody-w/RAPP/commits/cb921ae59b5d762ce0bdd5493764cbb1c8b539fe"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/RAPP/commits/4e3574bab9f86ba7c5f28f8fe05e46db519d1bcf/comments",
+  "commit": {
+   "author": {
+    "date": "2026-08-30T17:56:46Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-08-30T17:56:46Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "docs: make philosophy mirror-safe\n\nUse explicit main-RAPP links so protocol mirrors cannot reinterpret repository-relative authority or licensing statements.\n\nCo-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>\n\nCopilot-Session: 690f70cf-c834-40ff-b050-37382ea46b0d",
+   "tree": {
+    "sha": "7e86cb5406d5c3f6acc4a2cd5b66dd1993b97cd4",
+    "url": "https://api.github.com/repos/kody-w/RAPP/git/trees/7e86cb5406d5c3f6acc4a2cd5b66dd1993b97cd4"
+   },
+   "url": "https://api.github.com/repos/kody-w/RAPP/git/commits/4e3574bab9f86ba7c5f28f8fe05e46db519d1bcf",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/RAPP/commit/4e3574bab9f86ba7c5f28f8fe05e46db519d1bcf",
+  "node_id": "C_kwDOQbq5VtoAKDRlMzU3NGJhYjlmODZiYTdjNWYyOGY4ZmUwNWU0NmRiNTE5ZDFiY2Y",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/RAPP/commit/f0d4b2829e95de5581613b3672009d97816cb6ef",
+    "sha": "f0d4b2829e95de5581613b3672009d97816cb6ef",
+    "url": "https://api.github.com/repos/kody-w/RAPP/commits/f0d4b2829e95de5581613b3672009d97816cb6ef"
+   }
+  ],
+  "sha": "4e3574bab9f86ba7c5f28f8fe05e46db519d1bcf",
+  "url": "https://api.github.com/repos/kody-w/RAPP/commits/4e3574bab9f86ba7c5f28f8fe05e46db519d1bcf"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/RAPP/commits/b7a1af9b5d670b7a7784b42b550034bc6b36157f/comments",
+  "commit": {
+   "author": {
+    "date": "2026-08-30T17:46:31Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-08-30T17:46:31Z",
+    "email": "noreply@github.com",
+    "name": "GitHub"
+   },
+   "message": "Restore RAPP as the canonical public foundation\n\nKeep RAPP in the main repository, keep rapp-1 protocol-only, separate the public foundation from Rappter/RapterBox LLC products, and publish neutral rights/licensing boundaries.\n\nCo-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>\nCopilot-Session: 690f70cf-c834-40ff-b050-37382ea46b0d",
+   "tree": {
+    "sha": "81675c83607ff5474418e37f912c0eece18af05d",
+    "url": "https://api.github.com/repos/kody-w/RAPP/git/trees/81675c83607ff5474418e37f912c0eece18af05d"
+   },
+   "url": "https://api.github.com/repos/kody-w/RAPP/git/commits/b7a1af9b5d670b7a7784b42b550034bc6b36157f",
+   "verification": {
+    "payload": "tree 81675c83607ff5474418e37f912c0eece18af05d\nparent b0871597bfe70197f8a16bf6d2f6030aa924a552\nparent f0d4b2829e95de5581613b3672009d97816cb6ef\nauthor Kody Wildfeuer <kwildfeuer@me.com> 1788111991 -0400\ncommitter GitHub <noreply@github.com> 1788111991 -0400\n\nRestore RAPP as the canonical public foundation\n\nKeep RAPP in the main repository, keep rapp-1 protocol-only, separate the public foundation from Rappter/RapterBox LLC products, and publish neutral rights/licensing boundaries.\n\nCo-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>\nCopilot-Session: 690f70cf-c834-40ff-b050-37382ea46b0d",
+    "reason": "valid",
+    "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqlGx3CRC1aQ7uu5UhlAAAQYYQAEvTz0ZlnO2GaWjIILfW5qiy\nFHv5ltSeFeYLQxSlcEXbm3grT79Jc3cm2jBUAMubwPyC3ZZbOjTuIhl9ZcHsfvwr\nbrxy4Ta/0PG7oR4ddc/AfNc+FZJHOXn7bSDs1M+B9Yi/obAhWc3ALyQPtHBGv9Sf\nNc3dMTPTk7lbWSY662EmOQG09uyXjQmbk9JEjIpEXegAkRAoqAFwLJ4Xqorv1qjD\nh1XX4U+r4ZtIHb1HFA3GFqKdiQxfPWRHVUhnxSSmNP7jaXcL/JMbiS6vbXgjQHI0\nSRqzQXJMdT/74slaObg8BaVkqd8Ehhz24zZQ2bWfeHFMyuqQa04R05y08W81i52I\nJBeK6FDeVIPNiOoqE0zEVgJ1gxCiktgDgDCPH1EiVNwjNrQcM1kxqHk6z6R/bllR\nkKLEkdbG5d0PsApaAMabu1i7J3Cuxah3OIq4CwJR6sLa2zToZwGRN/7uH+zzHwvh\nU1YlfZaZxSRPBU7bINxWylSHkg7V94ARi7kPH1rkgNRC9GuTV2pRJ9VBahHWWicE\nrX1EpRX28ZoU/NjzwG2qgXpmCYTogQREi2IW7L6aDNV0Jb0NbdVtJQvstaPGZGDU\nFiNirNPE80Qajfywp5B4PnIiKtum7meRLFLtn0cdqYMhBU2nErFgCL9ZJsdsrv2e\njFShAv8KblnyUJPRbXvs\n=r3qp\n-----END PGP SIGNATURE-----\n",
+    "verified": true,
+    "verified_at": "2026-08-30T17:46:32Z"
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+   "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+   "followers_url": "https://api.github.com/users/web-flow/followers",
+   "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+   "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/web-flow",
+   "id": 19864447,
+   "login": "web-flow",
+   "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+   "organizations_url": "https://api.github.com/users/web-flow/orgs",
+   "received_events_url": "https://api.github.com/users/web-flow/received_events",
+   "repos_url": "https://api.github.com/users/web-flow/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/web-flow",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/RAPP/commit/b7a1af9b5d670b7a7784b42b550034bc6b36157f",
+  "node_id": "C_kwDOQbq5VtoAKGI3YTFhZjliNWQ2NzBiN2E3Nzg0YjQyYjU1MDAzNGJjNmIzNjE1N2Y",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/RAPP/commit/b0871597bfe70197f8a16bf6d2f6030aa924a552",
+    "sha": "b0871597bfe70197f8a16bf6d2f6030aa924a552",
+    "url": "https://api.github.com/repos/kody-w/RAPP/commits/b0871597bfe70197f8a16bf6d2f6030aa924a552"
+   },
+   {
+    "html_url": "https://github.com/kody-w/RAPP/commit/f0d4b2829e95de5581613b3672009d97816cb6ef",
+    "sha": "f0d4b2829e95de5581613b3672009d97816cb6ef",
+    "url": "https://api.github.com/repos/kody-w/RAPP/commits/f0d4b2829e95de5581613b3672009d97816cb6ef"
+   }
+  ],
+  "sha": "b7a1af9b5d670b7a7784b42b550034bc6b36157f",
+  "url": "https://api.github.com/repos/kody-w/RAPP/commits/b7a1af9b5d670b7a7784b42b550034bc6b36157f"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/RAPP/commits/f0d4b2829e95de5581613b3672009d97816cb6ef/comments",
+  "commit": {
+   "author": {
+    "date": "2026-08-30T17:45:17Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-08-30T17:45:17Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "ci: pin metropolis harvest actions\n\nBring the new harvest workflow into the immutable action inventory so the canonical structural gate remains green.\n\nCo-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>\n\nCopilot-Session: 690f70cf-c834-40ff-b050-37382ea46b0d",
+   "tree": {
+    "sha": "81675c83607ff5474418e37f912c0eece18af05d",
+    "url": "https://api.github.com/repos/kody-w/RAPP/git/trees/81675c83607ff5474418e37f912c0eece18af05d"
+   },
+   "url": "https://api.github.com/repos/kody-w/RAPP/git/commits/f0d4b2829e95de5581613b3672009d97816cb6ef",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/RAPP/commit/f0d4b2829e95de5581613b3672009d97816cb6ef",
+  "node_id": "C_kwDOQbq5VtoAKGYwZDRiMjgyOWU5NWRlNTU4MTYxM2IzNjcyMDA5ZDk3ODE2Y2I2ZWY",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/RAPP/commit/bdeffa9d789ebaea0b4710236b49a0cc07e035b5",
+    "sha": "bdeffa9d789ebaea0b4710236b49a0cc07e035b5",
+    "url": "https://api.github.com/repos/kody-w/RAPP/commits/bdeffa9d789ebaea0b4710236b49a0cc07e035b5"
+   }
+  ],
+  "sha": "f0d4b2829e95de5581613b3672009d97816cb6ef",
+  "url": "https://api.github.com/repos/kody-w/RAPP/commits/f0d4b2829e95de5581613b3672009d97816cb6ef"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/RAPP/commits/bdeffa9d789ebaea0b4710236b49a0cc07e035b5/comments",
+  "commit": {
+   "author": {
+    "date": "2026-08-30T17:39:16Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-08-30T17:39:16Z",
+    "email": "kwildfeuer@me.com",
+    "name": "Kody Wildfeuer"
+   },
+   "message": "docs: restore RAPP foundation authority\n\nKeep the public RAPP foundation and product canon in kody-w/RAPP, scope rapp-1 to protocol authority, separate downstream Rappter/RapterBox LLC products, and add neutral rights/licensing boundaries.\n\nCo-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>\n\nCopilot-Session: 690f70cf-c834-40ff-b050-37382ea46b0d",
+   "tree": {
+    "sha": "6499af47145f6797cc11188821367ff92b0168a4",
+    "url": "https://api.github.com/repos/kody-w/RAPP/git/trees/6499af47145f6797cc11188821367ff92b0168a4"
+   },
+   "url": "https://api.github.com/repos/kody-w/RAPP/git/commits/bdeffa9d789ebaea0b4710236b49a0cc07e035b5",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/u/1735900?v=4",
+   "events_url": "https://api.github.com/users/kody-w/events{/privacy}",
+   "followers_url": "https://api.github.com/users/kody-w/followers",
+   "following_url": "https://api.github.com/users/kody-w/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kody-w/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/kody-w",
+   "id": 1735900,
+   "login": "kody-w",
+   "node_id": "MDQ6VXNlcjE3MzU5MDA=",
+   "organizations_url": "https://api.github.com/users/kody-w/orgs",
+   "received_events_url": "https://api.github.com/users/kody-w/received_events",
+   "repos_url": "https://api.github.com/users/kody-w/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/kody-w/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kody-w/subscriptions",
+   "type": "User",
+   "url": "https://api.github.com/users/kody-w",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/RAPP/commit/bdeffa9d789ebaea0b4710236b49a0cc07e035b5",
+  "node_id": "C_kwDOQbq5VtoAKGJkZWZmYTlkNzg5ZWJhZWEwYjQ3MTAyMzZiNDlhMGNjMDdlMDM1YjU",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/RAPP/commit/b0871597bfe70197f8a16bf6d2f6030aa924a552",
+    "sha": "b0871597bfe70197f8a16bf6d2f6030aa924a552",
+    "url": "https://api.github.com/repos/kody-w/RAPP/commits/b0871597bfe70197f8a16bf6d2f6030aa924a552"
+   }
+  ],
+  "sha": "bdeffa9d789ebaea0b4710236b49a0cc07e035b5",
+  "url": "https://api.github.com/repos/kody-w/RAPP/commits/bdeffa9d789ebaea0b4710236b49a0cc07e035b5"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+   "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+   "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+   "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+   "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/apps/github-actions",
+   "id": 41898282,
+   "login": "github-actions[bot]",
+   "node_id": "MDM6Qm90NDE4OTgyODI=",
+   "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+   "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+   "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+   "type": "Bot",
+   "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+   "user_view_type": "public"
+  },
+  "comments_url": "https://api.github.com/repos/kody-w/RAPP/commits/b0871597bfe70197f8a16bf6d2f6030aa924a552/comments",
+  "commit": {
+   "author": {
+    "date": "2026-08-30T16:47:13Z",
+    "email": "github-actions[bot]@users.noreply.github.com",
+    "name": "github-actions[bot]"
+   },
+   "comment_count": 0,
+   "committer": {
+    "date": "2026-08-30T16:47:13Z",
+    "email": "github-actions[bot]@users.noreply.github.com",
+    "name": "github-actions[bot]"
+   },
+   "message": "chore: harvest metropolis activity snapshot",
+   "tree": {
+    "sha": "0649d7cfb6c2056f4331353d6eca59d9a34c234b",
+    "url": "https://api.github.com/repos/kody-w/RAPP/git/trees/0649d7cfb6c2056f4331353d6eca59d9a34c234b"
+   },
+   "url": "https://api.github.com/repos/kody-w/RAPP/git/commits/b0871597bfe70197f8a16bf6d2f6030aa924a552",
+   "verification": {
+    "payload": null,
+    "reason": "unsigned",
+    "signature": null,
+    "verified": false,
+    "verified_at": null
+   }
+  },
+  "committer": {
+   "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+   "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+   "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+   "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+   "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/apps/github-actions",
+   "id": 41898282,
+   "login": "github-actions[bot]",
+   "node_id": "MDM6Qm90NDE4OTgyODI=",
+   "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+   "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+   "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+   "type": "Bot",
+   "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+   "user_view_type": "public"
+  },
+  "html_url": "https://github.com/kody-w/RAPP/commit/b0871597bfe70197f8a16bf6d2f6030aa924a552",
+  "node_id": "C_kwDOQbq5VtoAKGIwODcxNTk3YmZlNzAxOTdmOGExNmJmNmQyZjYwMzBhYTkyNGE1NTI",
+  "parents": [
+   {
+    "html_url": "https://github.com/kody-w/RAPP/commit/55c98a23910a386d4821f09637c3a43a9e59224e",
+    "sha": "55c98a23910a386d4821f09637c3a43a9e59224e",
+    "url": "https://api.github.com/repos/kody-w/RAPP/commits/55c98a23910a386d4821f09637c3a43a9e59224e"
+   }
+  ],
+  "sha": "b0871597bfe70197f8a16bf6d2f6030aa924a552",
+  "url": "https://api.github.com/repos/kody-w/RAPP/commits/b0871597bfe70197f8a16bf6d2f6030aa924a552"
+ },
+ {
+  "author": {
+   "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+   "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+   "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+   "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+   "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+   "gravatar_id": "",
+   "html_url": "https://github.com/apps/github-actions",
+   "id": 41898282,
+   "login": "github-actions[bot]",
+   "node_id": "MDM6Qm90NDE4OTgyODI=",
+   "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+   "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+   "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+   "site_admin": false,
+   "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+   "type": "Bot",
+   "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+   "user_view_type": "public"
+  },
   "comments_url": "https://api.github.com/repos/kody-w/RAPP/commits/55c98a23910a386d4821f09637c3a43a9e59224e/comments",
   "commit": {
    "author": {
@@ -1889,579 +2473,5 @@
   ],
   "sha": "a1b8bcaedba02fd66a91d4fa00b6ccd1add4c716",
   "url": "https://api.github.com/repos/kody-w/RAPP/commits/a1b8bcaedba02fd66a91d4fa00b6ccd1add4c716"
- },
- {
-  "author": {
-   "avatar_url": "https://avatars.githubusercontent.com/u/267697307?v=4",
-   "events_url": "https://api.github.com/users/rappter2-ux/events{/privacy}",
-   "followers_url": "https://api.github.com/users/rappter2-ux/followers",
-   "following_url": "https://api.github.com/users/rappter2-ux/following{/other_user}",
-   "gists_url": "https://api.github.com/users/rappter2-ux/gists{/gist_id}",
-   "gravatar_id": "",
-   "html_url": "https://github.com/rappter2-ux",
-   "id": 267697307,
-   "login": "rappter2-ux",
-   "node_id": "U_kgDOD_S8mw",
-   "organizations_url": "https://api.github.com/users/rappter2-ux/orgs",
-   "received_events_url": "https://api.github.com/users/rappter2-ux/received_events",
-   "repos_url": "https://api.github.com/users/rappter2-ux/repos",
-   "site_admin": false,
-   "starred_url": "https://api.github.com/users/rappter2-ux/starred{/owner}{/repo}",
-   "subscriptions_url": "https://api.github.com/users/rappter2-ux/subscriptions",
-   "type": "User",
-   "url": "https://api.github.com/users/rappter2-ux",
-   "user_view_type": "public"
-  },
-  "comments_url": "https://api.github.com/repos/kody-w/RAPP/commits/bd122780ac90010e607ce9549e7c5ed18bee5d73/comments",
-  "commit": {
-   "author": {
-    "date": "2026-07-17T12:39:49Z",
-    "email": "rappter2@icloud.com",
-    "name": "rappter2-ux"
-   },
-   "comment_count": 0,
-   "committer": {
-    "date": "2026-07-17T12:39:49Z",
-    "email": "rappter2@icloud.com",
-    "name": "rappter2-ux"
-   },
-   "message": "docs: scope installer retirement precisely\n\nKeep public distribution, deployment, and download entrypoints retired while documenting the repository-local mint-once lineage utility for fresh template clones.\n\nCo-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>",
-   "tree": {
-    "sha": "634af0f8919c14cce977ce4b89c33ac87fe905ac",
-    "url": "https://api.github.com/repos/kody-w/RAPP/git/trees/634af0f8919c14cce977ce4b89c33ac87fe905ac"
-   },
-   "url": "https://api.github.com/repos/kody-w/RAPP/git/commits/bd122780ac90010e607ce9549e7c5ed18bee5d73",
-   "verification": {
-    "payload": null,
-    "reason": "unsigned",
-    "signature": null,
-    "verified": false,
-    "verified_at": null
-   }
-  },
-  "committer": {
-   "avatar_url": "https://avatars.githubusercontent.com/u/267697307?v=4",
-   "events_url": "https://api.github.com/users/rappter2-ux/events{/privacy}",
-   "followers_url": "https://api.github.com/users/rappter2-ux/followers",
-   "following_url": "https://api.github.com/users/rappter2-ux/following{/other_user}",
-   "gists_url": "https://api.github.com/users/rappter2-ux/gists{/gist_id}",
-   "gravatar_id": "",
-   "html_url": "https://github.com/rappter2-ux",
-   "id": 267697307,
-   "login": "rappter2-ux",
-   "node_id": "U_kgDOD_S8mw",
-   "organizations_url": "https://api.github.com/users/rappter2-ux/orgs",
-   "received_events_url": "https://api.github.com/users/rappter2-ux/received_events",
-   "repos_url": "https://api.github.com/users/rappter2-ux/repos",
-   "site_admin": false,
-   "starred_url": "https://api.github.com/users/rappter2-ux/starred{/owner}{/repo}",
-   "subscriptions_url": "https://api.github.com/users/rappter2-ux/subscriptions",
-   "type": "User",
-   "url": "https://api.github.com/users/rappter2-ux",
-   "user_view_type": "public"
-  },
-  "html_url": "https://github.com/kody-w/RAPP/commit/bd122780ac90010e607ce9549e7c5ed18bee5d73",
-  "node_id": "C_kwDOQbq5VtoAKGJkMTIyNzgwYWM5MDAxMGU2MDdjZTk1NDllN2M1ZWQxOGJlZTVkNzM",
-  "parents": [
-   {
-    "html_url": "https://github.com/kody-w/RAPP/commit/8383dc24a47bf0e310f20b3ecb7c7675dcaabb81",
-    "sha": "8383dc24a47bf0e310f20b3ecb7c7675dcaabb81",
-    "url": "https://api.github.com/repos/kody-w/RAPP/commits/8383dc24a47bf0e310f20b3ecb7c7675dcaabb81"
-   }
-  ],
-  "sha": "bd122780ac90010e607ce9549e7c5ed18bee5d73",
-  "url": "https://api.github.com/repos/kody-w/RAPP/commits/bd122780ac90010e607ce9549e7c5ed18bee5d73"
- },
- {
-  "author": {
-   "avatar_url": "https://avatars.githubusercontent.com/u/267697307?v=4",
-   "events_url": "https://api.github.com/users/rappter2-ux/events{/privacy}",
-   "followers_url": "https://api.github.com/users/rappter2-ux/followers",
-   "following_url": "https://api.github.com/users/rappter2-ux/following{/other_user}",
-   "gists_url": "https://api.github.com/users/rappter2-ux/gists{/gist_id}",
-   "gravatar_id": "",
-   "html_url": "https://github.com/rappter2-ux",
-   "id": 267697307,
-   "login": "rappter2-ux",
-   "node_id": "U_kgDOD_S8mw",
-   "organizations_url": "https://api.github.com/users/rappter2-ux/orgs",
-   "received_events_url": "https://api.github.com/users/rappter2-ux/received_events",
-   "repos_url": "https://api.github.com/users/rappter2-ux/repos",
-   "site_admin": false,
-   "starred_url": "https://api.github.com/users/rappter2-ux/starred{/owner}{/repo}",
-   "subscriptions_url": "https://api.github.com/users/rappter2-ux/subscriptions",
-   "type": "User",
-   "url": "https://api.github.com/users/rappter2-ux",
-   "user_view_type": "public"
-  },
-  "comments_url": "https://api.github.com/repos/kody-w/RAPP/commits/8383dc24a47bf0e310f20b3ecb7c7675dcaabb81/comments",
-  "commit": {
-   "author": {
-    "date": "2026-07-17T12:32:19Z",
-    "email": "rappter2@icloud.com",
-    "name": "rappter2-ux"
-   },
-   "comment_count": 0,
-   "committer": {
-    "date": "2026-07-17T12:32:19Z",
-    "email": "rappter2@icloud.com",
-    "name": "rappter2-ux"
-   },
-   "message": "docs: close final public surface blockers\n\nRetire the installer README, correct shared footer licensing and authority links, and fail closed on both terminal states in the documentation gate.\n\nCo-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>",
-   "tree": {
-    "sha": "780e843535bc2752711356018997b9c6f5c97440",
-    "url": "https://api.github.com/repos/kody-w/RAPP/git/trees/780e843535bc2752711356018997b9c6f5c97440"
-   },
-   "url": "https://api.github.com/repos/kody-w/RAPP/git/commits/8383dc24a47bf0e310f20b3ecb7c7675dcaabb81",
-   "verification": {
-    "payload": null,
-    "reason": "unsigned",
-    "signature": null,
-    "verified": false,
-    "verified_at": null
-   }
-  },
-  "committer": {
-   "avatar_url": "https://avatars.githubusercontent.com/u/267697307?v=4",
-   "events_url": "https://api.github.com/users/rappter2-ux/events{/privacy}",
-   "followers_url": "https://api.github.com/users/rappter2-ux/followers",
-   "following_url": "https://api.github.com/users/rappter2-ux/following{/other_user}",
-   "gists_url": "https://api.github.com/users/rappter2-ux/gists{/gist_id}",
-   "gravatar_id": "",
-   "html_url": "https://github.com/rappter2-ux",
-   "id": 267697307,
-   "login": "rappter2-ux",
-   "node_id": "U_kgDOD_S8mw",
-   "organizations_url": "https://api.github.com/users/rappter2-ux/orgs",
-   "received_events_url": "https://api.github.com/users/rappter2-ux/received_events",
-   "repos_url": "https://api.github.com/users/rappter2-ux/repos",
-   "site_admin": false,
-   "starred_url": "https://api.github.com/users/rappter2-ux/starred{/owner}{/repo}",
-   "subscriptions_url": "https://api.github.com/users/rappter2-ux/subscriptions",
-   "type": "User",
-   "url": "https://api.github.com/users/rappter2-ux",
-   "user_view_type": "public"
-  },
-  "html_url": "https://github.com/kody-w/RAPP/commit/8383dc24a47bf0e310f20b3ecb7c7675dcaabb81",
-  "node_id": "C_kwDOQbq5VtoAKDgzODNkYzI0YTQ3YmYwZTMxMGYyMGIzZWNiN2M3Njc1ZGNhYWJiODE",
-  "parents": [
-   {
-    "html_url": "https://github.com/kody-w/RAPP/commit/0364a97c0498663b83945a039d7ac0786e6f6aeb",
-    "sha": "0364a97c0498663b83945a039d7ac0786e6f6aeb",
-    "url": "https://api.github.com/repos/kody-w/RAPP/commits/0364a97c0498663b83945a039d7ac0786e6f6aeb"
-   }
-  ],
-  "sha": "8383dc24a47bf0e310f20b3ecb7c7675dcaabb81",
-  "url": "https://api.github.com/repos/kody-w/RAPP/commits/8383dc24a47bf0e310f20b3ecb7c7675dcaabb81"
- },
- {
-  "author": {
-   "avatar_url": "https://avatars.githubusercontent.com/u/267697307?v=4",
-   "events_url": "https://api.github.com/users/rappter2-ux/events{/privacy}",
-   "followers_url": "https://api.github.com/users/rappter2-ux/followers",
-   "following_url": "https://api.github.com/users/rappter2-ux/following{/other_user}",
-   "gists_url": "https://api.github.com/users/rappter2-ux/gists{/gist_id}",
-   "gravatar_id": "",
-   "html_url": "https://github.com/rappter2-ux",
-   "id": 267697307,
-   "login": "rappter2-ux",
-   "node_id": "U_kgDOD_S8mw",
-   "organizations_url": "https://api.github.com/users/rappter2-ux/orgs",
-   "received_events_url": "https://api.github.com/users/rappter2-ux/received_events",
-   "repos_url": "https://api.github.com/users/rappter2-ux/repos",
-   "site_admin": false,
-   "starred_url": "https://api.github.com/users/rappter2-ux/starred{/owner}{/repo}",
-   "subscriptions_url": "https://api.github.com/users/rappter2-ux/subscriptions",
-   "type": "User",
-   "url": "https://api.github.com/users/rappter2-ux",
-   "user_view_type": "public"
-  },
-  "comments_url": "https://api.github.com/repos/kody-w/RAPP/commits/0364a97c0498663b83945a039d7ac0786e6f6aeb/comments",
-  "commit": {
-   "author": {
-    "date": "2026-07-17T12:18:27Z",
-    "email": "rappter2@icloud.com",
-    "name": "rappter2-ux"
-   },
-   "comment_count": 0,
-   "committer": {
-    "date": "2026-07-17T12:18:27Z",
-    "email": "rappter2@icloud.com",
-    "name": "rappter2-ux"
-   },
-   "message": "test: assert final closure terminal states\n\nRemove resolved pages/Cave ownership exclusions and pin the exact pre-acceptance landing page, fail-closed installer agent, and retired non-streamable Cave indexes from main.\n\nCo-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>",
-   "tree": {
-    "sha": "cd404d96429662a6ab0db984a220dbe2164275f0",
-    "url": "https://api.github.com/repos/kody-w/RAPP/git/trees/cd404d96429662a6ab0db984a220dbe2164275f0"
-   },
-   "url": "https://api.github.com/repos/kody-w/RAPP/git/commits/0364a97c0498663b83945a039d7ac0786e6f6aeb",
-   "verification": {
-    "payload": null,
-    "reason": "unsigned",
-    "signature": null,
-    "verified": false,
-    "verified_at": null
-   }
-  },
-  "committer": {
-   "avatar_url": "https://avatars.githubusercontent.com/u/267697307?v=4",
-   "events_url": "https://api.github.com/users/rappter2-ux/events{/privacy}",
-   "followers_url": "https://api.github.com/users/rappter2-ux/followers",
-   "following_url": "https://api.github.com/users/rappter2-ux/following{/other_user}",
-   "gists_url": "https://api.github.com/users/rappter2-ux/gists{/gist_id}",
-   "gravatar_id": "",
-   "html_url": "https://github.com/rappter2-ux",
-   "id": 267697307,
-   "login": "rappter2-ux",
-   "node_id": "U_kgDOD_S8mw",
-   "organizations_url": "https://api.github.com/users/rappter2-ux/orgs",
-   "received_events_url": "https://api.github.com/users/rappter2-ux/received_events",
-   "repos_url": "https://api.github.com/users/rappter2-ux/repos",
-   "site_admin": false,
-   "starred_url": "https://api.github.com/users/rappter2-ux/starred{/owner}{/repo}",
-   "subscriptions_url": "https://api.github.com/users/rappter2-ux/subscriptions",
-   "type": "User",
-   "url": "https://api.github.com/users/rappter2-ux",
-   "user_view_type": "public"
-  },
-  "html_url": "https://github.com/kody-w/RAPP/commit/0364a97c0498663b83945a039d7ac0786e6f6aeb",
-  "node_id": "C_kwDOQbq5VtoAKDAzNjRhOTdjMDQ5ODY2M2I4Mzk0NWEwMzlkN2FjMDc4NmU2ZjZhZWI",
-  "parents": [
-   {
-    "html_url": "https://github.com/kody-w/RAPP/commit/fe5d3ca1d1433240cdc1301aac03730f6f851026",
-    "sha": "fe5d3ca1d1433240cdc1301aac03730f6f851026",
-    "url": "https://api.github.com/repos/kody-w/RAPP/commits/fe5d3ca1d1433240cdc1301aac03730f6f851026"
-   }
-  ],
-  "sha": "0364a97c0498663b83945a039d7ac0786e6f6aeb",
-  "url": "https://api.github.com/repos/kody-w/RAPP/commits/0364a97c0498663b83945a039d7ac0786e6f6aeb"
- },
- {
-  "author": {
-   "avatar_url": "https://avatars.githubusercontent.com/u/267697307?v=4",
-   "events_url": "https://api.github.com/users/rappter2-ux/events{/privacy}",
-   "followers_url": "https://api.github.com/users/rappter2-ux/followers",
-   "following_url": "https://api.github.com/users/rappter2-ux/following{/other_user}",
-   "gists_url": "https://api.github.com/users/rappter2-ux/gists{/gist_id}",
-   "gravatar_id": "",
-   "html_url": "https://github.com/rappter2-ux",
-   "id": 267697307,
-   "login": "rappter2-ux",
-   "node_id": "U_kgDOD_S8mw",
-   "organizations_url": "https://api.github.com/users/rappter2-ux/orgs",
-   "received_events_url": "https://api.github.com/users/rappter2-ux/received_events",
-   "repos_url": "https://api.github.com/users/rappter2-ux/repos",
-   "site_admin": false,
-   "starred_url": "https://api.github.com/users/rappter2-ux/starred{/owner}{/repo}",
-   "subscriptions_url": "https://api.github.com/users/rappter2-ux/subscriptions",
-   "type": "User",
-   "url": "https://api.github.com/users/rappter2-ux",
-   "user_view_type": "public"
-  },
-  "comments_url": "https://api.github.com/repos/kody-w/RAPP/commits/fe5d3ca1d1433240cdc1301aac03730f6f851026/comments",
-  "commit": {
-   "author": {
-    "date": "2026-07-17T12:04:06Z",
-    "email": "rappter2@icloud.com",
-    "name": "rappter2-ux"
-   },
-   "comment_count": 0,
-   "committer": {
-    "date": "2026-07-17T12:15:32Z",
-    "email": "rappter2@icloud.com",
-    "name": "rappter2-ux"
-   },
-   "message": "docs: reconcile integrated containment ledger\n\nPreserve code/distribution-owned bytes, classify the integrated planting tombstones as contained, and distinguish the dated 691-row report from the 694-path rebased tree.\n\nCo-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>",
-   "tree": {
-    "sha": "d4e71d606c4254476e2edb966d07b98338fc6cf1",
-    "url": "https://api.github.com/repos/kody-w/RAPP/git/trees/d4e71d606c4254476e2edb966d07b98338fc6cf1"
-   },
-   "url": "https://api.github.com/repos/kody-w/RAPP/git/commits/fe5d3ca1d1433240cdc1301aac03730f6f851026",
-   "verification": {
-    "payload": null,
-    "reason": "unsigned",
-    "signature": null,
-    "verified": false,
-    "verified_at": null
-   }
-  },
-  "committer": {
-   "avatar_url": "https://avatars.githubusercontent.com/u/267697307?v=4",
-   "events_url": "https://api.github.com/users/rappter2-ux/events{/privacy}",
-   "followers_url": "https://api.github.com/users/rappter2-ux/followers",
-   "following_url": "https://api.github.com/users/rappter2-ux/following{/other_user}",
-   "gists_url": "https://api.github.com/users/rappter2-ux/gists{/gist_id}",
-   "gravatar_id": "",
-   "html_url": "https://github.com/rappter2-ux",
-   "id": 267697307,
-   "login": "rappter2-ux",
-   "node_id": "U_kgDOD_S8mw",
-   "organizations_url": "https://api.github.com/users/rappter2-ux/orgs",
-   "received_events_url": "https://api.github.com/users/rappter2-ux/received_events",
-   "repos_url": "https://api.github.com/users/rappter2-ux/repos",
-   "site_admin": false,
-   "starred_url": "https://api.github.com/users/rappter2-ux/starred{/owner}{/repo}",
-   "subscriptions_url": "https://api.github.com/users/rappter2-ux/subscriptions",
-   "type": "User",
-   "url": "https://api.github.com/users/rappter2-ux",
-   "user_view_type": "public"
-  },
-  "html_url": "https://github.com/kody-w/RAPP/commit/fe5d3ca1d1433240cdc1301aac03730f6f851026",
-  "node_id": "C_kwDOQbq5VtoAKGZlNWQzY2ExZDE0MzMyNDBjZGMxMzAxYWFjMDM3MzBmNmY4NTEwMjY",
-  "parents": [
-   {
-    "html_url": "https://github.com/kody-w/RAPP/commit/f49a0b4c1661775e5e3eb190ccaf53af28b76f68",
-    "sha": "f49a0b4c1661775e5e3eb190ccaf53af28b76f68",
-    "url": "https://api.github.com/repos/kody-w/RAPP/commits/f49a0b4c1661775e5e3eb190ccaf53af28b76f68"
-   }
-  ],
-  "sha": "fe5d3ca1d1433240cdc1301aac03730f6f851026",
-  "url": "https://api.github.com/repos/kody-w/RAPP/commits/fe5d3ca1d1433240cdc1301aac03730f6f851026"
- },
- {
-  "author": {
-   "avatar_url": "https://avatars.githubusercontent.com/u/267697307?v=4",
-   "events_url": "https://api.github.com/users/rappter2-ux/events{/privacy}",
-   "followers_url": "https://api.github.com/users/rappter2-ux/followers",
-   "following_url": "https://api.github.com/users/rappter2-ux/following{/other_user}",
-   "gists_url": "https://api.github.com/users/rappter2-ux/gists{/gist_id}",
-   "gravatar_id": "",
-   "html_url": "https://github.com/rappter2-ux",
-   "id": 267697307,
-   "login": "rappter2-ux",
-   "node_id": "U_kgDOD_S8mw",
-   "organizations_url": "https://api.github.com/users/rappter2-ux/orgs",
-   "received_events_url": "https://api.github.com/users/rappter2-ux/received_events",
-   "repos_url": "https://api.github.com/users/rappter2-ux/repos",
-   "site_admin": false,
-   "starred_url": "https://api.github.com/users/rappter2-ux/starred{/owner}{/repo}",
-   "subscriptions_url": "https://api.github.com/users/rappter2-ux/subscriptions",
-   "type": "User",
-   "url": "https://api.github.com/users/rappter2-ux",
-   "user_view_type": "public"
-  },
-  "comments_url": "https://api.github.com/repos/kody-w/RAPP/commits/f49a0b4c1661775e5e3eb190ccaf53af28b76f68/comments",
-  "commit": {
-   "author": {
-    "date": "2026-07-17T11:50:02Z",
-    "email": "rappter2@icloud.com",
-    "name": "rappter2-ux"
-   },
-   "comment_count": 0,
-   "committer": {
-    "date": "2026-07-17T12:15:32Z",
-    "email": "rappter2@icloud.com",
-    "name": "rappter2-ux"
-   },
-   "message": "docs: preserve code-owned swarm tombstone\n\nLeave the retired swarm README to the post-code containment owner and record that boundary explicitly in the documentation ledger.\n\nCo-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>",
-   "tree": {
-    "sha": "4983bfe26ba2bfbb2985d6f17bd11b17f1689027",
-    "url": "https://api.github.com/repos/kody-w/RAPP/git/trees/4983bfe26ba2bfbb2985d6f17bd11b17f1689027"
-   },
-   "url": "https://api.github.com/repos/kody-w/RAPP/git/commits/f49a0b4c1661775e5e3eb190ccaf53af28b76f68",
-   "verification": {
-    "payload": null,
-    "reason": "unsigned",
-    "signature": null,
-    "verified": false,
-    "verified_at": null
-   }
-  },
-  "committer": {
-   "avatar_url": "https://avatars.githubusercontent.com/u/267697307?v=4",
-   "events_url": "https://api.github.com/users/rappter2-ux/events{/privacy}",
-   "followers_url": "https://api.github.com/users/rappter2-ux/followers",
-   "following_url": "https://api.github.com/users/rappter2-ux/following{/other_user}",
-   "gists_url": "https://api.github.com/users/rappter2-ux/gists{/gist_id}",
-   "gravatar_id": "",
-   "html_url": "https://github.com/rappter2-ux",
-   "id": 267697307,
-   "login": "rappter2-ux",
-   "node_id": "U_kgDOD_S8mw",
-   "organizations_url": "https://api.github.com/users/rappter2-ux/orgs",
-   "received_events_url": "https://api.github.com/users/rappter2-ux/received_events",
-   "repos_url": "https://api.github.com/users/rappter2-ux/repos",
-   "site_admin": false,
-   "starred_url": "https://api.github.com/users/rappter2-ux/starred{/owner}{/repo}",
-   "subscriptions_url": "https://api.github.com/users/rappter2-ux/subscriptions",
-   "type": "User",
-   "url": "https://api.github.com/users/rappter2-ux",
-   "user_view_type": "public"
-  },
-  "html_url": "https://github.com/kody-w/RAPP/commit/f49a0b4c1661775e5e3eb190ccaf53af28b76f68",
-  "node_id": "C_kwDOQbq5VtoAKGY0OWEwYjRjMTY2MTc3NWU1ZTNlYjE5MGNjYWY1M2FmMjhiNzZmNjg",
-  "parents": [
-   {
-    "html_url": "https://github.com/kody-w/RAPP/commit/875386352144e4cbf7ebed087bb8e3b74e203af5",
-    "sha": "875386352144e4cbf7ebed087bb8e3b74e203af5",
-    "url": "https://api.github.com/repos/kody-w/RAPP/commits/875386352144e4cbf7ebed087bb8e3b74e203af5"
-   }
-  ],
-  "sha": "f49a0b4c1661775e5e3eb190ccaf53af28b76f68",
-  "url": "https://api.github.com/repos/kody-w/RAPP/commits/f49a0b4c1661775e5e3eb190ccaf53af28b76f68"
- },
- {
-  "author": {
-   "avatar_url": "https://avatars.githubusercontent.com/u/267697307?v=4",
-   "events_url": "https://api.github.com/users/rappter2-ux/events{/privacy}",
-   "followers_url": "https://api.github.com/users/rappter2-ux/followers",
-   "following_url": "https://api.github.com/users/rappter2-ux/following{/other_user}",
-   "gists_url": "https://api.github.com/users/rappter2-ux/gists{/gist_id}",
-   "gravatar_id": "",
-   "html_url": "https://github.com/rappter2-ux",
-   "id": 267697307,
-   "login": "rappter2-ux",
-   "node_id": "U_kgDOD_S8mw",
-   "organizations_url": "https://api.github.com/users/rappter2-ux/orgs",
-   "received_events_url": "https://api.github.com/users/rappter2-ux/received_events",
-   "repos_url": "https://api.github.com/users/rappter2-ux/repos",
-   "site_admin": false,
-   "starred_url": "https://api.github.com/users/rappter2-ux/starred{/owner}{/repo}",
-   "subscriptions_url": "https://api.github.com/users/rappter2-ux/subscriptions",
-   "type": "User",
-   "url": "https://api.github.com/users/rappter2-ux",
-   "user_view_type": "public"
-  },
-  "comments_url": "https://api.github.com/repos/kody-w/RAPP/commits/875386352144e4cbf7ebed087bb8e3b74e203af5/comments",
-  "commit": {
-   "author": {
-    "date": "2026-07-17T11:47:56Z",
-    "email": "rappter2@icloud.com",
-    "name": "rappter2-ux"
-   },
-   "comment_count": 0,
-   "committer": {
-    "date": "2026-07-17T12:15:32Z",
-    "email": "rappter2@icloud.com",
-    "name": "rappter2-ux"
-   },
-   "message": "test: preserve baseline canon scope\n\nRetain the exact 45-path canon declaration set as bounded baseline provenance while keeping fabricated POST-CANON IDs out of the final ledger.\n\nCo-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>",
-   "tree": {
-    "sha": "38c7ed1a889107ce3d6a46b16b0ac6c5765a3ab2",
-    "url": "https://api.github.com/repos/kody-w/RAPP/git/trees/38c7ed1a889107ce3d6a46b16b0ac6c5765a3ab2"
-   },
-   "url": "https://api.github.com/repos/kody-w/RAPP/git/commits/875386352144e4cbf7ebed087bb8e3b74e203af5",
-   "verification": {
-    "payload": null,
-    "reason": "unsigned",
-    "signature": null,
-    "verified": false,
-    "verified_at": null
-   }
-  },
-  "committer": {
-   "avatar_url": "https://avatars.githubusercontent.com/u/267697307?v=4",
-   "events_url": "https://api.github.com/users/rappter2-ux/events{/privacy}",
-   "followers_url": "https://api.github.com/users/rappter2-ux/followers",
-   "following_url": "https://api.github.com/users/rappter2-ux/following{/other_user}",
-   "gists_url": "https://api.github.com/users/rappter2-ux/gists{/gist_id}",
-   "gravatar_id": "",
-   "html_url": "https://github.com/rappter2-ux",
-   "id": 267697307,
-   "login": "rappter2-ux",
-   "node_id": "U_kgDOD_S8mw",
-   "organizations_url": "https://api.github.com/users/rappter2-ux/orgs",
-   "received_events_url": "https://api.github.com/users/rappter2-ux/received_events",
-   "repos_url": "https://api.github.com/users/rappter2-ux/repos",
-   "site_admin": false,
-   "starred_url": "https://api.github.com/users/rappter2-ux/starred{/owner}{/repo}",
-   "subscriptions_url": "https://api.github.com/users/rappter2-ux/subscriptions",
-   "type": "User",
-   "url": "https://api.github.com/users/rappter2-ux",
-   "user_view_type": "public"
-  },
-  "html_url": "https://github.com/kody-w/RAPP/commit/875386352144e4cbf7ebed087bb8e3b74e203af5",
-  "node_id": "C_kwDOQbq5VtoAKDg3NTM4NjM1MjE0NGU0Y2JmN2ViZWQwODdiYjhlM2I3NGUyMDNhZjU",
-  "parents": [
-   {
-    "html_url": "https://github.com/kody-w/RAPP/commit/57c1720394b133e9aab5beefa8f90d9e9be16c8a",
-    "sha": "57c1720394b133e9aab5beefa8f90d9e9be16c8a",
-    "url": "https://api.github.com/repos/kody-w/RAPP/commits/57c1720394b133e9aab5beefa8f90d9e9be16c8a"
-   }
-  ],
-  "sha": "875386352144e4cbf7ebed087bb8e3b74e203af5",
-  "url": "https://api.github.com/repos/kody-w/RAPP/commits/875386352144e4cbf7ebed087bb8e3b74e203af5"
- },
- {
-  "author": {
-   "avatar_url": "https://avatars.githubusercontent.com/u/267697307?v=4",
-   "events_url": "https://api.github.com/users/rappter2-ux/events{/privacy}",
-   "followers_url": "https://api.github.com/users/rappter2-ux/followers",
-   "following_url": "https://api.github.com/users/rappter2-ux/following{/other_user}",
-   "gists_url": "https://api.github.com/users/rappter2-ux/gists{/gist_id}",
-   "gravatar_id": "",
-   "html_url": "https://github.com/rappter2-ux",
-   "id": 267697307,
-   "login": "rappter2-ux",
-   "node_id": "U_kgDOD_S8mw",
-   "organizations_url": "https://api.github.com/users/rappter2-ux/orgs",
-   "received_events_url": "https://api.github.com/users/rappter2-ux/received_events",
-   "repos_url": "https://api.github.com/users/rappter2-ux/repos",
-   "site_admin": false,
-   "starred_url": "https://api.github.com/users/rappter2-ux/starred{/owner}{/repo}",
-   "subscriptions_url": "https://api.github.com/users/rappter2-ux/subscriptions",
-   "type": "User",
-   "url": "https://api.github.com/users/rappter2-ux",
-   "user_view_type": "public"
-  },
-  "comments_url": "https://api.github.com/repos/kody-w/RAPP/commits/57c1720394b133e9aab5beefa8f90d9e9be16c8a/comments",
-  "commit": {
-   "author": {
-    "date": "2026-07-17T11:46:14Z",
-    "email": "rappter2@icloud.com",
-    "name": "rappter2-ux"
-   },
-   "comment_count": 0,
-   "committer": {
-    "date": "2026-07-17T12:15:32Z",
-    "email": "rappter2@icloud.com",
-    "name": "rappter2-ux"
-   },
-   "message": "test: pin canon audit provenance\n\nFail closed on the exact baseline canon-report digest alongside the final post-ledger evidence.\n\nCo-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>",
-   "tree": {
-    "sha": "0597475c102d63e66283ee07c6831bf0f2ab00cd",
-    "url": "https://api.github.com/repos/kody-w/RAPP/git/trees/0597475c102d63e66283ee07c6831bf0f2ab00cd"
-   },
-   "url": "https://api.github.com/repos/kody-w/RAPP/git/commits/57c1720394b133e9aab5beefa8f90d9e9be16c8a",
-   "verification": {
-    "payload": null,
-    "reason": "unsigned",
-    "signature": null,
-    "verified": false,
-    "verified_at": null
-   }
-  },
-  "committer": {
-   "avatar_url": "https://avatars.githubusercontent.com/u/267697307?v=4",
-   "events_url": "https://api.github.com/users/rappter2-ux/events{/privacy}",
-   "followers_url": "https://api.github.com/users/rappter2-ux/followers",
-   "following_url": "https://api.github.com/users/rappter2-ux/following{/other_user}",
-   "gists_url": "https://api.github.com/users/rappter2-ux/gists{/gist_id}",
-   "gravatar_id": "",
-   "html_url": "https://github.com/rappter2-ux",
-   "id": 267697307,
-   "login": "rappter2-ux",
-   "node_id": "U_kgDOD_S8mw",
-   "organizations_url": "https://api.github.com/users/rappter2-ux/orgs",
-   "received_events_url": "https://api.github.com/users/rappter2-ux/received_events",
-   "repos_url": "https://api.github.com/users/rappter2-ux/repos",
-   "site_admin": false,
-   "starred_url": "https://api.github.com/users/rappter2-ux/starred{/owner}{/repo}",
-   "subscriptions_url": "https://api.github.com/users/rappter2-ux/subscriptions",
-   "type": "User",
-   "url": "https://api.github.com/users/rappter2-ux",
-   "user_view_type": "public"
-  },
-  "html_url": "https://github.com/kody-w/RAPP/commit/57c1720394b133e9aab5beefa8f90d9e9be16c8a",
-  "node_id": "C_kwDOQbq5VtoAKDU3YzE3MjAzOTRiMTMzZTlhYWI1YmVlZmE4ZjkwZDllOWJlMTZjOGE",
-  "parents": [
-   {
-    "html_url": "https://github.com/kody-w/RAPP/commit/4c3183effb8d74a03bd780ed3f8428970781493e",
-    "sha": "4c3183effb8d74a03bd780ed3f8428970781493e",
-    "url": "https://api.github.com/repos/kody-w/RAPP/commits/4c3183effb8d74a03bd780ed3f8428970781493e"
-   }
-  ],
-  "sha": "57c1720394b133e9aab5beefa8f90d9e9be16c8a",
-  "url": "https://api.github.com/repos/kody-w/RAPP/commits/57c1720394b133e9aab5beefa8f90d9e9be16c8a"
  }
 ]
