@@ -98,7 +98,7 @@
  "releases_url": "https://api.github.com/repos/kody-w/RAPP/releases{/id}",
  "size": 14487,
  "ssh_url": "git@github.com:kody-w/RAPP.git",
- "stargazers_count": 0,
+ "stargazers_count": 1,
  "stargazers_url": "https://api.github.com/repos/kody-w/RAPP/stargazers",
  "statuses_url": "https://api.github.com/repos/kody-w/RAPP/statuses/{sha}",
  "subscribers_count": 0,
@@ -110,10 +110,10 @@
  "temp_clone_token": "",
  "topics": [],
  "trees_url": "https://api.github.com/repos/kody-w/RAPP/git/trees{/sha}",
- "updated_at": "2026-10-20T19:40:35Z",
+ "updated_at": "2026-10-22T15:55:40Z",
  "url": "https://api.github.com/repos/kody-w/RAPP",
  "visibility": "public",
- "watchers": 0,
- "watchers_count": 0,
+ "watchers": 1,
+ "watchers_count": 1,
  "web_commit_signoff_required": false
 }
